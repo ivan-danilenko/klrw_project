@@ -1,0 +1,14 @@
+{
+    "python.formatting.provider": "black",
+    "jupyter.kernels.excludePythonEnvironments": [
+        "/usr/local/bin/python3",
+        "/private/var/tmp/sage-10.0-current/local/var/lib/sage/venv-python3.11.1/bin/python3",
+        "/usr/bin/python3"
+    ],
+    "flake8.args": [
+        "--max-line-length", "88",
+        "--extend-ignore", "E203",
+    ],
+    "python.analysis.typeCheckingMode": "off",
+}
+
