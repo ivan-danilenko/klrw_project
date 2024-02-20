@@ -63,8 +63,12 @@ class KLRWbraid(ElementWrapper):
     def find_intersection(self, i, j, right_state=True):
         raise NotImplementedError()
 
-    #    def drop_right_intersection(self):
-    #         raise NotImplementedError()
+    def find_position_on_other_side(
+        self, index: int, reverse: bool = False
+    ):
+        return self.parent().find_position_on_other_side(
+            index=index, word=self.word(), reverse=reverse
+        )
 
     def add_right_intersection(self, i):
         raise NotImplementedError()
@@ -303,6 +307,9 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
     """
 
     def _element_constructor_(self, state, word=()):
+        if self._check:
+            assert isinstance(state, KLRWstate)
+            assert isinstance(word, tuple)
         return self.element_class(self, state, word)
 
     def __init__(
@@ -318,6 +325,7 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
         else:
             self.Element = KLRWbraid_state_on_left
         self.KLRWstate_set = KLRWstate_set(framed_quiver)
+        self._check = False
 
     def enable_checks(self):
         self.KLRWstate_set.enable_checks()
@@ -359,12 +367,6 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
                 index -= 1
         return index
 
-    #    def braid_set_with_smaller_dimensions(self, decrements : dict):
-    #        new_dimensions = self.KLRWstate_set.dimensions(copy = True)
-    #        for node,dim in decrements:
-    #            new_dimensions[node] -= dim
-    #        return self.__init__(new_quiver)
-
     def _braids_with_left_state_iter_(self, state):
         length = len(state)
         if length <= 1:
@@ -395,6 +397,91 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
     def __iter__(self):
         for state in self.KLRWstate_set:
             yield from self._braids_with_left_state_iter_(state)
+
+    def total_number_of_strands(self):
+        return self.KLRWstate_set.total_number_of_strands()
+
+    def braid_for_one_strand(
+        self,
+        right_state: KLRWstate,
+        right_moving_strand_position: int,
+        left_moving_strand_position: int,
+        check=False,
+    ) -> KLRWbraid:
+        """
+        Returns a KLRW braid with given right state
+        where the only one strand moves from
+        the position prescribed in
+        left_moving_strand_position on the lest to
+        right_moving_strand_position on the right.
+
+        Works faster than the function for more general number of strands
+        """
+        if check:
+            assert right_moving_strand_position < len(right_state), "Index out of range"
+            assert left_moving_strand_position < len(right_state), "Index out of range"
+            assert not right_state[
+                right_moving_strand_position
+            ].is_framing(), "Framing nodes can't move"
+
+        if right_moving_strand_position >= left_moving_strand_position:
+            word = tuple(
+                range(left_moving_strand_position, right_moving_strand_position)
+            )
+        else:
+            word = tuple(
+                range(
+                    left_moving_strand_position - 1,
+                    right_moving_strand_position - 1,
+                    -1,
+                )
+            )
+
+        return self._element_constructor_(state=right_state, word=word)
+
+    def braid_by_extending_permutation(
+        self,
+        right_state: KLRWstate,
+        mapping: dict,
+        check=False,
+    ) -> KLRWbraid:
+        """
+        Returns a braid given by a permutation of (a part of) moving strands,
+        the rest of strands are not intersecting.
+        """
+
+        N = max(max(mapping.values()), max(mapping.keys()))
+
+        if check:
+            assert N >= self.total_total_number_of_strands()
+
+        right_not_moving_strands = [
+            x for x in range(N + 1) if x not in mapping.values()
+        ]
+        left_not_moving_strands = [x for x in range(N + 1) if x not in mapping.keys()]
+
+        # define permutation on the not moving part
+        permutation = {
+            b: t for b, t in zip(left_not_moving_strands, right_not_moving_strands)
+        }
+
+        # define permutation on the moving set
+        for b, t in mapping.items():
+            permutation[b] = t
+
+        # make reduced word by finding elements of the Lehmer cocode
+        rw = []
+        for left_index in range(N + 1):
+            right_index = permutation[left_index]
+            # cocode for a strand indicates how many strands
+            # moved through it from left to right
+            cocode_element = sum(
+                1 for i in range(left_index) if permutation[i] > right_index
+            )
+            piece = [j for j in range(left_index, left_index - cocode_element, -1)]
+            rw += piece
+
+        return self._element_constructor_(state=right_state, word=tuple(rw))
 
     # TODO: rewrite
     def check_minimality(self):

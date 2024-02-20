@@ -7,5 +7,6 @@ __all__ = [
     "klrw_state",
     "klrw_tests",
     "perfect_complex",
+    "solver",
     "stable_envelopes",
 ]

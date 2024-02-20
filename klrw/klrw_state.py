@@ -96,6 +96,9 @@ class KLRWstate_set(UniqueRepresentation, Set_generic):
                     raise ValueError("Node dimensions must be integers.")
                 assert dim >= 0, "Node dimensions must be non-negative."
 
+    def total_number_of_strands(self):
+        return self._total_number_of_strands
+
     def __iter__(self):
         assert hasattr(self, "_dimensions"), "Dimensions have to be defined"
         lowest_state = []

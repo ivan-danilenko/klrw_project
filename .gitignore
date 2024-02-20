@@ -1,0 +1,18 @@
+# OS generated files #
+######################
+.DS_Store?
+*.DS_Store
+  
+# Generated files
+build/
+*.so
+*.pyd
+
+# Cythonized files
+*.c
+
+# ipynb checkpoints
+# .ipynb_checkpoints/
+
+# explicitly local files
+*_local*

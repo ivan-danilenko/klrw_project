@@ -233,7 +233,6 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         base_R,
         quiver: FramedDynkinDiagram_with_dimensions,
         warnings=False,
-        downstairs=False,
         **prefixes
     ):
         """
@@ -243,16 +242,10 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         """
         self.warnings = warnings
         self.quiver = deepcopy(quiver)  # .copy()
-        self.KLRWBraid = KLRWbraid_set(quiver, state_on_right=True)
-        # if downstairs:
-        # too slow.
-        # Do operations upstairs and return the reduced elements?
-        #    dots_algebra = KLRWDownstairsDotsAlgebra(base_R, quiver)
-        # else:
-        dots_algebra = KLRWUpstairsDotsAlgebra(base_R, quiver, **prefixes)
+        self.KLRWBraid = KLRWbraid_set(self.quiver, state_on_right=True)
+        dots_algebra = KLRWUpstairsDotsAlgebra(base_R, self.quiver, **prefixes)
         category = FiniteDimensionalAlgebrasWithBasis(dots_algebra)
         super().__init__(R=dots_algebra, element_class=KLRWElement, category=category)
-        # can add element_class=KLRWElement as a parameter
 
     def __getitem__(self, key: slice):
         """
@@ -378,6 +371,9 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
 
     def braid_set(self):
         return self.KLRWBraid
+
+    def braid(self, state, word):
+        return self.braid_set()._element_constructor_(state, word)
 
     def state_set(self):
         return self.braid_set().KLRWstate_set

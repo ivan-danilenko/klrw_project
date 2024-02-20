@@ -1,6 +1,8 @@
-from typing import NamedTuple
+from typing import NamedTuple, Self
 from collections import defaultdict
 from dataclasses import dataclass
+from types import MappingProxyType
+
 from sage.combinat.root_system.dynkin_diagram import DynkinDiagram_class
 from sage.combinat.root_system.cartan_type import CartanType_abstract
 from sage.structure.unique_representation import UniqueRepresentation
@@ -513,3 +515,26 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
                     raise ValueError("The dots are not homogeneous!")
 
         return degree
+
+    def hom_from_dots_map(self, codomain: Self, map: MappingProxyType):
+        variables_images = [
+            codomain.variables[map[index]].monomial
+            if index in map
+            else codomain.variables[index].monomial
+            for index in self.variables
+            if self.variables[index].name is not None
+        ]
+
+        return self.hom(variables_images, codomain)
+
+    @cached_method
+    def hom_ignore_non_dots(self):
+        variables_images = [
+            self.variables[index].monomial
+            if is_a_dot_index(index)
+            else self.one()
+            for index in self.variables
+            if self.variables[index].name is not None
+        ]
+
+        return self.hom(variables_images, self)

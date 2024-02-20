@@ -4,9 +4,13 @@ from Cython.Build import cythonize
 import numpy
 
 extensions = [
-    Extension("Solver", ["Solver.pyx"], include_dirs=[numpy.get_include()]),
+    Extension(
+        "solver",
+        ["solver.pyx"],
+        include_dirs=[numpy.get_include()]
+    ),
 ]
 setup(
-    name="Solver",
+    name="klrw.solver",
     ext_modules=cythonize(extensions),
 )
