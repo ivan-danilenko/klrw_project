@@ -65,7 +65,7 @@ class CSR_Mat:
         assert tolerance >= 0
         i: cython.int
         for i in range(self.nnz()):
-            for x, coef in self.data[i].monomial_coefficients().items():
+            for x, coef in self.data[i]:
                 if tolerance == 0:
                     if not coef.is_zero():
                         return False
@@ -82,7 +82,7 @@ class CSR_Mat:
         assert tolerance >= 0
         i: cython.int
         for i in range(self.nnz()):
-            for x, coef in self.data[i].monomial_coefficients().items():
+            for x, coef in self.data[i]:
                 if tolerance == 0:
                     if not ideal.reduce(coef).is_zero():
                         return False
@@ -208,7 +208,7 @@ class CSC_Mat:
         assert tolerance >= 0
         i: cython.int
         for i in range(self.nnz()):
-            for x, coef in self.data[i].monomial_coefficients().items():
+            for x, coef in self.data[i]:
                 if tolerance == 0:
                     if not coef.is_zero():
                         return False
@@ -225,7 +225,7 @@ class CSC_Mat:
         assert tolerance >= 0
         i: cython.int
         for i in range(self.nnz()):
-            for x, coef in self.data[i].monomial_coefficients().items():
+            for x, coef in self.data[i]:
                 if tolerance == 0:
                     if not ideal.reduce(coef).is_zero():
                         return False
@@ -279,7 +279,7 @@ class CSC_Mat:
                         if not dot_product.is_zero():
                             return False
                     else:
-                        for coef in dot_product.monomial_coefficients().values():
+                        for _, coef in dot_product:
                             if mod_ideal.reduce(coef) != 0:
                                 return False
 
@@ -520,10 +520,7 @@ class Solver:
                             if n == -1:
                                 print("+")
                             KLRW_element = multiplier * d0_element * d1_elem
-                            for (
-                                basis_vector,
-                                coef,
-                            ) in KLRW_element.monomial_coefficients().items():
+                            for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
                                     if condition(exp, self.h_position, self.u_position, order):
                                         if (exp, basis_vector) in ij_dict:
@@ -564,10 +561,7 @@ class Solver:
                             if n == -1:
                                 print("+")
                             KLRW_element = multiplier * d1_elements[n] * d0_element
-                            for (
-                                basis_vector,
-                                coef,
-                            ) in KLRW_element.monomial_coefficients().items():
+                            for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
                                     if condition(exp, self.h_position, self.u_position, order):
                                         if (exp, basis_vector) in ij_dict:
@@ -604,10 +598,7 @@ class Solver:
                             # d0_element2 = d0_csc.data[indptr2]
                             d0_element2 = self.d0_csc.data[indptr2]
                             KLRW_element = d0_element1 * d0_element2
-                            for (
-                                basis_vector,
-                                coef,
-                            ) in KLRW_element._monomial_coefficients.items():
+                            for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
                                     if condition(exp, self.h_position, self.u_position, order):
                                         # here we keep only (exp,basis_vector)
