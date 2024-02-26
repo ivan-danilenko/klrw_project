@@ -12,7 +12,8 @@ from sage.combinat.root_system.cartan_type import CartanType
 
 from .klrw_algebra import KLRWAlgebra
 from .framed_dynkin import FramedDynkinDiagram_with_dimensions
-from .solver import CSC_Mat, Solver
+from .cython_exts.solver import Solver
+from .cython_exts.sparse_csc import CSC_Mat
 
 
 class TThimble:
@@ -679,6 +680,10 @@ class CombinatorialEBrane:
             else:
                 points_by_hom_degree[hom_deg] = [(index, thimble)]
 
+        print("Homological degrees:", len(points_by_hom_degree))
+        for d, l in points_by_hom_degree.items():
+            print(d, " : ", len(l))
+
         d1_dict = {}
         variable_index = 0
         for hom_deg in sorted(points_by_hom_degree.keys()):
@@ -686,6 +691,8 @@ class CombinatorialEBrane:
             if hom_deg + 1 in points_by_hom_degree:
                 thimbles_of_hom_deg = points_by_hom_degree[hom_deg]
                 thimbles_of_hom_deg_plus_one = points_by_hom_degree[hom_deg + 1]
+
+                variables_of_degree = 0
 
                 for index0, thimble0 in thimbles_of_hom_deg:
                     for index1, thimble1 in thimbles_of_hom_deg_plus_one:
@@ -718,9 +725,7 @@ class CombinatorialEBrane:
                                 for dots_exp, _ in only_dots_poly.iterator_exp_coeff():
                                     existing_term = self.klrw_algebra[k].term(
                                         index=braid,
-                                        coeff=self.klrw_algebra[k]
-                                        .base()
-                                        .monomial(*dots_exp),
+                                        coeff=dots_algebra.monomial(*dots_exp),
                                     )
                                     try:
                                         basis.remove(existing_term)
@@ -728,11 +733,14 @@ class CombinatorialEBrane:
                                         pass  # we ignore if the term is not found
 
                         if basis:
+
                             # only if we have new elements
                             d1_dict[index0, index1] = {}
                             for elem in basis:
                                 d1_dict[index0, index1][variable_index] = elem
                                 variable_index += 1
+                                variables_of_degree += 1
+                print(hom_deg, "::", variables_of_degree)
 
         # TODO: make a function "from dict" for csc matrices
         number_of_columns = len(thimbles)

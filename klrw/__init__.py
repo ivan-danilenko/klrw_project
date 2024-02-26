@@ -1,5 +1,6 @@
 __all__ = [
     "bimodule_monoid",
+    "cython_exts",
     "framed_dynkin",
     "klrw_algebra",
     "klrw_braid",
@@ -7,6 +8,5 @@ __all__ = [
     "klrw_state",
     "klrw_tests",
     "perfect_complex",
-    "solver",
     "stable_envelopes",
 ]

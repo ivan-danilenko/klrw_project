@@ -1,364 +1,20 @@
 import cython
-
+cimport numpy as np
 import numpy as np
 
-cimport numpy as np
+# from sys import intern
+
 from scipy.sparse import csr_matrix, csc_matrix, spmatrix
 from scipy.sparse.linalg import cg
 
 from sage.rings.polynomial.polydict import ETuple
 from sage.rings.integer_ring import ZZ
 
-from .klrw_algebra import KLRWAlgebra, KLRWElement
+from klrw.klrw_algebra import KLRWAlgebra, KLRWElement
 
-
-# Making our version of CSR matrices, because scipy rejects
-# working with KLRWElement entries
-# Make into structs?
-@cython.cclass
-class CSR_Mat:
-    data: object[::1]
-    indices: cython.int[::1]
-    indptrs: cython.int[::1]
-    number_of_columns: cython.int
-
-    def __init__(self, data, indices, indptrs, number_of_columns):
-        assert len(data) == len(indices)
-        assert indptrs[0] == 0
-        assert indptrs[-1] == len(data)
-        # more checks?
-
-        self.data = data
-        self.indices = indices
-        self.indptrs = indptrs
-        self.number_of_columns = number_of_columns
-
-    def _data(self):
-        return self.data
-
-    def _indices(self):
-        return self.indices
-
-    def _indptrs(self):
-        return self.indptrs
-
-    def _number_of_columns(self):
-        return self.number_of_columns
-
-    @cython.ccall
-    def nnz(self) -> cython.int:
-        return len(self.indices)
-
-    def print_sizes(self):
-        print(
-            len(self.data), len(self.indices), len(self.indptrs), self.number_of_columns
-        )
-
-    def print_indices(self):
-        print(np.asarray(self.indices))
-
-    def print_indptrs(self):
-        print(np.asarray(self.indptrs))
-
-    @cython.ccall
-    def is_zero(self, tolerance: cython.double = 0):
-        assert tolerance >= 0
-        i: cython.int
-        for i in range(self.nnz()):
-            for x, coef in self.data[i]:
-                if tolerance == 0:
-                    if not coef.is_zero():
-                        return False
-                else:
-                    scalar: cython.double
-                    for __, scalar in coef.iterator_exp_coeff():
-                        if scalar > tolerance or scalar < -tolerance:
-                            return False
-
-        return True
-
-    @cython.ccall
-    def is_zero_mod(self, ideal, tolerance: cython.double = 0):
-        assert tolerance >= 0
-        i: cython.int
-        for i in range(self.nnz()):
-            for x, coef in self.data[i]:
-                if tolerance == 0:
-                    if not ideal.reduce(coef).is_zero():
-                        return False
-                else:
-                    scalar: cython.double
-                    for __, scalar in ideal.reduce(coef).iterator_exp_coeff():
-                        if scalar > tolerance or scalar < -tolerance:
-                            return False
-
-        return True
-
-
-# Making our version of CSC matrices, because scipy rejects working with object entries
-@cython.cclass
-class CSC_Mat:
-    data: object[::1]
-    indices: cython.int[::1]
-    indptrs: cython.int[::1]
-    number_of_rows: cython.int
-
-    def __init__(self, data, indices, indptrs, number_of_rows):
-        assert len(data) == len(indices)
-        assert indptrs[0] == 0
-        assert indptrs[-1] == len(data), repr(indptrs[-1]) + " " + repr(len(data))
-        # more checks?
-
-        self.data = data
-        self.indices = indices
-        self.indptrs = indptrs
-        self.number_of_rows = number_of_rows
-
-    def print_sizes(self):
-        print(len(self.data), len(self.indices), len(self.indptrs), self.number_of_rows)
-
-    def print_indices(self):
-        print(np.asarray(self.indices))
-
-    def print_indptrs(self):
-        print(np.asarray(self.indptrs))
-
-    def _data(self):
-        return self.data
-
-    def _indices(self):
-        return self.indices
-
-    def _indptrs(self):
-        return self.indptrs
-
-    def _number_of_rows(self):
-        return self.number_of_rows
-
-    @cython.ccall
-    def nnz(self) -> cython.int:
-        return len(self.indices)
-
-    def as_an_array(self):
-        N: cython.int = self.number_of_rows
-        i: cython.int
-        j: cython.int
-
-        A = np.empty((N, len(self.indptrs) - 1), dtype=np.dtype("O"))
-
-        for i in range(len(self.indptrs) - 1):
-            for j in range(self.indptrs[i], self.indptrs[i + 1]):
-                A[self.indices[j], i] = self.data[j]
-
-        return A
-
-    # TODO: return KLRW.zero() if not present
-    def __getitem__(self, key):
-        """
-        Returns (i,j)-th element if present
-        Returns None is not present
-        """
-        assert len(key) == 2
-        i: cython.int = key[0]
-        j: cython.int = key[1]
-        assert i >= 0
-        assert i <= self.number_of_rows
-        assert j >= 0
-        assert j < len(self.indptrs)
-
-        ind: cython.int = self.indptrs[j]
-        ind_end: cython.int = self.indptrs[j + 1]
-        while ind != ind_end:
-            ii: cython.int = self.indices[ind]
-            if ii < i:
-                ind += 1
-            elif ii == i:
-                return self.data[ind]
-            else:
-                break
-        return None
-
-    @cython.ccall
-    def to_csr(self):  # -> CSR_Mat:
-        # scipy doesn't support matrix multiplication
-        # and conversion to CSR with non-standard coefficients
-        # Nevertheless we can use it to convert from one sparce matrix form to another
-        # Since it's basically resorting indices + some compression.
-        # Scipy will to do it fast
-        M_csc = csc_matrix(
-            (range(1, len(self.indices) + 1), self.indices, self.indptrs),
-            shape=(len(self.indptrs) - 1, self.number_of_rows),
-        )
-        M_csr = M_csc.tocsr()
-        del M_csc
-
-        csr_data: object[::1] = np.empty(len(self.data), dtype=object)
-        i: cython.int
-        entry: cython.int
-        for i in range(self.nnz()):
-            entry = M_csr.data[i]
-            csr_data[i] = self.data[entry - 1]
-        csr_indices: cython.int[::1] = M_csr.indices.astype(dtype=np.dtype("intc"))
-        csr_indptrs: cython.int[::1] = M_csr.indptr.astype(dtype=np.dtype("intc"))
-
-        return CSR_Mat(csr_data, csr_indices, csr_indptrs, len(self.indptrs) - 1)
-
-    @cython.ccall
-    def is_zero(self, tolerance: cython.double = 0):
-        assert tolerance >= 0
-        i: cython.int
-        for i in range(self.nnz()):
-            for x, coef in self.data[i]:
-                if tolerance == 0:
-                    if not coef.is_zero():
-                        return False
-                else:
-                    scalar: cython.double
-                    for __, scalar in coef.iterator_exp_coeff():
-                        if scalar > tolerance or scalar < -tolerance:
-                            return False
-
-        return True
-
-    @cython.ccall
-    def is_zero_mod(self, ideal, tolerance: cython.double = 0):
-        assert tolerance >= 0
-        i: cython.int
-        for i in range(self.nnz()):
-            for x, coef in self.data[i]:
-                if tolerance == 0:
-                    if not ideal.reduce(coef).is_zero():
-                        return False
-                else:
-                    scalar: cython.double
-                    for __, scalar in ideal.reduce(coef).iterator_exp_coeff():
-                        if scalar > tolerance or scalar < -tolerance:
-                            return False
-
-        return True
-
-    def squares_to_zero(self, mod_ideal=None):
-        csr = self.to_csr()
-
-        assert self.number_of_rows == len(self.indptrs) - 1
-        N: cython.int = self.number_of_rows
-
-        i: cython.int
-        j: cython.int
-        indptr1: cython.int
-        indptr2: cython.int
-        indptr1_end: cython.int
-        indptr2_end: cython.int
-
-        entry_can_be_non_zero: cython.bint = False
-
-        for i in range(N):
-            for j in range(N):
-                indptr1 = csr.indptrs[i]
-                indptr2 = self.indptrs[j]
-                indptr1_end = csr.indptrs[i + 1]
-                indptr2_end = self.indptrs[j + 1]
-                while indptr1 != indptr1_end and indptr2 != indptr2_end:
-                    if csr.indices[indptr1] == self.indices[indptr2]:
-                        if not entry_can_be_non_zero:
-                            dot_product: KLRWElement = (
-                                csr.data[indptr1] * self.data[indptr2]
-                            )
-                            entry_can_be_non_zero = True
-                        else:
-                            dot_product += csr.data[indptr1] * self.data[indptr2]
-                        indptr1 += 1
-                        indptr2 += 1
-                    elif csr.indices[indptr1] < self.indices[indptr2]:
-                        indptr1 += 1
-                    else:
-                        indptr2 += 1
-
-                if entry_can_be_non_zero:
-                    if mod_ideal is None:
-                        if not dot_product.is_zero():
-                            return False
-                    else:
-                        for _, coef in dot_product:
-                            if mod_ideal.reduce(coef) != 0:
-                                return False
-
-        # if never seen a non-zero matrix element
-        return True
-
-
-# might give a time increase in speed,
-# but will not give errors and indexing from the tail
-@cython.boundscheck(False)
-@cython.wraparound(False)
-def multiply(
-    M_csr: CSR_Mat,
-    N_csc: CSC_Mat,
-) -> CSR_Mat:
-
-    M_number_of_rows: cython.int = len(M_csr.indptrs) - 1
-    N_number_of_columns: cython.int = len(N_csc.indptrs) - 1
-
-    product_csr_indptrs: cython.int[::1] = np.zeros(
-        M_number_of_rows + 1, dtype=np.dtype("intc")
-    )
-    max_non_zero_entries: cython.int = len(M_csr.indices) * len(N_csc.indices)
-    product_csr_indices: cython.int[::1] = np.zeros(
-        max_non_zero_entries, dtype=np.dtype("intc")
-    )
-    product_csr_data: object[::1] = np.empty(max_non_zero_entries, dtype=object)
-
-    i: cython.int
-    j: cython.int
-    indptr1: cython.int
-    indptr2: cython.int
-    indptr1_end: cython.int
-    indptr2_end: cython.int
-
-    non_zero_entries_so_far: cython.int = 0
-    entry_can_be_non_zero: cython.bint = False
-
-    for i in range(M_number_of_rows):
-        for j in range(N_number_of_columns):
-            indptr1 = M_csr.indptrs[i]
-            indptr2 = N_csc.indptrs[j]
-            indptr1_end = M_csr.indptrs[i + 1]
-            indptr2_end = N_csc.indptrs[j + 1]
-            while indptr1 != indptr1_end and indptr2 != indptr2_end:
-                if M_csr.indices[indptr1] == N_csc.indices[indptr2]:
-                    if not entry_can_be_non_zero:
-                        dot_product = M_csr.data[indptr1] * N_csc.data[indptr2]
-                        entry_can_be_non_zero = True
-                    else:
-                        dot_product += M_csr.data[indptr1] * N_csc.data[indptr2]
-                    indptr1 += 1
-                    indptr2 += 1
-                elif M_csr.indices[indptr1] < N_csc.indices[indptr2]:
-                    indptr1 += 1
-                else:
-                    indptr2 += 1
-
-            if entry_can_be_non_zero:
-                if not dot_product.is_zero():
-                    product_csr_data[non_zero_entries_so_far] = dot_product
-                    product_csr_indices[non_zero_entries_so_far] = j
-                    non_zero_entries_so_far += 1
-                entry_can_be_non_zero = False
-
-        product_csr_indptrs[i + 1] = non_zero_entries_so_far
-
-    # Deleting tails of None's in data and zeroes in indices
-    # product_csr_indices = np.resize(product_csr_indices,(non_zero_entries_so_far,))
-    # product_csr_data = np.resize(product_csr_data,(non_zero_entries_so_far,))
-    # Deleting tails of None's in data and zeroes in indices
-    # Since we don't want to recreate the array, we use a slice
-    # It keeps irrelevent parts in memory but saves time
-    product_csr_indices = product_csr_indices[:non_zero_entries_so_far]
-    product_csr_data = product_csr_data[:non_zero_entries_so_far]
-    return CSR_Mat(
-        product_csr_data, product_csr_indices, product_csr_indptrs, M_number_of_rows
-    )
-
+from .sparse_csr cimport CSR_Mat
+from .sparse_csc cimport CSC_Mat
+from .sparse_multiplication import multiply
 
 @cython.cfunc
 def mod_h_sq(
@@ -888,48 +544,46 @@ class Solver:
 
     def check_d0(self):
         d0_squared_csr = multiply(self.d0_csc.to_csr(), self.d0_csc)
-        print("d0 squares to zero:", d0_squared_csr.is_zero(self.tolerance()))
+        print("d0 squares to zero:", d0_squared_csr.is_zero())
 
         hucenter = self.KLRW.base().ideal([self.u, self.h])
         print(
             "d0 squares to zero mod (u,h):",
-            d0_squared_csr.is_zero_mod(hucenter, self.tolerance()),
+            d0_squared_csr.is_zero_mod(hucenter),
         )
 
         husqcenter = self.KLRW.base().ideal([self.u**2, self.h])
         print(
             "d0 squares to zero mod (u^2,h):",
-            d0_squared_csr.is_zero_mod(husqcenter, self.tolerance()),
+            d0_squared_csr.is_zero_mod(husqcenter),
         )
 
         hucucenter = self.KLRW.base().ideal([self.u**3, self.h])
         print(
             "d0 squares to zero mod (u^3,h):",
-            d0_squared_csr.is_zero_mod(hucucenter, self.tolerance()),
+            d0_squared_csr.is_zero_mod(hucucenter),
         )
 
         hcenter = self.KLRW.base().ideal([self.h])
         print(
             "d0 squares to zero mod h:",
-            d0_squared_csr.is_zero_mod(hcenter, self.tolerance()),
+            d0_squared_csr.is_zero_mod(hcenter),
         )
 
         hsqcenter = self.KLRW.base().ideal([self.h**2])
         print(
             "d0 squares to zero mod h^2:",
-            d0_squared_csr.is_zero_mod(hsqcenter, self.tolerance()),
+            d0_squared_csr.is_zero_mod(hsqcenter),
         )
 
     def d0_squares_to_zero(self):
         d0_squared_csr = multiply(self.d0_csc.to_csr(), self.d0_csc)
-        d0_squared_is_zero = d0_squared_csr.is_zero(self.tolerance())
+        d0_squared_is_zero = d0_squared_csr.is_zero()
         print("d0 squares to zero:", d0_squared_is_zero)
         return d0_squared_is_zero
 
     def d0_squares_to_zero_mod(self, ideal):
         d0_squared_csr = multiply(self.d0_csc.to_csr(), self.d0_csc)
-        d0_squared_is_zero = d0_squared_csr.is_zero_mod(
-            ideal, tolerance=self.tolerance()
-        )
+        d0_squared_is_zero = d0_squared_csr.is_zero_mod(ideal)
         print("d0 squares to zero modulo the ideal:", d0_squared_is_zero)
         return d0_squared_is_zero
