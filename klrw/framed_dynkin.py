@@ -1,4 +1,4 @@
-from typing import NamedTuple, Self
+from typing import NamedTuple
 from collections import defaultdict
 from dataclasses import dataclass
 from types import MappingProxyType
@@ -516,7 +516,22 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
         return degree
 
-    def hom_from_dots_map(self, codomain: Self, map: MappingProxyType):
+    def element_max_number_of_dots(self, element):
+        # zero elements return 0 as degree
+        n_dots = 0
+        dot_variables = self.dot_variables
+        for exp, scalar in element.iterator_exp_coeff():
+            if not scalar.is_zero():
+                term_dots = sum(
+                    exp[var.position] for var in dot_variables.values()
+                )
+
+                if term_dots > n_dots:
+                    n_dots = term_dots
+
+        return n_dots
+
+    def hom_from_dots_map(self, codomain, map: MappingProxyType):
         variables_images = [
             codomain.variables[map[index]].monomial
             if index in map
