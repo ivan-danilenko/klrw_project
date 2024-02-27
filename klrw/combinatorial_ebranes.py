@@ -792,8 +792,9 @@ class CombinatorialEBrane:
             )
             d1_csc = self.one_dimentional_differential_corrections(i, order=order)
             S.set_d1(d1_csc, number_of_variables=len(d1_csc._data()))
-            u = self.klrw_algebra[1].base().variables[self.V, self.W].monomial
-            multiplier = u**order
+            # u = self.klrw_algebra[1].base().variables[self.V, self.W].monomial
+            # multiplier = u**order
+            multiplier = self.klrw_algebra[1].base().one()
             S.make_corrections(
                 multiplier=multiplier, order=order, graded_type="u^order*h^0"
             )
@@ -1231,7 +1232,7 @@ class CombinatorialEBrane:
                 d_csc=S.d0(),
             )
             S.set_d1(d1_csc, number_of_variables=number_of_variables)
-            u = klrw_algebra.base().variables[self.V, self.W].monomial
+            # u = klrw_algebra.base().variables[self.V, self.W].monomial
             h = klrw_algebra.base().variables[self.V].monomial
             for order in range(1, 3):
                 print(
@@ -1240,7 +1241,8 @@ class CombinatorialEBrane:
                         next_brane_number + 1
                     )
                 )
-                multiplier = (h * u) ** order
+                # multiplier = (h * u) ** order
+                multiplier = h**order
                 S.make_corrections(
                     multiplier=multiplier,
                     order=order,

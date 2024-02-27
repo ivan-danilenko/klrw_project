@@ -134,10 +134,7 @@ class RightDotAction(Action):
     def _act_on_bases_iter_(self, p_exp_tuple: ETuple, braid: KLRWbraid):
         # idempotents commute with dots
         if len(braid.word()) == 0:
-            yield self.codomain().term(
-                braid,
-                self.actor().monomial(*p_exp_tuple)
-            )
+            yield self.codomain().term(braid, self.actor().monomial(*p_exp_tuple))
         else:
             last_letter = braid.word()[-1]
             c1, c2 = braid.intersection_colors(-1)
@@ -267,10 +264,8 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         if self.warnings:
             print(
                 r"The identity of KLRW is used' often this is done deep in Sage's code."
-                +
-                "\n"
-                +
-                r"It's faster to replace this by a function that does not use it."
+                + "\n"
+                + r"It's faster to replace this by a function that does not use it."
             )
         return self._one_()
 
@@ -290,10 +285,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         # dots and other coefficients
         for state in self.KLRWBraid.KLRWstate_set:
             for scalar in self.base().gens():
-                yield self.term(
-                    self.KLRWBraid._element_constructor_(state),
-                    scalar
-                )
+                yield self.term(self.KLRWBraid._element_constructor_(state), scalar)
         # simple crossings
         yield from self.gens_over_dots()
 
@@ -303,10 +295,8 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             for i in range(1, len(state)):
                 if not state[i - 1].is_framing() and not state[i].is_framing():
                     yield self.term(
-                        self.KLRWBraid._element_constructor_(
-                            state, (i,)
-                        ),
-                        self.base().one()
+                        self.KLRWBraid._element_constructor_(state, (i,)),
+                        self.base().one(),
                     )
 
     def center_gens(self):
@@ -350,6 +340,16 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
                 n_dots = term_dots
 
         return n_dots
+
+    def scale_dots_in_element(self, element, multipliers):
+        dots_algebra = self.base()
+        return self.linear_combination(
+            (
+                self.monomial(braid),
+                dots_algebra.scale_dots_in_element(coeff, multipliers),
+            )
+            for braid, coeff in element
+        )
 
     @cached_method
     def basis_by_states_and_degrees_tuple(

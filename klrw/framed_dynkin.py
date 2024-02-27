@@ -433,11 +433,29 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         super().__init__(base_ring, len(names_list), names_list, order)
 
         self.degrees = [
-            quiver.scalar_product_of_simple_roots(index[0], index[0])
-            if is_a_dot_index(index)
-            else 0
+            (
+                quiver.scalar_product_of_simple_roots(index[0], index[0])
+                if is_a_dot_index(index)
+                else 0
+            )
             for index in names
         ]
+        # if we scale dots and vertex parameter of some type,
+        # this gives the weight of this scaling
+        self.scaling_weights = {}
+        for v in quiver.non_framing_nodes():
+            weights = []
+            for index in names:
+                if index == v:
+                    weights.append(1)
+                    continue
+                if is_a_dot_index(index):
+                    if index[0] == v:
+                        weights.append(1)
+                        continue
+                weights.append(0)
+            self.scaling_weights[v] = weights
+
         # type of variables is uniquely determined by its index data
         self.variables = {
             index: QuiverParameter(name, position, self(name))
@@ -522,20 +540,33 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         dot_variables = self.dot_variables
         for exp, scalar in element.iterator_exp_coeff():
             if not scalar.is_zero():
-                term_dots = sum(
-                    exp[var.position] for var in dot_variables.values()
-                )
+                term_dots = sum(exp[var.position] for var in dot_variables.values())
 
                 if term_dots > n_dots:
                     n_dots = term_dots
 
         return n_dots
 
+    def scale_dots_in_element(self, element, multipliers: dict):
+        result = self.zero()
+        for exp, scalar in element.iterator_exp_coeff():
+            multiplier = self.one()
+            for vertex in multipliers:
+                monomial_weight = sum(
+                    deg * power for deg, power in zip(self.scaling_weights[vertex], exp)
+                )
+                multiplier *= multipliers[vertex]**monomial_weight
+            result += scalar * multiplier * self.monomial(*exp)
+
+        return result
+
     def hom_from_dots_map(self, codomain, map: MappingProxyType):
         variables_images = [
-            codomain.variables[map[index]].monomial
-            if index in map
-            else codomain.variables[index].monomial
+            (
+                codomain.variables[map[index]].monomial
+                if index in map
+                else codomain.variables[index].monomial
+            )
             for index in self.variables
             if self.variables[index].name is not None
         ]
@@ -545,9 +576,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
     @cached_method
     def hom_ignore_non_dots(self):
         variables_images = [
-            self.variables[index].monomial
-            if is_a_dot_index(index)
-            else self.one()
+            self.variables[index].monomial if is_a_dot_index(index) else self.one()
             for index in self.variables
             if self.variables[index].name is not None
         ]

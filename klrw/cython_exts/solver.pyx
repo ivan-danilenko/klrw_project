@@ -51,6 +51,7 @@ class Solver:
     u_position: cython.int
     h: object
     u: object
+    u_multipliers : dict
 
     def __init__(self, KLRW, verbose=True):
         self.KLRW = KLRW
@@ -66,6 +67,7 @@ class Solver:
         self.h = self.KLRW.base().variables[V].monomial
         self.u_position = self.KLRW.base().variables[V,W].position
         self.u = self.KLRW.base().variables[V,W].monomial
+        self.u_multipliers = {V:self.u}
         print("h position: ", self.h_position, "u position: ", self.u_position)
 
     def KLRW_algebra(self):
@@ -176,6 +178,7 @@ class Solver:
                             if n == -1:
                                 print("+")
                             KLRW_element = multiplier * d0_element * d1_elem
+                            KLRW_element = self.KLRW.scale_dots_in_element(KLRW_element, self.u_multipliers)
                             for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
                                     if condition(exp, self.h_position, self.u_position, order):
@@ -217,6 +220,7 @@ class Solver:
                             if n == -1:
                                 print("+")
                             KLRW_element = multiplier * d1_elements[n] * d0_element
+                            KLRW_element = self.KLRW.scale_dots_in_element(KLRW_element, self.u_multipliers)
                             for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
                                     if condition(exp, self.h_position, self.u_position, order):
@@ -381,7 +385,9 @@ class Solver:
                 if indptr1 == indptr1_end:
                     entry = self.KLRW.zero()
                     for n, d1_entry in self.d1_csc.data[indptr2].items():
-                        entry += multiplier * self.KLRW.base()(x[n]) * d1_entry
+                        new_entry = multiplier * self.KLRW.base()(x[n]) * d1_entry
+                        new_entry = self.KLRW.scale_dots_in_element(new_entry, self.u_multipliers)
+                        entry += new_entry
                     if not entry.is_zero():
                         correted_csc_data[non_zero_entries_so_far] = entry
                         correted_csc_indices[non_zero_entries_so_far] = (
@@ -405,7 +411,9 @@ class Solver:
                 elif self.d0_csc.indices[indptr1] == self.d1_csc.indices[indptr2]:
                     entry = self.d0_csc.data[indptr1]
                     for n, d1_entry in self.d1_csc.data[indptr2].items():
-                        entry += multiplier * self.KLRW.base()(x[n]) * d1_entry
+                        new_entry = multiplier * self.KLRW.base()(x[n]) * d1_entry
+                        new_entry = self.KLRW.scale_dots_in_element(new_entry, self.u_multipliers)
+                        entry += new_entry
                     if not entry.is_zero():
                         correted_csc_data[non_zero_entries_so_far] = entry
                         correted_csc_indices[non_zero_entries_so_far] = (
@@ -430,7 +438,9 @@ class Solver:
                 else:
                     entry = self.KLRW.zero()
                     for n, d1_entry in self.d1_csc.data[indptr2].items():
-                        entry += multiplier * self.KLRW.base()(x[n]) * d1_entry
+                        new_entry = multiplier * self.KLRW.base()(x[n]) * d1_entry
+                        new_entry = self.KLRW.scale_dots_in_element(new_entry, self.u_multipliers)
+                        entry += new_entry
                     if not entry.is_zero():
                         correted_csc_data[non_zero_entries_so_far] = entry
                         correted_csc_indices[non_zero_entries_so_far] = (
