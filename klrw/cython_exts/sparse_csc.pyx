@@ -2,7 +2,6 @@ import cython
 from cython.cimports import cython
 import numpy as np
 from cython.cimports import numpy as np
-from typing import Self
 
 # from .sparse_csr cimport CSR_Mat
 from scipy.sparse import csc_matrix
@@ -118,7 +117,7 @@ class CSC_Mat:
         return CSR_Mat(csr_data, csr_indices, csr_indptrs, len(self.indptrs) - 1)
 
     @cython.ccall
-    def is_zero(self: Self) -> cython.bint:
+    def is_zero(self) -> cython.bint:
         i: cython.int
         for i in range(self.nnz()):
             for x, coef in self.data[i]:
@@ -128,7 +127,7 @@ class CSC_Mat:
         return True
 
     @cython.ccall
-    def is_zero_mod(self: Self, ideal: Ideal) -> cython.bint:
+    def is_zero_mod(self, ideal: Ideal) -> cython.bint:
         i: cython.int
         for i in range(self.nnz()):
             for x, coef in self.data[i]:
@@ -185,3 +184,30 @@ class CSC_Mat:
 
         # if never seen a non-zero matrix element
         return True
+
+    @classmethod
+    def from_dict(cls, d_dict: dict, number_of_rows, number_of_columns):
+        number_of_entries = len(d_dict)
+        d_csc_data = np.empty(number_of_entries, dtype="O")
+        d_csc_indices = np.zeros(number_of_entries, dtype="intc")
+        d_csc_indptrs = np.zeros(number_of_columns + 1, dtype="intc")
+
+        entries_so_far = 0
+        current_j = 0
+        for i, j in sorted(d_dict.keys(), key=lambda x: (x[1], x[0])):
+            for a in range(current_j + 1, j + 1):
+                d_csc_indptrs[a] = entries_so_far
+            current_j = j
+            # entries_so_far becomes the index of a new defomation variable
+            d_csc_data[entries_so_far] = d_dict[i, j]
+            d_csc_indices[entries_so_far] = i
+            entries_so_far += 1
+        for a in range(current_j + 1, number_of_columns + 1):
+            d_csc_indptrs[a] = entries_so_far
+
+        return cls(
+            data=d_csc_data,
+            indices=d_csc_indices,
+            indptrs=d_csc_indptrs,
+            number_of_rows=number_of_rows,
+        )

@@ -1,6 +1,5 @@
 # from sparse_csr cimport CSR_Mat
 from .sparse_csr cimport CSR_Mat
-from typing import Self
 
 from sage.rings.ideal import Ideal_generic as Ideal
 
@@ -14,8 +13,8 @@ cdef class CSC_Mat:
     cdef int[::1] indptrs
     cdef int number_of_rows
 
-    cpdef int nnz(self: Self)
-    cpdef CSR_Mat to_csr(self: Self)
-    cpdef bint is_zero(self: Self)
-    cpdef bint is_zero_mod(self: Self, ideal: Ideal)
+    cpdef int nnz(self)
+    cpdef CSR_Mat to_csr(self)
+    cpdef bint is_zero(self)
+    cpdef bint is_zero_mod(self, ideal: Ideal)
     
