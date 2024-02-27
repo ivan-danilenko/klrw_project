@@ -668,7 +668,7 @@ class CombinatorialEBrane:
 
         return d1_csc
 
-    def differential_u_corrections(self, thimbles, order, k, d_csc):
+    def differential_u_corrections(self, thimbles, max_number_of_dots, k, d_csc):
         # we organize points/T-thimbles in the brane by their cohomological degree as
         # a dictionary {hom_deg:(index_in_brane,TThimble)}
         points_by_hom_degree = {}
@@ -707,13 +707,16 @@ class CombinatorialEBrane:
                             for i in range(self.n + k)
                         )
                         equivariant_degree = thimble0.equ_deg - thimble1.equ_deg
-                        # equivariant_degree = thimble1.equ_deg - thimble0.equ_deg
 
-                        # if 2 * order == equivariant_degree - braid_degree:
                         graded_component = self.klrw_algebra[k][
                             left_state:right_state:equivariant_degree
                         ]
-                        basis = list(graded_component.basis().values())
+                        basis = [
+                            elem
+                            for elem in graded_component.basis().values()
+                            if self.klrw_algebra[k].element_max_number_of_dots(elem)
+                            <= max_number_of_dots
+                        ]
 
                         existing_entry = d_csc[index0, index1]
 
@@ -797,7 +800,7 @@ class CombinatorialEBrane:
 
         return S.d0()
 
-    def make_differential(self):
+    def make_differential(self, max_number_of_dots):
         assert self.branes, "There has to be at least one E-brane."
 
         # assign all intersection points order, i.e. the number
@@ -1222,7 +1225,10 @@ class CombinatorialEBrane:
             S.check_d0()
 
             d1_csc, number_of_variables = self.differential_u_corrections(
-                thimbles=thimbles, order=None, k=next_brane_number + 1, d_csc=S.d0()
+                thimbles=thimbles,
+                max_number_of_dots=max_number_of_dots,
+                k=next_brane_number + 1,
+                d_csc=S.d0(),
             )
             S.set_d1(d1_csc, number_of_variables=number_of_variables)
             u = klrw_algebra.base().variables[self.V, self.W].monomial
@@ -1236,7 +1242,9 @@ class CombinatorialEBrane:
                 )
                 multiplier = (h * u) ** order
                 S.make_corrections(
-                    multiplier=multiplier, order=order, graded_type="h^order"
+                    multiplier=multiplier,
+                    order=order,
+                    graded_type="h^order",
                 )
                 if S.d0_squares_to_zero():
                     break

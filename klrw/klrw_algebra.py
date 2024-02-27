@@ -341,6 +341,16 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
 
         return degree
 
+    def element_max_number_of_dots(self, element):
+        n_dots = 0
+        for braid, coeff in element:
+            term_dots = coeff.parent().element_max_number_of_dots(coeff)
+
+            if term_dots > n_dots:
+                n_dots = term_dots
+
+        return n_dots
+
     @cached_method
     def basis_by_states_and_degrees_tuple(
         self, left_state, right_state, degree, as_tuples=True
