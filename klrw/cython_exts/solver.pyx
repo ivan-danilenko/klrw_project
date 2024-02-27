@@ -177,8 +177,9 @@ class Solver:
                         for n, d1_elem in d1_elements.items():
                             if n == -1:
                                 print("+")
-                            KLRW_element = multiplier * d0_element * d1_elem
-                            KLRW_element = self.KLRW.scale_dots_in_element(KLRW_element, self.u_multipliers)
+                            d1_element = multiplier * d1_elements[n]
+                            d1_element = self.KLRW.scale_dots_in_element(d1_element, self.u_multipliers)
+                            KLRW_element = d0_element * d1_element
                             for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
                                     if condition(exp, self.h_position, self.u_position, order):
@@ -219,8 +220,9 @@ class Solver:
                         for n in d1_elements:
                             if n == -1:
                                 print("+")
-                            KLRW_element = multiplier * d1_elements[n] * d0_element
-                            KLRW_element = self.KLRW.scale_dots_in_element(KLRW_element, self.u_multipliers)
+                            d1_element = multiplier * d1_elements[n]
+                            d1_element = self.KLRW.scale_dots_in_element(d1_element, self.u_multipliers)
+                            KLRW_element = d1_element * d0_element
                             for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
                                     if condition(exp, self.h_position, self.u_position, order):
