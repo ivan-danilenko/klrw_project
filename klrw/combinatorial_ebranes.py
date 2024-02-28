@@ -720,6 +720,7 @@ class CombinatorialEBrane:
 
                         existing_entry = d_csc[index0, index1]
 
+                        '''
                         if basis and existing_entry:
                             for braid, poly in existing_entry:
                                 dots_algebra = self.klrw_algebra[k].base()
@@ -734,9 +735,14 @@ class CombinatorialEBrane:
                                         basis.remove(existing_term)
                                     except ValueError:
                                         pass  # we ignore if the term is not found
+                        '''
+                        not_geometric_entry = True
+                        if existing_entry is not None:
+                            for _, coeff in existing_entry:
+                                if not coeff.constant_coefficient().is_zero():
+                                    not_geometric_entry = False
 
-                        if basis:
-
+                        if basis and not_geometric_entry:
                             # only if we have new elements
                             d1_dict[index0, index1] = {}
                             for elem in basis:

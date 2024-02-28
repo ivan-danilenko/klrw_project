@@ -555,7 +555,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
                 monomial_weight = sum(
                     deg * power for deg, power in zip(self.scaling_weights[vertex], exp)
                 )
-                multiplier *= multipliers[vertex]**monomial_weight
+                multiplier *= multipliers[vertex] ** monomial_weight
             result += scalar * multiplier * self.monomial(*exp)
 
         return result
