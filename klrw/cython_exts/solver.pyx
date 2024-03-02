@@ -1,32 +1,26 @@
 import cython
-cimport numpy as np
 import numpy as np
+from cython.cimports import numpy as np
 
 # from sys import intern
 
 from scipy.sparse import csr_matrix, csc_matrix, spmatrix
-from scipy.sparse.linalg import cg
-
-import pypardiso
 
 from sage.rings.polynomial.polydict import ETuple
 from sage.rings.integer_ring import ZZ
 
 from klrw.klrw_algebra import KLRWAlgebra, KLRWElement
 
-from .sparse_csr cimport CSR_Mat
-from .sparse_csc cimport CSC_Mat
+from cython.cimports.klrw.cython_exts.sparse_csr import CSR_Mat
+from cython.cimports.klrw.cython_exts.sparse_csc import CSC_Mat
 from .sparse_multiplication import multiply
+
 
 @cython.cfunc
 def mod_h_sq(
-    exponents: ETuple,
-    h_position:cython.int,
-    u_position: cython.int,
-    order: cython.int
+    exponents: ETuple, h_position: cython.int, u_position: cython.int, order: cython.int
 ) -> cython.bint:
-    return <cython.bint>(exponents[h_position] == order)
-    # return <cython.bint>(exponents[1] == order)
+    return exponents[h_position] == order
 
 
 @cython.cfunc
@@ -34,10 +28,9 @@ def mod_u_sq_h(
     exponents: ETuple,
     h_position: cython.int,
     u_position: cython.int,
-    order: cython.int,    
+    order: cython.int,
 ) -> cython.bint:
-    return <cython.bint>(exponents[u_position] == order and exponents[h_position] == 0)
-    # return <cython.bint>(exponents[0] == order and exponents[1] == 0)
+    return exponents[u_position] == order and exponents[h_position] == 0
 
 
 @cython.cclass
@@ -53,7 +46,7 @@ class Solver:
     u_position: cython.int
     h: object
     u: object
-    u_multipliers : dict
+    u_multipliers: dict
 
     def __init__(self, KLRW, verbose=True):
         self.KLRW = KLRW
@@ -67,9 +60,9 @@ class Solver:
         W = V._replace(framing=True)
         self.h_position = self.KLRW.base().variables[V].position
         self.h = self.KLRW.base().variables[V].monomial
-        self.u_position = self.KLRW.base().variables[V,W].position
-        self.u = self.KLRW.base().variables[V,W].monomial
-        self.u_multipliers = {V:self.u}
+        self.u_position = self.KLRW.base().variables[V, W].position
+        self.u = self.KLRW.base().variables[V, W].monomial
+        self.u_multipliers = {V: self.u}
         print("h position: ", self.h_position, "u position: ", self.u_position)
 
     def KLRW_algebra(self):
@@ -180,11 +173,15 @@ class Solver:
                             if n == -1:
                                 print("+")
                             d1_element = multiplier * d1_elements[n]
-                            d1_element = self.KLRW.scale_dots_in_element(d1_element, self.u_multipliers)
+                            d1_element = self.KLRW.scale_dots_in_element(
+                                d1_element, self.u_multipliers
+                            )
                             KLRW_element = d0_element * d1_element
                             for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
-                                    if condition(exp, self.h_position, self.u_position, order):
+                                    if condition(
+                                        exp, self.h_position, self.u_position, order
+                                    ):
                                         if (exp, basis_vector) in ij_dict:
                                             row = ij_dict[exp, basis_vector]
                                             if n in row:
@@ -223,11 +220,15 @@ class Solver:
                             if n == -1:
                                 print("+")
                             d1_element = multiplier * d1_elements[n]
-                            d1_element = self.KLRW.scale_dots_in_element(d1_element, self.u_multipliers)
+                            d1_element = self.KLRW.scale_dots_in_element(
+                                d1_element, self.u_multipliers
+                            )
                             KLRW_element = d1_element * d0_element
                             for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
-                                    if condition(exp, self.h_position, self.u_position, order):
+                                    if condition(
+                                        exp, self.h_position, self.u_position, order
+                                    ):
                                         if (exp, basis_vector) in ij_dict:
                                             row = ij_dict[exp, basis_vector]
                                             if n in row:
@@ -264,7 +265,9 @@ class Solver:
                             KLRW_element = d0_element1 * d0_element2
                             for basis_vector, coef in KLRW_element:
                                 for exp, scalar in coef.iterator_exp_coeff():
-                                    if condition(exp, self.h_position, self.u_position, order):
+                                    if condition(
+                                        exp, self.h_position, self.u_position, order
+                                    ):
                                         # here we keep only (exp,basis_vector)
                                         # in ij_dict,
                                         # the others should cancel in
@@ -333,7 +336,9 @@ class Solver:
         return A_csr, b
 
     @cython.cfunc
-    def solve_system_for_differential(self, M: spmatrix, bb: spmatrix):
+    def solve_system_for_differential(
+        self, M: spmatrix, bb: spmatrix, method="pypardiso"
+    ):
         """
         Returns a tuple (solution : double[::1], is_integral : bool)
         """
@@ -343,19 +348,27 @@ class Solver:
         # scipy conjugate gradients only take dense vectors, so we convert
         # A1 flattens array
         y = bb.todense().A1
-        
-        # pypardiso requires floats not integers
-        M = M.asfptype()
 
-        x = pypardiso.spsolve(M, y)
+        if method == "pypardiso":
+            import pypardiso
+
+            # pypardiso requires floats not integers
+            M = M.asfptype()
+            x = pypardiso.spsolve(M, y)
+            if x.shape == 1:
+                x.reshape((1,))
+        elif method == "cg":
+            from scipy.sparse.linalg import cg
+
+            x, exit_code = cg(M, y)
+        else:
+            raise ValueError("Unknown method")
 
         # trying an integer approximation if it works
-        x_int = np.array(np.rint(x))  # .astype(dtype=np.dtype("intc"))
-        
-        if x_int.size == 1:
-            assert M * x_int == y, "Solution is not integral"
-        else:
-            assert np.allclose(M @ x_int, y), "Solution is not integral"
+        x_int = np.rint(x)
+
+        assert np.allclose(M @ x_int, y), "Solution is not integral"
+
         return x_int
 
     @cython.cfunc
@@ -394,7 +407,9 @@ class Solver:
                     entry = self.KLRW.zero()
                     for n, d1_entry in self.d1_csc.data[indptr2].items():
                         new_entry = multiplier * self.KLRW.base()(x[n]) * d1_entry
-                        new_entry = self.KLRW.scale_dots_in_element(new_entry, self.u_multipliers)
+                        new_entry = self.KLRW.scale_dots_in_element(
+                            new_entry, self.u_multipliers
+                        )
                         entry += new_entry
                     if not entry.is_zero():
                         correted_csc_data[non_zero_entries_so_far] = entry
@@ -420,7 +435,9 @@ class Solver:
                     entry = self.d0_csc.data[indptr1]
                     for n, d1_entry in self.d1_csc.data[indptr2].items():
                         new_entry = multiplier * self.KLRW.base()(x[n]) * d1_entry
-                        new_entry = self.KLRW.scale_dots_in_element(new_entry, self.u_multipliers)
+                        new_entry = self.KLRW.scale_dots_in_element(
+                            new_entry, self.u_multipliers
+                        )
                         entry += new_entry
                     if not entry.is_zero():
                         correted_csc_data[non_zero_entries_so_far] = entry
@@ -447,7 +464,9 @@ class Solver:
                     entry = self.KLRW.zero()
                     for n, d1_entry in self.d1_csc.data[indptr2].items():
                         new_entry = multiplier * self.KLRW.base()(x[n]) * d1_entry
-                        new_entry = self.KLRW.scale_dots_in_element(new_entry, self.u_multipliers)
+                        new_entry = self.KLRW.scale_dots_in_element(
+                            new_entry, self.u_multipliers
+                        )
                         entry += new_entry
                     if not entry.is_zero():
                         correted_csc_data[non_zero_entries_so_far] = entry
@@ -474,7 +493,11 @@ class Solver:
         )
 
     def make_corrections(
-        self, multiplier=1, order: cython.int = 1, graded_type="h^order"
+        self,
+        multiplier=1,
+        order: cython.int = 1,
+        graded_type="h^order",
+        method="pypardiso",
     ):
         """
         Solves the system (d0 + multiplier*d1)^2 = 0
@@ -532,7 +555,7 @@ class Solver:
             if M.indptr[i] == M.indptr[i + 1]:
                 print("Zero column in the square matrix:", i)
 
-        x = self.solve_system_for_differential(M, bb)
+        x = self.solve_system_for_differential(M, bb, method=method)
         del M, bb
 
         if columns_to_remove > 0:

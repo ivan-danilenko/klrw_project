@@ -720,7 +720,7 @@ class CombinatorialEBrane:
 
                         existing_entry = d_csc[index0, index1]
 
-                        '''
+                        """
                         if basis and existing_entry:
                             for braid, poly in existing_entry:
                                 dots_algebra = self.klrw_algebra[k].base()
@@ -735,7 +735,7 @@ class CombinatorialEBrane:
                                         basis.remove(existing_term)
                                     except ValueError:
                                         pass  # we ignore if the term is not found
-                        '''
+                        """
                         not_geometric_entry = True
                         if existing_entry is not None:
                             for _, coeff in existing_entry:
@@ -782,7 +782,7 @@ class CombinatorialEBrane:
 
         return d1_csc, variable_index
 
-    def one_dimentional_differential(self, i):
+    def one_dimentional_differential(self, i, method="pypardiso"):
         print("----------Making the initial approximation----------")
         d0_csc = self.one_dimentional_differential_initial(i)
 
@@ -802,12 +802,20 @@ class CombinatorialEBrane:
             # multiplier = u**order
             multiplier = self.klrw_algebra[1].base().one()
             S.make_corrections(
-                multiplier=multiplier, order=order, graded_type="u^order*h^0"
+                multiplier=multiplier,
+                order=order,
+                graded_type="u^order*h^0",
+                method=method,
             )
 
         return S.d0()
 
-    def make_differential(self, max_number_of_dots):
+    def make_differential(
+        self,
+        max_number_of_dots=2,
+        max_order_in_hbar=5,
+        method="pypardiso",
+    ):
         assert self.branes, "There has to be at least one E-brane."
 
         # assign all intersection points order, i.e. the number
@@ -819,7 +827,7 @@ class CombinatorialEBrane:
                 ind = ind + 1
 
         # the differential for the zeroth brane
-        d_csc_current = self.one_dimentional_differential(0)
+        d_csc_current = self.one_dimentional_differential(0, method=method)
 
         # print(np.asarray(d_csc_current._data()))
         # print(np.asarray(d_csc_current._indices()))
@@ -883,7 +891,9 @@ class CombinatorialEBrane:
                 )
 
             # the next_brane_diff is the differential for the next_brane_number-th brane
-            d_csc_next = self.one_dimentional_differential(next_brane_number)
+            d_csc_next = self.one_dimentional_differential(
+                next_brane_number, method=method
+            )
 
             # for degree test
             indptr: cython.int
@@ -1240,7 +1250,7 @@ class CombinatorialEBrane:
             S.set_d1(d1_csc, number_of_variables=number_of_variables)
             # u = klrw_algebra.base().variables[self.V, self.W].monomial
             h = klrw_algebra.base().variables[self.V].monomial
-            for order in range(1, 5):
+            for order in range(1, max_order_in_hbar):
                 print(
                     "----------Correcting order {} in h ".format(order)
                     + "for the product of the first {} branes----------".format(
@@ -1253,6 +1263,7 @@ class CombinatorialEBrane:
                     multiplier=multiplier,
                     order=order,
                     graded_type="h^order",
+                    method=method,
                 )
                 if S.d0_squares_to_zero():
                     break
