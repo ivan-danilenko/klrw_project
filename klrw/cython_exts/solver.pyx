@@ -7,6 +7,8 @@ import numpy as np
 from scipy.sparse import csr_matrix, csc_matrix, spmatrix
 from scipy.sparse.linalg import cg
 
+import pypardiso
+
 from sage.rings.polynomial.polydict import ETuple
 from sage.rings.integer_ring import ZZ
 
@@ -341,15 +343,19 @@ class Solver:
         # scipy conjugate gradients only take dense vectors, so we convert
         # A1 flattens array
         y = bb.todense().A1
+        
+        # pypardiso requires floats not integers
+        M = M.asfptype()
 
-        x, exit_code = cg(M, y)
-        if self.verbose:
-            print("Exit_Code:", exit_code)
+        x = pypardiso.spsolve(M, y)
 
         # trying an integer approximation if it works
-        x_int = np.rint(x)  # .astype(dtype=np.dtype("intc"))
-
-        assert np.allclose(M @ x_int, y), "Solution is not integral"
+        x_int = np.array(np.rint(x))  # .astype(dtype=np.dtype("intc"))
+        
+        if x_int.size == 1:
+            assert M * x_int == y, "Solution is not integral"
+        else:
+            assert np.allclose(M @ x_int, y), "Solution is not integral"
         return x_int
 
     @cython.cfunc

@@ -1240,7 +1240,7 @@ class CombinatorialEBrane:
             S.set_d1(d1_csc, number_of_variables=number_of_variables)
             # u = klrw_algebra.base().variables[self.V, self.W].monomial
             h = klrw_algebra.base().variables[self.V].monomial
-            for order in range(1, 3):
+            for order in range(1, 5):
                 print(
                     "----------Correcting order {} in h ".format(order)
                     + "for the product of the first {} branes----------".format(
