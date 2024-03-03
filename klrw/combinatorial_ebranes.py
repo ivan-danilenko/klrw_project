@@ -1327,7 +1327,7 @@ class CombinatorialEBrane:
             return False
         return True
 
-    def find_cohomology(self, R: PrincipalIdealDomain):
+    def find_cohomology(self, R: PrincipalIdealDomain, hom_deg_shift = 0, equ_deg_shift = 0):
         """
         Working over R that is a PID.
         [works on fields and integers, modules over
@@ -1411,7 +1411,7 @@ class CombinatorialEBrane:
                     homology_group = d_next.right_kernel()
                     invariants = [0] * homology_group.rank()
                     if invariants:
-                        Homology[current_hom_deg, current_equ_deg] = [
+                        Homology[current_hom_deg + current_equ_deg + hom_deg_shift, current_equ_deg + equ_deg_shift] = [
                             R.quotient(inv * R) for inv in invariants
                         ]
             else:
@@ -1444,7 +1444,7 @@ class CombinatorialEBrane:
                     homology_group = d_next.right_kernel() / d_prev.column_module()
                     invariants = homology_group.invariants()
                     if invariants:
-                        Homology[current_hom_deg, current_equ_deg] = [
+                        Homology[current_hom_deg + current_equ_deg + hom_deg_shift, current_equ_deg + equ_deg_shift] = [
                             R.quotient(inv * R) for inv in invariants
                         ]
 

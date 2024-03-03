@@ -355,8 +355,8 @@ class Solver:
             # pypardiso requires floats not integers
             M = M.asfptype()
             x = pypardiso.spsolve(M, y)
-            if x.shape == 1:
-                x.reshape((1,))
+            if x.shape == ():
+                x = x.reshape((1,))
         elif method == "cg":
             from scipy.sparse.linalg import cg
 
