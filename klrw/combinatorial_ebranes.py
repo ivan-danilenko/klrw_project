@@ -1239,7 +1239,6 @@ class CombinatorialEBrane:
 
             S = Solver(klrw_algebra)
             S.set_d0(d_csc)
-            S.check_d0()
 
             d1_csc, number_of_variables = self.differential_u_corrections(
                 thimbles=thimbles,
@@ -1247,6 +1246,12 @@ class CombinatorialEBrane:
                 k=next_brane_number + 1,
                 d_csc=S.d0(),
             )
+
+            from pickle import dump
+
+            with open("d1_local", "wb") as f:
+                dump(d1_csc.dict(), file=f)
+
             S.set_d1(d1_csc, number_of_variables=number_of_variables)
             # u = klrw_algebra.base().variables[self.V, self.W].monomial
             h = klrw_algebra.base().variables[self.V].monomial
@@ -1267,6 +1272,11 @@ class CombinatorialEBrane:
                 )
                 if S.d0_squares_to_zero():
                     break
+            else:
+                raise RuntimeError(
+                    "The system does not square to zero."
+                    + "Increase the order in hbar or max number of dots."
+                )
 
         self.differential = S.d0()
         self.thimbles = thimbles
@@ -1327,7 +1337,9 @@ class CombinatorialEBrane:
             return False
         return True
 
-    def find_cohomology(self, R: PrincipalIdealDomain, hom_deg_shift = 0, equ_deg_shift = 0):
+    def find_cohomology(
+        self, R: PrincipalIdealDomain, hom_deg_shift=0, equ_deg_shift=0
+    ):
         """
         Working over R that is a PID.
         [works on fields and integers, modules over
@@ -1411,9 +1423,10 @@ class CombinatorialEBrane:
                     homology_group = d_next.right_kernel()
                     invariants = [0] * homology_group.rank()
                     if invariants:
-                        Homology[current_hom_deg + current_equ_deg + hom_deg_shift, current_equ_deg + equ_deg_shift] = [
-                            R.quotient(inv * R) for inv in invariants
-                        ]
+                        Homology[
+                            current_hom_deg + current_equ_deg + hom_deg_shift,
+                            current_equ_deg + equ_deg_shift,
+                        ] = [R.quotient(inv * R) for inv in invariants]
             else:
                 # C1_indices = C2_indices
                 d_prev = d_next.__copy__()
@@ -1444,9 +1457,10 @@ class CombinatorialEBrane:
                     homology_group = d_next.right_kernel() / d_prev.column_module()
                     invariants = homology_group.invariants()
                     if invariants:
-                        Homology[current_hom_deg + current_equ_deg + hom_deg_shift, current_equ_deg + equ_deg_shift] = [
-                            R.quotient(inv * R) for inv in invariants
-                        ]
+                        Homology[
+                            current_hom_deg + current_equ_deg + hom_deg_shift,
+                            current_equ_deg + equ_deg_shift,
+                        ] = [R.quotient(inv * R) for inv in invariants]
 
         if R.is_field():
             return PoincarePolynomial
