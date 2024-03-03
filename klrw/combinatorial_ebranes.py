@@ -827,7 +827,7 @@ class CombinatorialEBrane:
                 ind = ind + 1
 
         # the differential for the zeroth brane
-        d_csc_current = self.one_dimentional_differential(0, method=method)
+        self.differential = self.one_dimentional_differential(0, method=method)
 
         # print(np.asarray(d_csc_current._data()))
         # print(np.asarray(d_csc_current._indices()))
@@ -853,12 +853,12 @@ class CombinatorialEBrane:
         for j in range(len(thimbles)):
             column_thimble = thimbles[j]
 
-            indptr: cython.int = d_csc_current._indptrs()[j]
-            indptr_end: cython.int = d_csc_current._indptrs()[j + 1]
+            indptr: cython.int = self.differential._indptrs()[j]
+            indptr_end: cython.int = self.differential._indptrs()[j + 1]
             while indptr != indptr_end:
-                i: cython.int = d_csc_current._indices()[indptr]
+                i: cython.int = self.differential._indices()[indptr]
                 row_thimble = thimbles[i]
-                entry = d_csc_current._data()[indptr]
+                entry = self.differential._data()[indptr]
                 assert (
                     column_thimble.hom_deg == row_thimble.hom_deg + 1
                 ), "Cohomological degrees differ by an unexpected value"
@@ -878,6 +878,7 @@ class CombinatorialEBrane:
         # before the step and _next for the one-strand differential of the new brane
         for next_brane_number in range(1, len(self.branes)):
             thimbles_current = thimbles.copy()
+            d_csc_current = self.differential
             thimbles_next = {}
             for index, pt in zip(count(), self.branes[next_brane_number]):
                 thimbles_next[index] = ProductThimbles(
@@ -1278,8 +1279,8 @@ class CombinatorialEBrane:
                     + "Increase the order in hbar or max number of dots."
                 )
 
-        self.differential = S.d0()
-        self.thimbles = thimbles
+            self.differential = S.d0()
+            self.thimbles = thimbles
 
     # @cython.ccall
     def find_differential_matrix(
