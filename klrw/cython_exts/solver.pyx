@@ -373,16 +373,21 @@ class Solver:
         return x_int
 
     @cython.cfunc
-    def update_differential(self, x: cython.double[::1], multiplier: KLRWElement = 1):
+    def update_differential(self, x: cython.int[::1], multiplier: KLRWElement = 1):
+        i: cython.int
+        x_nnz: cython.int = 0
+        for i in range(len(x)):
+            if x[i] != 0:
+                x_nnz += 1
         if self.verbose:
-            print("Correcting the differential")
+            print("Correcting {} matrix elements".format(x_nnz))
 
         number_of_columns: cython.int = self.N
 
         correted_csc_indptrs: cython.int[::1] = np.zeros(
             number_of_columns + 1, dtype=np.dtype("intc")
         )
-        max_non_zero_entries: cython.int = self.d0_csc.nnz() + self.d1_csc.nnz()
+        max_non_zero_entries: cython.int = self.d0_csc.nnz() + x_nnz
         correted_csc_indices: cython.int[::1] = np.zeros(
             max_non_zero_entries, dtype=np.dtype("intc")
         )
@@ -560,11 +565,13 @@ class Solver:
         del M, bb
 
         if columns_to_remove > 0:
-            x_modified = np.zeros(number_of_old_indices, dtype="d")
+            x_modified = np.zeros(number_of_old_indices, dtype="intc")
             i: cython.int
             for i in range(number_of_new_indices):
                 x_modified[new_to_old_index[i]] = x[i]
             x = x_modified
+        else:
+            x = x.astype(dtype="intc")
 
         # if still working over Z, comparison is exact
         if self.KLRW.scalars() == ZZ:
@@ -578,8 +585,6 @@ class Solver:
 
         if self.verbose:
             print("Found a solution!")
-            nnz = sum(1 for a in x.flat if a != 0)
-            print("Correcting {} matrix elements".format(nnz))
         del A, b
 
         self.update_differential(x, multiplier)
