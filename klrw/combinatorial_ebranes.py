@@ -827,7 +827,7 @@ class CombinatorialEBrane:
                 ind = ind + 1
 
         # the differential for the zeroth brane
-        self.differential = self.one_dimentional_differential(0, method=method)
+        d_csc_current = self.one_dimentional_differential(0, method=method)
 
         # print(np.asarray(d_csc_current._data()))
         # print(np.asarray(d_csc_current._indices()))
@@ -853,12 +853,12 @@ class CombinatorialEBrane:
         for j in range(len(thimbles)):
             column_thimble = thimbles[j]
 
-            indptr: cython.int = self.differential._indptrs()[j]
-            indptr_end: cython.int = self.differential._indptrs()[j + 1]
+            indptr: cython.int = d_csc_current._indptrs()[j]
+            indptr_end: cython.int = d_csc_current._indptrs()[j + 1]
             while indptr != indptr_end:
-                i: cython.int = self.differential._indices()[indptr]
+                i: cython.int = d_csc_current._indices()[indptr]
                 row_thimble = thimbles[i]
-                entry = self.differential._data()[indptr]
+                entry = d_csc_current._data()[indptr]
                 assert (
                     column_thimble.hom_deg == row_thimble.hom_deg + 1
                 ), "Cohomological degrees differ by an unexpected value"
@@ -878,7 +878,6 @@ class CombinatorialEBrane:
         # before the step and _next for the one-strand differential of the new brane
         for next_brane_number in range(1, len(self.branes)):
             thimbles_current = thimbles.copy()
-            d_csc_current = self.differential
             thimbles_next = {}
             for index, pt in zip(count(), self.branes[next_brane_number]):
                 thimbles_next[index] = ProductThimbles(
@@ -1106,16 +1105,25 @@ class CombinatorialEBrane:
                                 )
                             )
                             new_coeff = hom_to_more_dots(coef)
-                            entry += klrw_algebra.term(d_times_one_braid, new_coeff)
+                            if not new_coeff.is_zero():
+                                braid_degree = klrw_algebra.braid_degree(
+                                    d_times_one_braid
+                                )
+                                coeff_degree = klrw_algebra.base().element_degree(
+                                    new_coeff, check_if_homogeneous=True
+                                )
+                                term_degree = braid_degree + coeff_degree
+                            if (
+                                row_thimble.equ_deg - column_thimble.equ_deg
+                                == term_degree
+                            ):
+                                entry += klrw_algebra.term(d_times_one_braid, new_coeff)
 
                         assert (
                             column_thimble.hom_deg == row_thimble.hom_deg + 1
                         ), "Cohomological degrees differ by an unexpected value"
 
-                        if (
-                            row_thimble.equ_deg - column_thimble.equ_deg
-                            == entry.degree(check_if_homogeneous=True)
-                        ):
+                        if not entry.is_zero():
                             d0_csc_indices[entries_so_far] = row_index
                             d0_csc_data[entries_so_far] = entry
                             return entries_so_far + 1
@@ -1279,8 +1287,10 @@ class CombinatorialEBrane:
                     + "Increase the order in hbar or max number of dots."
                 )
 
-            self.differential = S.d0()
-            self.thimbles = thimbles
+            d_csc_current = S.d0()
+
+        self.differential = d_csc_current
+        self.thimbles = thimbles
 
     # @cython.ccall
     def find_differential_matrix(
