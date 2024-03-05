@@ -29,6 +29,14 @@ class CSR_Mat:
         self.indptrs = indptrs
         self.number_of_columns = number_of_columns
 
+    def __reduce__(self):
+        return self.__class__, (
+            np.asarray(self.data),
+            np.asarray(self.indices),
+            np.asarray(self.indptrs),
+            self.number_of_columns,
+        )
+
     def _data(self):
         return self.data
 
@@ -40,6 +48,18 @@ class CSR_Mat:
 
     def _number_of_columns(self):
         return self.number_of_columns
+
+    def dict(self):
+        i: cython.int
+        j: cython.int
+
+        d = {}
+
+        for i in range(len(self.indptrs) - 1):
+            for j in range(self.indptrs[i], self.indptrs[i + 1]):
+                d[i, self.indices[j]] = self.data[j]
+
+        return d
 
     @cython.ccall
     def nnz(self) -> cython.int:

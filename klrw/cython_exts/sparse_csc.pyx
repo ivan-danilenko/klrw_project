@@ -28,6 +28,14 @@ class CSC_Mat:
         self.indptrs = indptrs
         self.number_of_rows = number_of_rows
 
+    def __reduce__(self):
+        return self.__class__, (
+            np.asarray(self.data),
+            np.asarray(self.indices),
+            np.asarray(self.indptrs),
+            self.number_of_rows,
+        )
+
     def print_sizes(self):
         print(len(self.data), len(self.indices), len(self.indptrs), self.number_of_rows)
 
