@@ -1294,7 +1294,11 @@ class CombinatorialEBrane:
 
     # @cython.ccall
     def find_differential_matrix(
-        self, domain_indices: list, codomain_indices: list, R: PrincipalIdealDomain
+        self,
+        domain_indices: list,
+        codomain_indices: list,
+        R: PrincipalIdealDomain,
+        dualize_complex=False,
     ) -> Matrix_sparse:
         from .framed_dynkin import is_a_dot_index
 
@@ -1315,9 +1319,10 @@ class CombinatorialEBrane:
         d_dict = {}
         for ind_j, j in enumerate(domain_indices):
             for ind_i, i in enumerate(codomain_indices):
-                # temporary fix: our d0 is transposed to fix
-                # the multiplication order difference from Elise's version
-                elem = self.differential[j, i]
+                if dualize_complex:
+                    elem = self.differential[j, i]
+                else:
+                    elem = self.differential[i, j]
                 if elem is not None:
                     # no_terms_found = True
                     for braid, coef in elem:
@@ -1348,8 +1353,12 @@ class CombinatorialEBrane:
             return False
         return True
 
-    def find_cohomology(
-        self, R: PrincipalIdealDomain, hom_deg_shift=0, equ_deg_shift=0
+    def find_homology(
+        self,
+        R: PrincipalIdealDomain,
+        hom_deg_shift=0,
+        equ_deg_shift=0,
+        dualize_complex=False,
     ):
         """
         Working over R that is a PID.
@@ -1374,8 +1383,13 @@ class CombinatorialEBrane:
 
         # here we will use that it our convention differential
         # *preserves* the equivariant degree
-        # and increases the homological degree by 1.
-        relevant_thimbles.sort(key=(lambda x: (x[1].equ_deg, x[1].hom_deg)))
+        # and decreases the homological degree by 1.
+        if not dualize_complex:
+            relevant_thimbles.sort(key=(lambda x: (x[1].equ_deg, -x[1].hom_deg)))
+            diff_hom_deg = -1
+        else:
+            relevant_thimbles.sort(key=(lambda x: (x[1].equ_deg, x[1].hom_deg)))
+            diff_hom_deg = 1
 
         d_prev: Matrix_sparse
         d_next: Matrix_sparse
@@ -1395,7 +1409,7 @@ class CombinatorialEBrane:
         else:
             Homology = {}
         i = 0
-        current_hom_deg = 0
+        # current_hom_deg = 0
         C3_indices = []
         while i != len(relevant_thimbles):
             # if the chain did not break by ending as ->0 on the previous step
@@ -1407,19 +1421,27 @@ class CombinatorialEBrane:
                 current_equ_deg = relevant_thimbles[i][1].equ_deg
 
                 while self.part_of_graded_component(
-                    relevant_thimbles, current_hom_deg, current_equ_deg, i
+                    relevant_thimbles,
+                    current_hom_deg,
+                    current_equ_deg,
+                    i,
                 ):
                     C2_indices.append(relevant_thimbles[i][0])
                     i += 1
 
                 # we already know C3_indices = [] from if
                 while self.part_of_graded_component(
-                    relevant_thimbles, current_hom_deg + 1, current_equ_deg, i
+                    relevant_thimbles,
+                    current_hom_deg + diff_hom_deg,
+                    current_equ_deg,
+                    i,
                 ):
                     C3_indices.append(relevant_thimbles[i][0])
                     i += 1
 
-                d_next = self.find_differential_matrix(C2_indices, C3_indices, R)
+                d_next = self.find_differential_matrix(
+                    C2_indices, C3_indices, R, dualize_complex=dualize_complex
+                )
                 # print(C1_indices, "->", C2_indices, "->", C3_indices)
                 # print(d_next)
                 # print("-----")
@@ -1441,21 +1463,27 @@ class CombinatorialEBrane:
             else:
                 # C1_indices = C2_indices
                 d_prev = d_next.__copy__()
-                current_hom_deg += 1
+                current_hom_deg += diff_hom_deg
                 C2_indices = C3_indices
 
                 C3_indices = []
                 while self.part_of_graded_component(
-                    relevant_thimbles, current_hom_deg + 1, current_equ_deg, i
+                    relevant_thimbles,
+                    current_hom_deg + diff_hom_deg,
+                    current_equ_deg,
+                    i,
                 ):
                     C3_indices.append(relevant_thimbles[i][0])
                     i += 1
 
-                d_next = self.find_differential_matrix(C2_indices, C3_indices, R)
+                d_next = self.find_differential_matrix(
+                    C2_indices, C3_indices, R, dualize_complex=dualize_complex
+                )
 
                 assert (d_next * d_prev).is_zero()
                 # print(C1_indices, "->", C2_indices, "->", C3_indices)
-                # print(d_prev, d_next)
+                # print(d_prev, "\n")
+                # print(d_next)
                 # print("-----")
 
                 if R.is_field():
