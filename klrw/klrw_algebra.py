@@ -660,7 +660,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         return len(self.basis(as_tuples=False))
 
     @cached_method
-    def basis(self, as_tuples=False):
+    def basis(self, max_number_of_dots=None, as_tuples=False):
         """
         Generates a basis in a component
         If as_tuples=True returns tuples (braid, exp)
@@ -668,6 +668,17 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         braid is a KLRW braid.
         exp is a tuple of exponents in the polynomial coefficients.
         """
+        if max_number_of_dots is not None:
+            return MappingProxyType(
+                {
+                    key: elem
+                    for key, elem in self.basis(
+                        max_number_of_dots=None, as_tuples=as_tuples
+                    ).items()
+                    if self.KLRW_algebra.element_max_number_of_dots(elem)
+                    <= max_number_of_dots
+                }
+            )
         if not as_tuples:
             # MappingProxyType makes sure it's immutable
             return MappingProxyType(dict(enumerate(self._basis_iter_())))

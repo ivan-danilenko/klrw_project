@@ -711,14 +711,16 @@ class CombinatorialEBrane:
                         graded_component = self.klrw_algebra[k][
                             left_state:right_state:equivariant_degree
                         ]
-                        basis = [
-                            elem
-                            for elem in graded_component.basis().values()
-                            if self.klrw_algebra[k].element_max_number_of_dots(elem)
-                            <= max_number_of_dots
-                        ]
+                        basis = list(
+                            graded_component.basis(
+                                max_number_of_dots=max_number_of_dots
+                            ).values()
+                        )
 
                         existing_entry = d_csc[index0, index1]
+
+                        if not basis:
+                            continue
 
                         """
                         if basis and existing_entry:
@@ -741,8 +743,9 @@ class CombinatorialEBrane:
                             for _, coeff in existing_entry:
                                 if not coeff.constant_coefficient().is_zero():
                                     not_geometric_entry = False
+                                    break
 
-                        if basis and not_geometric_entry:
+                        if not_geometric_entry:
                             # only if we have new elements
                             d1_dict[index0, index1] = {}
                             for elem in basis:
