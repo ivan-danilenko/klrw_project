@@ -457,7 +457,6 @@ class CombinatorialEBrane:
     def one_dimentional_differential_initial(self, i):
         brane = self.branes[i]
 
-        entries_so_far = 0
         d0_dict = {}
         for current_index in range(len(brane)):
             if current_index != len(brane) - 1:
@@ -547,30 +546,8 @@ class CombinatorialEBrane:
             else:
                 raise ValueError("Cohomological degrees differ by an unexpected value")
 
-        number_of_columns = len(brane)
-        # on average, exactly one term in a column/row
-        number_of_entries = number_of_columns
-        d0_csc_data = np.empty(number_of_entries, dtype="O")
-        d0_csc_indices = np.zeros(number_of_entries, dtype="intc")
-        d0_csc_indptrs = np.zeros(number_of_columns + 1, dtype="intc")
-
-        entries_so_far = 0
-        current_j = 0
-        for i, j in sorted(d0_dict.keys(), key=lambda x: (x[1], x[0])):
-            for k in range(current_j + 1, j + 1):
-                d0_csc_indptrs[k] = entries_so_far
-            current_j = j
-            d0_csc_data[entries_so_far] = d0_dict[i, j]
-            d0_csc_indices[entries_so_far] = i
-            entries_so_far += 1
-        for k in range(current_j + 1, number_of_columns + 1):
-            d0_csc_indptrs[k] = entries_so_far
-
-        d0_csc = CSC_Mat(
-            data=d0_csc_data,
-            indices=d0_csc_indices,
-            indptrs=d0_csc_indptrs,
-            number_of_rows=number_of_columns,
+        d0_csc = CSC_Mat.from_dict(
+            d0_dict, number_of_rows=len(brane), number_of_columns=len(brane)
         )
 
         return d0_csc
@@ -639,31 +616,8 @@ class CombinatorialEBrane:
                                 d1_dict[index0, index1] = {variable_index: elem}
                                 variable_index += 1
 
-        # TODO: make a function "from dict" for csc matrices
-        number_of_columns = len(brane)
-        number_of_entries = len(d1_dict)
-        d1_csc_data = np.empty(number_of_entries, dtype="O")
-        d1_csc_indices = np.zeros(number_of_entries, dtype="intc")
-        d1_csc_indptrs = np.zeros(number_of_columns + 1, dtype="intc")
-
-        entries_so_far = 0
-        current_j = 0
-        for i, j in sorted(d1_dict.keys(), key=lambda x: (x[1], x[0])):
-            for k in range(current_j + 1, j + 1):
-                d1_csc_indptrs[k] = entries_so_far
-            current_j = j
-            # entries_so_far becomes the index of a new defomation variable
-            d1_csc_data[entries_so_far] = d1_dict[i, j]
-            d1_csc_indices[entries_so_far] = i
-            entries_so_far += 1
-        for k in range(current_j + 1, number_of_columns + 1):
-            d1_csc_indptrs[k] = entries_so_far
-
-        d1_csc = CSC_Mat(
-            data=d1_csc_data,
-            indices=d1_csc_indices,
-            indptrs=d1_csc_indptrs,
-            number_of_rows=number_of_columns,
+        d1_csc = CSC_Mat.from_dict(
+            d1_dict, number_of_rows=len(brane), number_of_columns=len(brane)
         )
 
         return d1_csc
@@ -754,34 +708,9 @@ class CombinatorialEBrane:
                                 variables_of_degree += 1
                 print(hom_deg, "::", variables_of_degree)
 
-        # TODO: make a function "from dict" for csc matrices
-        number_of_columns = len(thimbles)
-        number_of_entries = len(d1_dict)
-        d1_csc_data = np.empty(number_of_entries, dtype="O")
-        d1_csc_indices = np.zeros(number_of_entries, dtype="intc")
-        d1_csc_indptrs = np.zeros(number_of_columns + 1, dtype="intc")
-
-        entries_so_far = 0
-        current_j = 0
-        for i, j in sorted(d1_dict.keys(), key=lambda x: (x[1], x[0])):
-            for a in range(current_j + 1, j + 1):
-                d1_csc_indptrs[a] = entries_so_far
-            current_j = j
-            # entries_so_far becomes the index of a new defomation variable
-            d1_csc_data[entries_so_far] = d1_dict[i, j]
-            d1_csc_indices[entries_so_far] = i
-            entries_so_far += 1
-        for a in range(current_j + 1, number_of_columns + 1):
-            d1_csc_indptrs[a] = entries_so_far
-
-        d1_csc = CSC_Mat(
-            data=d1_csc_data,
-            indices=d1_csc_indices,
-            indptrs=d1_csc_indptrs,
-            number_of_rows=number_of_columns,
+        d1_csc = CSC_Mat.from_dict(
+            d1_dict, number_of_rows=len(thimbles), number_of_columns=len(thimbles)
         )
-
-        # print(d1_csc_data)
 
         return d1_csc, variable_index
 
