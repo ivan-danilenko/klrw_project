@@ -337,17 +337,29 @@ class Solver:
 
     @cython.cfunc
     def solve_system_for_differential(
-        self, M: spmatrix, bb: spmatrix, method="pypardiso"
+        self, A: spmatrix, b: spmatrix, method="pypardiso"
     ):
         """
         Returns a tuple (solution : double[::1], is_integral : bool)
         """
+        if method == "pypardiso" or method == "cg":
+            if self.verbose:
+                print("Transfoming to a symmetric square system")
+            A_tr = A.transpose()
+            M = A_tr @ A
+            bb = A_tr @ b
+            
+            
+            for i in range(len(M.indptr) - 1):
+                if M.indptr[i] == M.indptr[i + 1]:
+                    print("Zero column in the square matrix:", i)
+            
+            # scipy conjugate gradients only take dense vectors, so we convert
+            # A1 flattens array
+            y = bb.todense().A1
+            
         if self.verbose:
             print("Solving the system")
-
-        # scipy conjugate gradients only take dense vectors, so we convert
-        # A1 flattens array
-        y = bb.todense().A1
 
         if method == "pypardiso":
             import pypardiso
@@ -357,18 +369,32 @@ class Solver:
             x = pypardiso.spsolve(M, y)
 
             if x.shape == ():
-                x = x.reshape((1,))
+                x = x.reshape((1,))        
         elif method == "cg":
             from scipy.sparse.linalg import cg
 
             x, exit_code = cg(M, y)
+        elif method == "gurobi":
+            import gurobipy as gp
+            
+            y = b.todense().A1
+            
+            m = gp.Model()
+            x = m.addMVar(A.shape[1], lb=-float("inf"))
+            m.addConstr(A @ x == y)
+            m.optimize()
+            if m.Status == 3:
+                m.computeIIS()
+                m.write("model.ilp")
+            x = x.X
         else:
             raise ValueError("Unknown method")
 
         # trying an integer approximation if it works
         x_int = np.rint(x)
 
-        assert np.allclose(M @ x_int, y), "Solution is not integral"
+        if method == "pypardiso" or method == "cg":
+            assert np.allclose(M @ x_int, y), "Solution is not integral"
 
         return x_int
 
@@ -551,18 +577,7 @@ class Solver:
         with open("vector_local", "wb") as f:
             dump(b, file=f)
 
-        if self.verbose:
-            print("Transfoming to a symmetric square system")
-        A_tr = A.transpose()
-        M = A_tr @ A
-        bb = A_tr @ b
-
-        for i in range(len(M.indptr) - 1):
-            if M.indptr[i] == M.indptr[i + 1]:
-                print("Zero column in the square matrix:", i)
-
-        x = self.solve_system_for_differential(M, bb, method=method)
-        del M, bb
+        x = self.solve_system_for_differential(A, b, method=method)
 
         if columns_to_remove > 0:
             x_modified = np.zeros(number_of_old_indices, dtype="intc")

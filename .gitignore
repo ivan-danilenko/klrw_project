@@ -16,3 +16,7 @@ build/
 
 # explicitly local files
 *_local*
+*.csv
+*.mtx
+*__pycache__*
+*.ilp
