@@ -348,16 +348,15 @@ class Solver:
             A_tr = A.transpose()
             M = A_tr @ A
             bb = A_tr @ b
-            
-            
+
             for i in range(len(M.indptr) - 1):
                 if M.indptr[i] == M.indptr[i + 1]:
                     print("Zero column in the square matrix:", i)
-            
+
             # scipy conjugate gradients only take dense vectors, so we convert
             # A1 flattens array
             y = bb.todense().A1
-            
+
         if self.verbose:
             print("Solving the system")
 
@@ -369,16 +368,16 @@ class Solver:
             x = pypardiso.spsolve(M, y)
 
             if x.shape == ():
-                x = x.reshape((1,))        
+                x = x.reshape((1,))
         elif method == "cg":
             from scipy.sparse.linalg import cg
 
             x, exit_code = cg(M, y)
         elif method == "gurobi":
             import gurobipy as gp
-            
+
             y = b.todense().A1
-            
+
             m = gp.Model()
             x = m.addMVar(A.shape[1], lb=-float("inf"))
             m.addConstr(A @ x == y)

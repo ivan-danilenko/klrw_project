@@ -16,7 +16,11 @@ build/
 
 # explicitly local files
 *_local*
+
+# Python cache
+*__pycache__*
+
+# output files
 *.csv
 *.mtx
-*__pycache__*
 *.ilp
