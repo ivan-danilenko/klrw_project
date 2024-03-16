@@ -722,7 +722,7 @@ class CombinatorialEBrane:
         S.set_d0(d0_csc)
 
         for order in count(start=1):
-            if S.d0_squares_to_zero():
+            if S.d0().squares_to_zero():
                 break
             print(
                 "----------Correcting order {} ".format(order)
@@ -1211,7 +1211,7 @@ class CombinatorialEBrane:
                     graded_type="h^order",
                     method=method,
                 )
-                if S.d0_squares_to_zero():
+                if S.d0().squares_to_zero():
                     break
             else:
                 raise RuntimeError(
