@@ -408,7 +408,10 @@ class Solver:
             m = gp.Model()
             x = m.addMVar(A.shape[1], lb=-float("inf"))
             m.addConstr(A @ x == y)
+            # set method to primal simplex method
+            m.Params.Method = 0
             m.optimize()
+            # if model is infeasible
             if m.Status == 3:
                 m.computeIIS()
                 m.write("model.ilp")
