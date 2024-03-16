@@ -343,6 +343,33 @@ class Solver:
         Returns a tuple (solution : double[::1], is_integral : bool)
         """
         if method == "pypardiso" or method == "cg":
+            A_csc = A.tocsc()
+            columns_to_remove = 0
+            for i in range(len(A_csc.indptr) - 1):
+                if A_csc.indptr[i] == A_csc.indptr[i + 1]:
+                    columns_to_remove += 1
+                    print("Zero column in the original matrix:", i)
+
+            if columns_to_remove > 0:
+                number_of_old_indices: cython.int = A_csc.shape[1]
+                number_of_new_indices: cython.int = A_csc.shape[1] - columns_to_remove
+                new_to_old_index = np.zeros(number_of_new_indices, dtype="intc")
+                A_csc_indptrs_new = np.zeros(number_of_new_indices + 1, dtype="intc")
+                new_indices_so_far: cython.int = 0
+                i: cython.int
+                for i in range(A_csc.shape[1]):
+                    # if we don't delete this column
+                    if A_csc.indptr[i] < A_csc.indptr[i + 1]:
+                        new_to_old_index[new_indices_so_far] = i
+                        A_csc_indptrs_new[new_indices_so_far + 1] = A_csc.indptr[i + 1]
+                        new_indices_so_far += 1
+                A = csc_matrix(
+                    (A_csc.data, A_csc.indices, A_csc_indptrs_new),
+                    shape=(A_csc.shape[0], number_of_new_indices),
+                )
+            else:
+                A = A_csc
+
             if self.verbose:
                 print("Transfoming to a symmetric square system")
             A_tr = A.transpose()
@@ -389,13 +416,20 @@ class Solver:
         else:
             raise ValueError("Unknown method")
 
-        # trying an integer approximation if it works
-        x_int = np.rint(x)
-
         if method == "pypardiso" or method == "cg":
-            assert np.allclose(M @ x_int, y), "Solution is not integral"
+            x = np.rint(x).astype(dtype="intc")
+            assert np.all(M @ x == y), "Solution is not integral"
 
-        return x_int
+            if columns_to_remove > 0:
+                x_modified = np.zeros(number_of_old_indices, dtype="intc")
+                i: cython.int
+                for i in range(number_of_new_indices):
+                    x_modified[new_to_old_index[i]] = x[i]
+                x = x_modified
+
+        x = x.astype(dtype="intc")
+
+        return x
 
     @cython.cfunc
     def update_differential(self, x: cython.int[::1], multiplier: KLRWElement = 1):
@@ -542,109 +576,10 @@ class Solver:
             multiplier=multiplier, order=order, graded_type=graded_type
         )
 
-        A_csc = A_csr.tocsc()
-        columns_to_remove = 0
-        for i in range(len(A_csc.indptr) - 1):
-            if A_csc.indptr[i] == A_csc.indptr[i + 1]:
-                columns_to_remove += 1
-                print("Zero column in the original matrix:", i)
-
-        if columns_to_remove > 0:
-            number_of_old_indices: cython.int = A_csc.shape[1]
-            number_of_new_indices: cython.int = A_csc.shape[1] - columns_to_remove
-            new_to_old_index = np.zeros(number_of_new_indices, dtype="intc")
-            A_csc_indptrs_new = np.zeros(number_of_new_indices + 1, dtype="intc")
-            new_indices_so_far: cython.int = 0
-            i: cython.int
-            for i in range(A_csc.shape[1]):
-                # if we don't delete this column
-                if A_csc.indptr[i] < A_csc.indptr[i + 1]:
-                    new_to_old_index[new_indices_so_far] = i
-                    A_csc_indptrs_new[new_indices_so_far + 1] = A_csc.indptr[i + 1]
-                    new_indices_so_far += 1
-            A = csc_matrix(
-                (A_csc.data, A_csc.indices, A_csc_indptrs_new),
-                shape=(A_csc.shape[0], number_of_new_indices),
-            )
-        else:
-            A = A_csc
-
-        from pickle import dump
-
-        with open("matrix_local", "wb") as f:
-            dump(A, file=f)
-        with open("vector_local", "wb") as f:
-            dump(b, file=f)
-
-        x = self.solve_system_for_differential(A, b, method=method)
-
-        if columns_to_remove > 0:
-            x_modified = np.zeros(number_of_old_indices, dtype="intc")
-            i: cython.int
-            for i in range(number_of_new_indices):
-                x_modified[new_to_old_index[i]] = x[i]
-            x = x_modified
-        else:
-            x = x.astype(dtype="intc")
-
-        # if still working over Z, comparison is exact
-        if self.KLRW.scalars() == ZZ:
-            assert np.array_equal(
-                A_csc @ x.astype(np.dtype("intc")), b.todense().A1
-            ), "Not a solution!"
-        else:
-            assert np.allclose(
-                A_csc @ x, b.todense().A1, atol=self.tolerance()
-            ), "Not a solution!"
+        x = self.solve_system_for_differential(A_csr, b, method=method)
 
         if self.verbose:
             print("Found a solution!")
-        del A, b
+        del A_csr, b
 
         self.update_differential(x, multiplier)
-
-    def check_d0(self):
-        d0_squared_csr = multiply(self.d0_csc.to_csr(), self.d0_csc)
-        print("d0 squares to zero:", d0_squared_csr.is_zero())
-
-        hucenter = self.KLRW.base().ideal([self.u, self.h])
-        print(
-            "d0 squares to zero mod (u,h):",
-            d0_squared_csr.is_zero_mod(hucenter),
-        )
-
-        husqcenter = self.KLRW.base().ideal([self.u**2, self.h])
-        print(
-            "d0 squares to zero mod (u^2,h):",
-            d0_squared_csr.is_zero_mod(husqcenter),
-        )
-
-        hucucenter = self.KLRW.base().ideal([self.u**3, self.h])
-        print(
-            "d0 squares to zero mod (u^3,h):",
-            d0_squared_csr.is_zero_mod(hucucenter),
-        )
-
-        hcenter = self.KLRW.base().ideal([self.h])
-        print(
-            "d0 squares to zero mod h:",
-            d0_squared_csr.is_zero_mod(hcenter),
-        )
-
-        hsqcenter = self.KLRW.base().ideal([self.h**2])
-        print(
-            "d0 squares to zero mod h^2:",
-            d0_squared_csr.is_zero_mod(hsqcenter),
-        )
-
-    def d0_squares_to_zero(self):
-        d0_squared_csr = multiply(self.d0_csc.to_csr(), self.d0_csc)
-        d0_squared_is_zero = d0_squared_csr.is_zero()
-        print("d0 squares to zero:", d0_squared_is_zero)
-        return d0_squared_is_zero
-
-    def d0_squares_to_zero_mod(self, ideal):
-        d0_squared_csr = multiply(self.d0_csc.to_csr(), self.d0_csc)
-        d0_squared_is_zero = d0_squared_csr.is_zero_mod(ideal)
-        print("d0 squares to zero modulo the ideal:", d0_squared_is_zero)
-        return d0_squared_is_zero
