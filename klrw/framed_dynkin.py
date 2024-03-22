@@ -498,6 +498,11 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         for _, e_list in elementary_symmetric_polynomials.items():
             yield from e_list
 
+    def exps_for_dots_of_degree(self, degree):
+        # should we make it separately?
+        for mon in self.dots_of_degree(degree):
+            yield from mon.exponents()
+
     def dots_of_degree(self, degree):
         variables = [
             v.monomial
@@ -534,13 +539,15 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
         return degree
 
+    def exp_number_of_dots(self, exp):
+        return sum(exp[var.position] for var in self.dot_variables.values())
+
     def element_max_number_of_dots(self, element):
         # zero elements return 0 as degree
         n_dots = 0
-        dot_variables = self.dot_variables
         for exp, scalar in element.iterator_exp_coeff():
             if not scalar.is_zero():
-                term_dots = sum(exp[var.position] for var in dot_variables.values())
+                term_dots = self.exp_number_of_dots(exp)
 
                 if term_dots > n_dots:
                     n_dots = term_dots

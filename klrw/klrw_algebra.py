@@ -668,29 +668,31 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         braid is a KLRW braid.
         exp is a tuple of exponents in the polynomial coefficients.
         """
-        if max_number_of_dots is not None:
-            return MappingProxyType(
-                {
-                    key: elem
-                    for key, elem in self.basis(
-                        max_number_of_dots=None, as_tuples=as_tuples
-                    ).items()
-                    if self.KLRW_algebra.element_max_number_of_dots(elem)
-                    <= max_number_of_dots
-                }
-            )
-        if not as_tuples:
-            # MappingProxyType makes sure it's immutable
-            return MappingProxyType(dict(enumerate(self._basis_iter_())))
+        if as_tuples:
+            if max_number_of_dots is None:
+                # MappingProxyType makes sure it's immutable
+                return MappingProxyType(dict(enumerate(self._basis_iter_as_tuples_())))
+            else:
+                return MappingProxyType(
+                    {
+                        key: (braid, exp)
+                        for key, (braid, exp) in self.basis(
+                            max_number_of_dots=None,
+                            as_tuples=True,
+                        ).items()
+                        if self.KLRW_algebra.base().exp_number_of_dots(exp)
+                        <= max_number_of_dots
+                    }
+                )
         else:
             result = {}
-            for i, basis_element in self.basis(as_tuples=False).items():
-                assert len(basis_element) == 1
-                for braid, monomial in basis_element:
-                    assert monomial.is_term()
-                    for exp, coeff in monomial.iterator_exp_coeff(as_ETuples=True):
-                        assert coeff == self.KLRW_algebra.base().base().one()
-                        result[i] = (braid, exp)
+            for i, (braid, exp) in self.basis(
+                max_number_of_dots=max_number_of_dots,
+                as_tuples=True,
+            ).items():
+                print(braid, exp)
+                coeff = self.KLRW_algebra.base().monomial(*exp)
+                result[i] = self.KLRW_algebra.term(braid, coeff)
             return MappingProxyType(result)
 
     @lazy_attribute
@@ -706,16 +708,15 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
             result[braid.word(), exp] = i
         return MappingProxyType(result)
 
-    def _basis_iter_(self):
+    def _basis_iter_as_tuples_(self):
         for braid in self.KLRW_algebra.KLRWBraid._braids_with_left_state_iter_(
             self.left_state
         ):
             if braid.right_state() == self.right_state:
-                for monomial in self.KLRW_algebra.base().dots_of_degree(
+                for exp in self.KLRW_algebra.base().exps_for_dots_of_degree(
                     self.degree - self.KLRW_algebra.braid_degree(braid)
                 ):
-                    assert monomial.is_term()
-                    yield self.KLRW_algebra.term(braid, monomial)
+                    yield (braid, exp)
 
     def _element_from_vector_(self, vector):
         assert len(vector) == len(self.basis())
