@@ -124,26 +124,26 @@ class CSR_Mat:
     @classmethod
     def from_dict(cls, d_dict: dict, number_of_rows, number_of_columns):
         number_of_entries = len(d_dict)
-        d_csc_data = np.empty(number_of_entries, dtype="O")
-        d_csc_indices = np.zeros(number_of_entries, dtype="intc")
-        d_csc_indptrs = np.zeros(number_of_rows + 1, dtype="intc")
+        d_csr_data = np.empty(number_of_entries, dtype="O")
+        d_csr_indices = np.zeros(number_of_entries, dtype="intc")
+        d_csr_indptrs = np.zeros(number_of_rows + 1, dtype="intc")
 
         entries_so_far = 0
         current_j = 0
-        for i, j in sorted(d_dict.keys()):
+        for j, i in sorted(d_dict.keys()):
             for a in range(current_j + 1, j + 1):
-                d_csc_indptrs[a] = entries_so_far
+                d_csr_indptrs[a] = entries_so_far
             current_j = j
             # entries_so_far becomes the index of a new defomation variable
-            d_csc_data[entries_so_far] = d_dict[j, i]
-            d_csc_indices[entries_so_far] = i
+            d_csr_data[entries_so_far] = d_dict[j, i]
+            d_csr_indices[entries_so_far] = i
             entries_so_far += 1
         for a in range(current_j + 1, number_of_rows + 1):
-            d_csc_indptrs[a] = entries_so_far
+            d_csr_indptrs[a] = entries_so_far
 
         return cls(
-            data=d_csc_data,
-            indices=d_csc_indices,
-            indptrs=d_csc_indptrs,
-            number_of_rows=number_of_columns,
+            data=d_csr_data,
+            indices=d_csr_indices,
+            indptrs=d_csr_indptrs,
+            number_of_columns=number_of_columns,
         )
