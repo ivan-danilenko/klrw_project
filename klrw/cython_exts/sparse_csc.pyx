@@ -108,7 +108,7 @@ class CSC_Mat:
         # Scipy will to do it fast
         M_csc = csc_matrix(
             (range(1, len(self.indices) + 1), self.indices, self.indptrs),
-            shape=(len(self.indptrs) - 1, self.number_of_rows),
+            shape=(self.number_of_rows, len(self.indptrs) - 1),
         )
         M_csr = M_csc.tocsr()
         del M_csc

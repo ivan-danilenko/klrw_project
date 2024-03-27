@@ -87,7 +87,7 @@ class CSR_Mat:
             (range(1, len(self.indices) + 1), self.indices, self.indptrs),
             shape=(len(self.indptrs) - 1, self.number_of_columns),
         )
-        M_csc = M_csr.tocsr()
+        M_csc = M_csr.tocsc()
         del M_csr
 
         csc_data: object[::1] = np.empty(len(self.data), dtype=object)
