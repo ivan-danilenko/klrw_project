@@ -450,6 +450,10 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
         the rest of strands are not intersecting.
         """
 
+        # if mapping is empty, the word is trivial
+        if not mapping:
+            return self._element_constructor_(state=right_state, word=tuple())
+
         N = max(max(mapping.values()), max(mapping.keys()))
 
         if check:

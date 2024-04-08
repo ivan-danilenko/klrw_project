@@ -9,6 +9,7 @@ from sage.structure.unique_representation import UniqueRepresentation
 from sage.rings.polynomial.multi_polynomial_libsingular import (
     MPolynomialRing_libsingular as PolynomialRing,
 )
+from sage.rings.polynomial.polydict import ETuple
 from sage.rings.ring import CommutativeRing
 
 from sage.misc.cachefunc import cached_method
@@ -432,6 +433,12 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
         super().__init__(base_ring, len(names_list), names_list, order)
 
+        self.number_of_non_dot_params = sum(
+            1
+            for index in names
+            if not is_a_dot_index(index)
+        )
+
         self.degrees = [
             (
                 quiver.scalar_product_of_simple_roots(index[0], index[0])
@@ -539,8 +546,25 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
         return degree
 
-    def exp_number_of_dots(self, exp):
-        return sum(exp[var.position] for var in self.dot_variables.values())
+    @cached_method
+    def non_dots_characteristic_tuple(self):
+        char_t = ETuple((0,)*len(self.gens()))
+        for index, var in self.variables.items():
+            if not is_a_dot_index(index):
+                if var.position is not None:
+                    char_t = char_t.eadd_p(1, var.position)
+        return char_t
+
+    @cached_method
+    def dots_characteristic_tuple(self):
+        char_t = ETuple((0,)*len(self.gens()))
+        for var in self.dot_variables.values():
+            char_t = char_t.eadd_p(1, var.position)
+        return char_t
+
+    @cached_method
+    def exp_number_of_dots(self, exp: ETuple):
+        return exp.dotprod(self.dots_characteristic_tuple())
 
     def element_max_number_of_dots(self, element):
         # zero elements return 0 as degree
@@ -566,6 +590,10 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
             result += scalar * multiplier * self.monomial(*exp)
 
         return result
+
+    def etuple_ignoring_dots(self, et: ETuple):
+        # we assume that the non-zero dots have first positions
+        return et[:self.number_of_non_dot_params]
 
     def hom_from_dots_map(self, codomain, map: MappingProxyType):
         variables_images = [

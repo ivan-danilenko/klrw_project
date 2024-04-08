@@ -1,6 +1,7 @@
 import cython
 import numpy as np
 from itertools import count
+from collections import defaultdict
 import bisect
 
 from sage.rings.integer_ring import ZZ
@@ -12,8 +13,10 @@ from sage.combinat.root_system.cartan_type import CartanType
 
 from .klrw_algebra import KLRWAlgebra
 from .framed_dynkin import FramedDynkinDiagram_with_dimensions
+from klrw.perfect_complex import KLRWProjectiveModule
 from .cython_exts.solver import Solver
 from .cython_exts.sparse_csc import CSC_Mat
+from .perfect_complex_corrections_local import PerfectComplex, corrected_diffirential_csc
 
 
 class TThimble:
@@ -54,7 +57,7 @@ class ProductThimbles:
         "colored_state",
         "hom_deg",
         "equ_deg",
-        "order",
+        "points",
         "next_thimble_strand_number",
         "next_thimble_position",
         "intersection_indices",
@@ -65,7 +68,7 @@ class ProductThimbles:
         colored_state: list | tuple,
         hom_deg,
         equ_deg,
-        order: list | tuple,
+        points: list | tuple,
         next_thimble_strand_number,
         next_thimble_position,
         intersection_indices,
@@ -73,7 +76,7 @@ class ProductThimbles:
         self.colored_state = colored_state
         self.hom_deg = hom_deg
         self.equ_deg = equ_deg
-        self.order = order
+        self.points = points
         self.next_thimble_strand_number = next_thimble_strand_number
         self.next_thimble_position = next_thimble_position
         self.intersection_indices = intersection_indices
@@ -87,7 +90,7 @@ class ProductThimbles:
             + ", "
             + self.equ_deg.__repr__()
             + ", "
-            + self.order.__repr__()
+            + self.points.__repr__()
             + ", "
             + self.equ_deg.__repr__()
             + ", "
@@ -130,7 +133,7 @@ class CombinatorialEBrane:
         # to elements of the one with more strands.
         # self.hom_one_to_many_dots[i,j] is the homomorphism
         # from the algebra of dots on one strand to the algebra
-        # on i strands that sends all dots to dots on j-th strand.
+        # on i + 1 strands that sends all dots to dots on j-th strand.
         self.hom_one_to_many_dots = {}
         domain_dots_algebra = self.klrw_algebra[1].base()
         for i in range(1, self.k):
@@ -211,8 +214,12 @@ class CombinatorialEBrane:
             number_of_E_branes * intersection_points_in_E_brane
         )
 
-        self.differential = None
-        self.thimbles = None
+        # we use homological degree convention: differential
+        # lowers homological grading by 1
+        self.degree = -1
+        # dictionary to keep track of projectives
+        self.thimbles = {}
+        self.complex = {}
 
     def apply_s(self, i):
         assert i != 0
@@ -439,25 +446,53 @@ class CombinatorialEBrane:
         for b in braid:
             self.apply_s(b)
 
-    #    def tensor_product_index(self, indices : list):
-    #        """
-    #        Indices in a lexmin order on the tensor product basis
-    #        """
-    #        assert len(indices) == len(self.branes)
-    #        for ind,br in zip(indices,self.branes):
-    #            assert ind < len(br)
-    #
-    #        tensor_index = 0
-    #        for ind, br in zip(indices[-1::-1],self.branes[-1::-1]):
-    #            tensor_index *= len(br)
-    #            tensor_index += ind
-    #
-    #        return tensor_index
+    def is_ordered(self):
+        # checks if intersection points are enumerated from left to right
+        current_index = 0
+        for segment in self.intersections:
+            for j in segment:
+                if j != current_index:
+                    return False
+                current_index += 1
+        return True
 
-    def one_dimentional_differential_initial(self, i):
+    def order_intersections(self):
+        if self.is_ordered():
+            return
+
+        old_to_new_index = {}
+        new_index = 0
+        for segment in self.intersections:
+            for j in range(len(segment)):
+                old_index = segment[j]
+                segment[j] = new_index
+                old_to_new_index[old_index] = new_index
+                new_index += 1
+
+        new_intersections_data = {
+            old_to_new_index[pt]: data for pt, data in self.intersections_data.items()
+        }
+        self.intersections_data = new_intersections_data
+
+        for brane in self.branes:
+            for j in range(len(brane)):
+                brane[j] = old_to_new_index[brane[j]]
+
+        new_pairwise_equ_deg = {
+            (
+                old_to_new_index[pt1],
+                old_to_new_index[pt2],
+            ): deg
+            for (pt1, pt2), deg in self.pairwise_equ_deg.items()
+        }
+        self.pairwise_equ_deg = new_pairwise_equ_deg
+
+    def one_dimensional_differential_geometric(self, i):
         brane = self.branes[i]
+        projectives = defaultdict(list)
+        thimbles = defaultdict(list)
 
-        d0_dict = {}
+        differential_dicts = defaultdict(dict)
         for current_index in range(len(brane)):
             if current_index != len(brane) - 1:
                 next_index = current_index + 1
@@ -471,19 +506,43 @@ class CombinatorialEBrane:
             next_point = brane[next_index]
 
             next_hom_deg = self.intersections_data[next_point].hom_deg
+            next_equ_deg = self.intersections_data[next_point].equ_deg
             next_segment = self.intersections_data[next_point].segment
             next_state = self.klrw_algebra[1].state(
                 self.V if i == next_segment else self.W for i in range(self.n + 1)
             )
             current_hom_deg = self.intersections_data[current_point].hom_deg
+            current_equ_deg = self.intersections_data[current_point].equ_deg
             current_segment = self.intersections_data[current_point].segment
             current_state = self.klrw_algebra[1].state(
                 self.V if i == current_segment else self.W for i in range(self.n + 1)
             )
-            # shift by 1 in segments because numbering
-            # of strands in KLRWAlgebra starts with 1.
 
-            if next_hom_deg == current_hom_deg - 1:
+            thimbles[current_hom_deg].append(
+                ProductThimbles(
+                    colored_state=(current_segment,),
+                    hom_deg=None,
+                    equ_deg=None,
+                    points=(current_point,),
+                    next_thimble_strand_number=None,
+                    next_thimble_position=None,
+                    intersection_indices=None,
+                )
+            )
+            projectives[current_hom_deg].append(
+                KLRWProjectiveModule(
+                    state=current_state,
+                    equivariant_degree=current_equ_deg,
+                )
+            )
+            current_index_within_hom_deg = len(projectives[current_hom_deg]) - 1
+            if not have_endpoint:
+                # we will add this projective in the next run of this cycle
+                next_index_within_hom_deg = len(projectives[next_hom_deg])
+            else:
+                next_index_within_hom_deg = 0
+
+            if next_hom_deg == current_hom_deg + 1:
                 KLRWbraid = (
                     self.klrw_algebra[1]
                     .braid_set()
@@ -495,38 +554,6 @@ class CombinatorialEBrane:
                     )
                 )
 
-                next_equ_deg = self.intersections_data[next_point].equ_deg
-                current_equ_deg = self.intersections_data[current_point].equ_deg
-                braid_degree = self.klrw_algebra[1].braid_degree(KLRWbraid)
-                assert next_equ_deg - current_equ_deg == braid_degree, (
-                    current_equ_deg.__repr__()
-                    + " "
-                    + next_equ_deg.__repr__()
-                    + " "
-                    + braid_degree.__repr__()
-                )
-
-                KLRWElement = self.klrw_algebra[1].monomial(KLRWbraid)
-                if have_endpoint:
-                    # we have sign (-1)^{(n/2)+1}
-                    if len(brane) % 4 == 0:
-                        # ???modify the sign?
-                        KLRWElement *= ZZ(-1)
-                d0_dict[next_index, current_index] = KLRWElement
-            elif next_hom_deg == current_hom_deg + 1:
-                KLRWbraid = (
-                    self.klrw_algebra[1]
-                    .braid_set()
-                    .braid_for_one_strand(
-                        right_state=next_state,
-                        right_moving_strand_position=next_segment + 1,
-                        left_moving_strand_position=current_segment + 1,
-                        check=False,
-                    )
-                )
-
-                next_equ_deg = self.intersections_data[next_point].equ_deg
-                current_equ_deg = self.intersections_data[current_point].equ_deg
                 braid_degree = self.klrw_algebra[1].braid_degree(KLRWbraid)
                 assert current_equ_deg - next_equ_deg == braid_degree, (
                     current_equ_deg.__repr__()
@@ -540,87 +567,45 @@ class CombinatorialEBrane:
                 if have_endpoint:
                     # we have sign (-1)^{(n/2)+1}
                     if len(brane) % 4 == 0:
-                        # ???modify the sign?
                         KLRWElement *= ZZ(-1)
-                d0_dict[current_index, next_index] = KLRWElement
+
+                differential_dicts[next_hom_deg][
+                    next_index_within_hom_deg, current_index_within_hom_deg
+                ] = KLRWElement
+            elif next_hom_deg == current_hom_deg - 1:
+                KLRWbraid = (
+                    self.klrw_algebra[1]
+                    .braid_set()
+                    .braid_for_one_strand(
+                        right_state=next_state,
+                        right_moving_strand_position=next_segment + 1,
+                        left_moving_strand_position=current_segment + 1,
+                        check=False,
+                    )
+                )
+
+                braid_degree = self.klrw_algebra[1].braid_degree(KLRWbraid)
+                assert next_equ_deg - current_equ_deg == braid_degree, (
+                    current_equ_deg.__repr__()
+                    + " "
+                    + next_equ_deg.__repr__()
+                    + " "
+                    + braid_degree.__repr__()
+                )
+
+                KLRWElement = self.klrw_algebra[1].monomial(KLRWbraid)
+                if have_endpoint:
+                    # we have sign (-1)^{(n/2)+1}
+                    if len(brane) % 4 == 0:
+                        KLRWElement *= ZZ(-1)
+
+                differential_dicts[current_hom_deg][
+                    current_index_within_hom_deg, next_index_within_hom_deg
+                ] = KLRWElement
             else:
                 raise ValueError("Cohomological degrees differ by an unexpected value")
 
-        d0_csc = CSC_Mat.from_dict(
-            d0_dict, number_of_rows=len(brane), number_of_columns=len(brane)
-        )
-
-        return d0_csc
-
-    def one_dimentional_differential_corrections(self, i, order):
-        brane = self.branes[i]
-
-        # we organize points/T-thimbles in the brane by their cohomological degree as
-        # a dictionary {hom_deg:(index_in_brane,TThimble)}
-        points_by_hom_degree = {}
-        for index in range(len(brane)):
-            point = brane[index]
-            thimble = self.intersections_data[point]
-            hom_deg = thimble.hom_deg
-
-            if hom_deg in points_by_hom_degree:
-                points_by_hom_degree[hom_deg].append((index, thimble))
-            else:
-                points_by_hom_degree[hom_deg] = [(index, thimble)]
-
-        d1_dict = {}
-        variable_index = 0
-        for hom_deg in sorted(points_by_hom_degree.keys()):
-            # terms of differential exist only between adjacent coh degrees
-            if hom_deg + 1 in points_by_hom_degree:
-                thimbles_of_hom_deg = points_by_hom_degree[hom_deg]
-                thimbles_of_hom_deg_plus_one = points_by_hom_degree[hom_deg + 1]
-
-                for index0, thimble0 in thimbles_of_hom_deg:
-                    for index1, thimble1 in thimbles_of_hom_deg_plus_one:
-                        right_state = self.klrw_algebra[1].state(
-                            self.V if i == thimble1.segment else self.W
-                            for i in range(self.n + 1)
-                        )
-                        left_state = self.klrw_algebra[1].state(
-                            self.V if i == thimble0.segment else self.W
-                            for i in range(self.n + 1)
-                        )
-                        equivariant_degree = thimble0.equ_deg - thimble1.equ_deg
-
-                        braid_degree = abs(thimble1.segment - thimble0.segment)
-                        # we want to have exactly :order: dots
-                        # each dot has degree 2
-                        if 2 * order == equivariant_degree - braid_degree:
-                            graded_component = self.klrw_algebra[1][
-                                left_state:right_state:equivariant_degree
-                            ]
-                            basis = graded_component.basis()
-
-                            if basis:
-                                assert (
-                                    len(basis) <= 1
-                                ), "Too many possible corrections for one strand case."
-                                # this is the only element
-                                elem = basis[0]
-                                # for braid, _ in elem:
-                                #     assert (
-                                #         self.klrw_algebra[1].braid_degree(braid)
-                                #         == braid_degree
-                                #     ), (
-                                #         repr(self.klrw_algebra[1].braid_degree(braid))
-                                #         + " "
-                                #         + repr(braid_degree)
-                                #     )
-
-                                d1_dict[index0, index1] = {variable_index: elem}
-                                variable_index += 1
-
-        d1_csc = CSC_Mat.from_dict(
-            d1_dict, number_of_rows=len(brane), number_of_columns=len(brane)
-        )
-
-        return d1_csc
+        return differential_dicts, projectives, thimbles
 
     def differential_u_corrections(self, thimbles, max_number_of_dots, k, d_csc):
         # we organize points/T-thimbles in the brane by their cohomological degree as
@@ -714,33 +699,31 @@ class CombinatorialEBrane:
 
         return d1_csc, variable_index
 
-    def one_dimentional_differential(self, i, method="pypardiso"):
-        print("----------Making the initial approximation----------")
-        d0_csc = self.one_dimentional_differential_initial(i)
+    def one_dimensional_differential_projectives_thimbles(self, i):
+        differential_dicts, projectives, thimbles = (
+            self.one_dimensional_differential_geometric(i)
+        )
 
-        S = Solver(self.klrw_algebra[1])
-        S.set_d0(d0_csc)
+        diff_csc = corrected_diffirential_csc(
+            self.klrw_algebra[1],
+            differential_dicts,
+            projectives,
+            degree=self.degree,
+        )
 
-        for order in count(start=1):
-            if S.d0().squares_to_zero():
-                break
-            print(
-                "----------Correcting order {} ".format(order)
-                + "in u for brane {}----------".format(i)
-            )
-            d1_csc = self.one_dimentional_differential_corrections(i, order=order)
-            S.set_d1(d1_csc, number_of_variables=len(d1_csc._data()))
-            # u = self.klrw_algebra[1].base().variables[self.V, self.W].monomial
-            # multiplier = u**order
-            multiplier = self.klrw_algebra[1].base().one()
-            S.make_corrections(
-                multiplier=multiplier,
-                order=order,
-                graded_type="u^order*h^0",
-                method=method,
-            )
+        return diff_csc, projectives, thimbles
 
-        return S.d0()
+    def one_dimensional_complex(self, i):
+        differential_dicts, projectives, _ = (
+            self.one_dimensional_differential_geometric(i)
+        )
+
+        return PerfectComplex(
+            self.klrw_algebra[1],
+            differential_dicts,
+            projectives,
+            degree=self.degree,
+        )
 
     def make_differential(
         self,
@@ -759,7 +742,7 @@ class CombinatorialEBrane:
                 ind = ind + 1
 
         # the differential for the zeroth brane
-        d_csc_current = self.one_dimentional_differential(0, method=method)
+        d_csc_current = self.one_dimensional_differential(0, method=method)
 
         # print(np.asarray(d_csc_current._data()))
         # print(np.asarray(d_csc_current._indices()))
@@ -773,7 +756,7 @@ class CombinatorialEBrane:
                 colored_state=(self.intersections_data[pt].segment,),
                 hom_deg=self.intersections_data[pt].hom_deg,
                 equ_deg=self.intersections_data[pt].equ_deg,
-                order=(self.intersections_data[pt].order,),
+                points=(self.intersections_data[pt].order,),
                 next_thimble_strand_number=1,
                 next_thimble_position=self.intersections_data[pt].segment + 1,
                 intersection_indices=(pt,),
@@ -823,7 +806,7 @@ class CombinatorialEBrane:
                 )
 
             # the next_brane_diff is the differential for the next_brane_number-th brane
-            d_csc_next = self.one_dimentional_differential(
+            d_csc_next = self.one_dimensional_differential(
                 next_brane_number, method=method
             )
 

@@ -112,6 +112,31 @@ class KLRWElement(IndexedFreeModuleElement):
             for braid, coeff in self
         )
 
+    def is_geometric(self):
+        """
+        Return True if self has at least one non-zero constant term.
+        """
+        for _, coeff in self:
+            if not coeff.constant_coefficient().is_zero():
+                return True
+
+        return False
+
+    def geometric_part(self):
+        """
+        Return the geometric part of the element.
+
+        The geometric part contains only constant dot coefficients.
+        """
+        return self.parent().linear_combination(
+            (
+                self.parent().monomial(braid),
+                self.parent().base()(coeff.constant_coefficient()),
+            )
+            for braid, coeff in self
+            if not coeff.constant_coefficient().is_zero()
+        )
+
     # TODO:rewrite
     # def check(self):
 
@@ -229,6 +254,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         self,
         base_R,
         quiver: FramedDynkinDiagram_with_dimensions,
+        dot_algebra_order="degrevlex",
         warnings=False,
         **prefixes
     ):
@@ -240,7 +266,9 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         self.warnings = warnings
         self.quiver = deepcopy(quiver)  # .copy()
         self.KLRWBraid = KLRWbraid_set(self.quiver, state_on_right=True)
-        dots_algebra = KLRWUpstairsDotsAlgebra(base_R, self.quiver, **prefixes)
+        dots_algebra = KLRWUpstairsDotsAlgebra(
+            base_R, self.quiver, order=dot_algebra_order, **prefixes
+        )
         category = FiniteDimensionalAlgebrasWithBasis(dots_algebra)
         super().__init__(R=dots_algebra, element_class=KLRWElement, category=category)
 
@@ -660,7 +688,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         return len(self.basis(as_tuples=False))
 
     @cached_method
-    def basis(self, max_number_of_dots=None, as_tuples=False):
+    def basis(self, min_number_of_dots=0, max_number_of_dots=None, as_tuples=False):
         """
         Generates a basis in a component
         If as_tuples=True returns tuples (braid, exp)
@@ -670,13 +698,30 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         """
         if as_tuples:
             if max_number_of_dots is None:
-                # MappingProxyType makes sure it's immutable
-                return MappingProxyType(dict(enumerate(self._basis_iter_as_tuples_())))
+                if min_number_of_dots == 0:
+                    # MappingProxyType makes sure it's immutable
+                    return MappingProxyType(
+                        dict(enumerate(self._basis_iter_as_tuples_()))
+                    )
+                else:
+                    return MappingProxyType(
+                        {
+                            key: (braid, exp)
+                            for key, (braid, exp) in self.basis(
+                                min_number_of_dots=0,
+                                max_number_of_dots=None,
+                                as_tuples=True,
+                            ).items()
+                            if self.KLRW_algebra.base().exp_number_of_dots(exp)
+                            >= min_number_of_dots
+                        }
+                    )
             else:
                 return MappingProxyType(
                     {
                         key: (braid, exp)
                         for key, (braid, exp) in self.basis(
+                            min_number_of_dots=min_number_of_dots,
                             max_number_of_dots=None,
                             as_tuples=True,
                         ).items()
@@ -687,6 +732,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         else:
             result = {}
             for i, (braid, exp) in self.basis(
+                min_number_of_dots=min_number_of_dots,
                 max_number_of_dots=max_number_of_dots,
                 as_tuples=True,
             ).items():

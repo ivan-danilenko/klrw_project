@@ -24,3 +24,6 @@ build/
 *.csv
 *.mtx
 *.ilp
+
+# Visual Studio Code files
+.vscode
