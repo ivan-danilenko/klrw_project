@@ -1,13 +1,20 @@
+# cython: profile=True
+
 import cython
 from cython.cimports import cython
 import numpy as np
 from cython.cimports import numpy as np
 
-from .sparse_csc cimport CSC_Mat
+from cython.cimports.klrw.cython_exts.sparse_csc import CSC_Mat
+
 
 def add(left: CSC_Mat, right: CSC_Mat) -> CSC_Mat:
-    assert len(left.indptrs) == len(right.indptrs), "Shapes do not match: different number of columns"
-    assert left.number_of_rows == right.number_of_rows, "Shapes do not match: different number of rows"
+    assert len(left.indptrs) == len(
+        right.indptrs
+    ), "Shapes do not match: different number of columns"
+    assert (
+        left.number_of_rows == right.number_of_rows
+    ), "Shapes do not match: different number of rows"
 
     sum_csc_indptrs: cython.int[::1] = np.zeros(
         len(left.indptrs), dtype=np.dtype("intc")
@@ -18,7 +25,6 @@ def add(left: CSC_Mat, right: CSC_Mat) -> CSC_Mat:
     )
     sum_csc_data: object[::1] = np.empty(max_non_zero_entries, dtype=object)
 
-    n: cython.int
     j: cython.int
     indptr1: cython.int
     indptr2: cython.int

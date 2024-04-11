@@ -1,3 +1,5 @@
+# cython: profile=True
+
 import cython
 from cython.cimports import cython
 import numpy as np
@@ -6,8 +8,6 @@ from cython.cimports import numpy as np
 from scipy.sparse import csr_matrix
 
 from klrw.klrw_algebra import KLRWElement
-
-from .sparse_csc cimport CSC_Mat
 
 
 # Making our version of CSR matrices, because scipy rejects working with object entries

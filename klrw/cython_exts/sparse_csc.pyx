@@ -1,3 +1,5 @@
+# cython: profile=True
+
 import cython
 from cython.cimports import cython
 import numpy as np
@@ -242,7 +244,7 @@ class CSC_Mat:
 
         output_data = output_data[:entries_so_far]
         output_indices = output_indices[:entries_so_far]
-        
+
         return CSC_Mat(
             output_data,
             output_indices,

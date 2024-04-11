@@ -8,16 +8,14 @@ from sage.structure.parent import Parent
 from sage.structure.element import Element
 from sage.combinat.free_module import CombinatorialFreeModule
 
-# from sage.structure.richcmp import richcmp
-
 from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
 from sage.matrix.matrix0 import Matrix
 from sage.matrix.constructor import matrix
 from sage.modules.free_module_element import vector
 from sage.modules.free_module import span
 from sage.structure.element import Vector
-
-from sage.rings.integer_ring import IntegerRing
+from sage.homology.chain_complex import ChainComplex, ChainComplex_class
+from sage.rings.integer_ring import ZZ
 from sage.rings.finite_rings.integer_mod_ring import IntegerModRing
 from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
@@ -46,8 +44,8 @@ class KLRWPerfectComplex(Parent):
         differentials: dict[Element, Matrix],
         projectives: dict[Element, Iterable[KLRWProjectiveModule]] | None = None,
         degree=-1,
-        grading_group=IntegerRing(),
-        mod2grading=IntegerModRing(2).coerce_map_from(IntegerRing()),
+        grading_group=ZZ,
+        mod2grading=IntegerModRing(2).coerce_map_from(ZZ),
         check=True,
     ):
         """
@@ -65,9 +63,6 @@ class KLRWPerfectComplex(Parent):
         self.KLRW_algebra = KLRW_algebra
         self.degree = degree
 
-        #        self.differentials: defaultdict[Element, Matrix] = defaultdict(
-        #            lambda: matrix(self.KLRW_algebra)
-        #        )
         self.differentials = differentials
         if isinstance(projectives, defaultdict):
             assert projectives.default_factory is list
@@ -100,29 +95,102 @@ class KLRWPerfectComplex(Parent):
                         - self.projectives[n][i].equivariant_degree
                     ) == elem.degree(check_if_homogeneous=True)
 
-    #    def rhom_from_projective(
-    #        self, projective: KLRWProjectiveModule, i: int | None = None
-    #    ) -> ChainComplex_class:
-    #        if i is None:
-    #            return ChainComplex(
-    #                data={i: d for i, d in self.matrices_in_rhom(projective)},
-    #                degree_of_differential=self.degree,
-    #                grading_group=IntegerRing(),
-    #            )
-    #        else:
-    #            basis_previous = self.basis_index(projective, i - self.degree)
-    #            basis_current = self.basis_index(projective, i)
-    #            basis_next = self.basis_index(projective, i + self.degree)
-    #            d_next = self.matrix_from_krlw_matrix(
-    #                self.differentials[i], basis_current, basis_next
-    #            )
-    #            d_previous = self.matrix_from_krlw_matrix(
-    #                self.differentials[i - self.degree], basis_previous, basis_current
-    #            )
-    #
-    #            assert (d_next * d_previous).is_zero()
-    #
-    #            return d_next.right_kernel() / d_previous.column_space()
+    def rhom_to_simple(
+        self,
+        simple: KLRWstate,
+        dualize_complex=False,
+    ) -> ChainComplex_class:
+        from sage.groups.additive_abelian.additive_abelian_group import (
+            AdditiveAbelianGroup,
+        )
+
+        # we grade by ZZ x ZZ
+        # these pairs of integers represent
+        # (homological_degree, equivariant_degree)
+        grading_group = AdditiveAbelianGroup([0, 0])
+        degree = grading_group((self.degree, 0))
+
+        relevant_indices = defaultdict(dict)
+        for hom_deg in self.projectives:
+            for index, proj in enumerate(self.projectives[hom_deg]):
+                if proj.state == simple:
+                    eq_deg = proj.equivariant_degree
+                    grading = grading_group((hom_deg, eq_deg))
+                    if (hom_deg, eq_deg) in relevant_indices:
+                        new_index = len(relevant_indices[hom_deg, eq_deg])
+                    else:
+                        relevant_indices[hom_deg, eq_deg] = {}
+                        new_index = 0
+                    relevant_indices[hom_deg, eq_deg][index] = new_index
+
+        rhom_diff = {}
+        for hom_deg, eq_deg in relevant_indices:
+            if dualize_complex:
+                codomain_degrees = (hom_deg + self.degree, eq_deg)
+            else:
+                # since we take RHom(-,I) degree of te differential
+                # becomes opposite
+                codomain_degrees = (hom_deg - self.degree, eq_deg)
+
+            if codomain_degrees in relevant_indices:
+                nrows = len(relevant_indices[codomain_degrees])
+            else:
+                nrows = 0
+
+            ncols = len(relevant_indices[hom_deg, eq_deg])
+
+            if dualize_complex:
+                grading = grading_group((hom_deg, eq_deg))
+            else:
+                # since we take RHom(-,I) gradings become opposite
+                # and domain and codomains swap
+                # it gives an extra degree shift
+                grading = grading_group((-hom_deg, -eq_deg))
+
+            rhom_diff[grading] = matrix(
+                self.KLRW_algebra.scalars(),
+                nrows,
+                ncols,
+            )
+
+        hom = self.KLRW_algebra.base().hom_in_simple()
+        for hom_deg, diff in self.differentials.items():
+            for (i, j), elem in diff.dict().items():
+                left_proj = self.projectives[hom_deg][i]
+                if left_proj.state == simple:
+                    for braid, coeff in elem:
+                        # keep only trivial braids
+                        if braid.word() == ():
+                            new_elem = hom(coeff)
+                            if not new_elem.is_zero():
+                                eq_deg = left_proj.equivariant_degree
+                                if dualize_complex:
+                                    i_new = relevant_indices[
+                                        hom_deg + self.degree, eq_deg
+                                    ][j]
+                                    j_new = relevant_indices[hom_deg, eq_deg][i]
+
+                                    grading = grading_group((hom_deg, eq_deg))
+                                else:
+                                    # since we take RHom(-,I) gradings become opposite
+                                    # and domain and codomains swap
+                                    # it gives an extra degree shift
+                                    i_new = relevant_indices[hom_deg, eq_deg][i]
+                                    j_new = relevant_indices[
+                                        hom_deg + self.degree, eq_deg
+                                    ][j]
+
+                                    grading = grading_group(
+                                        (-hom_deg - self.degree, -eq_deg)
+                                    )
+
+                                rhom_diff[grading][i_new, j_new] = new_elem
+
+        return ChainComplex(
+            data=rhom_diff,
+            degree_of_differential=degree,
+            grading_group=grading_group,
+        )
 
     def sign(self, shift):
         shift = self.grading_group(shift)
@@ -160,15 +228,12 @@ class KLRWPerfectComplex(Parent):
         else:
             raise ValueError(sign)
 
-        #        if eq_shift is not 0:
         shifted_projectives = defaultdict(list)
         for grading, projectives_in_grading in self.projectives.items():
             shifted_projectives[grading - hom_shift] = [
                 proj._replace(equivariant_degree=proj.equivariant_degree + eq_shift)
                 for proj in projectives_in_grading
             ]
-        #        else:
-        #            shifted_projectives = copy(self.projectives)
 
         return self.__class__(
             self.KLRW_algebra,
@@ -187,64 +252,6 @@ class KLRWPerfectComplex(Parent):
             result += "d_{} = \n".format(grading)
             result += repr(diff) + "\n"
         return result
-
-
-#    def matrix_from_krlw_matrix(
-#        self, krlw_matrix: Matrix, domain_basis: dict, codomain_basis: dict
-#    ):
-#        mat = matrix(
-#            self.KLRW_algebra.scalars(),
-#            len(codomain_basis),
-#            len(domain_basis),
-#            sparse=True,
-#        )
-#        for (i, braid, exp), column_ind in domain_basis.items():
-#            for j in range(krlw_matrix.ncols()):
-#                for br, poly in (
-#                    self.KLRW_algebra.base().monomial(*exp)
-#                    * self.KLRW_algebra.monomial(braid)
-#                    * krlw_matrix[i, j]
-#                ):
-#                    for ex, coeff in poly.iterator_exp_coeff():
-#                        row_ind = codomain_basis[j, br, ex]
-#                        mat[row_ind, column_ind] += coeff
-#        return mat
-
-#    @cached_method
-#    def basis_index(self, projective: KLRWProjectiveModule, cycle_index) -> dict:
-#        """
-#        Returns {(i, braid, exp): index}
-#        """
-#        basis_iterator = (
-#            (i, basis)
-#            for i in range(len(self.projectives[cycle_index]))
-#            for basis in self.KLRW_algebra.basis_by_states_and_degrees(
-#                projective.state,
-#                self.projectives[cycle_index][i].state,
-#                self.projectives[cycle_index][i].equivariant_degree
-#                - projective.equivariant_degree,
-#            )
-#        )
-#
-#        basis_index = {
-#            (state_index,) + basis_tuple: index
-#            for index, (state_index, basis_tuple) in enumerate(basis_iterator)
-#        }
-#        return basis_index
-
-#    def matrices_in_rhom(self, projective):
-#        """
-#        TODO: rewrite, so it works not only for lists?
-#        """
-#        for i in self.differentials:
-#            basis_previous = self.basis_index(projective, i + self.degree)
-#            basis_next = self.basis_index(projective, i)
-#            yield (
-#                i,
-#                self.matrix_from_krlw_matrix(
-#                    self.differentials[i], basis_next, basis_previous
-#                ),
-#            )
 
 
 class SummandType(NamedTuple):
@@ -287,16 +294,9 @@ class KLRWHomOfGradedProjectivesElement(IndexedFreeModuleElement):
 
     def cone(self, check=True, keep_subdivisions=True):
         parent = self.parent()
-        # print(parent)
         domain = parent.domain[parent.domain.degree]
         codomain = parent.codomain
-        # print("Domain:")
-        # print(domain)
-        # print("Codomain:")
-        # print(codomain)
         dict_of_matrices = self.dict_of_matrices()
-        # print("Matrices:")
-        # print(self.dict_of_matrices())
 
         projectives = defaultdict(list)
         for grading, projs in domain.projectives.items():
@@ -326,12 +326,10 @@ class KLRWHomOfGradedProjectivesElement(IndexedFreeModuleElement):
                 else:
                     left_block_size = 0
 
-                # print(top_block_size, left_block_size)
                 if grading in domain.differentials:
                     differentials[grading].set_block(
                         0, 0, domain.differentials[grading]
                     )
-                # print(dict_of_matrices[next_grading])
                 if next_grading in dict_of_matrices:
                     differentials[grading].set_block(
                         0, left_block_size, dict_of_matrices[next_grading]
@@ -345,15 +343,6 @@ class KLRWHomOfGradedProjectivesElement(IndexedFreeModuleElement):
                         [0, top_block_size, len(projectives[grading])],
                         [0, left_block_size, len(projectives[next_grading])],
                     )
-                # print("~~~")
-                # print(prev_grading, grading, next_grading)
-                # print(differentials[grading])
-                # print("~~~")
-
-        # for grading, mat in differentials.items():
-        #    print(grading)
-        #    print(mat)
-        # print(projectives)
 
         cone = KLRWPerfectComplex(
             codomain.KLRW_algebra,
@@ -527,31 +516,15 @@ class KLRWExtOfGradedProjectives(Parent):
     def __init__(self, ambient, shift):
         self._shift = shift
         self._ambient = ambient
-        # print("Hom dim:", hom.dimension())
         previous_differential_matrix = ambient._differential_matrix_(
             shift - ambient.degree()
         )
         current_differential_matrix = ambient._differential_matrix_(shift)
-        # print(
-        #    "Current",
-        #    current_differential_matrix.nrows(),
-        #    current_differential_matrix.ncols(),
-        # )
-        # print(current_differential_matrix)
-        # print(
-        #    "Previous",
-        #    previous_differential_matrix.nrows(),
-        #    previous_differential_matrix.ncols(),
-        # )
-        # print(previous_differential_matrix)
 
         assert (current_differential_matrix * previous_differential_matrix).is_zero()
 
         kernel = current_differential_matrix.right_kernel()
         image = previous_differential_matrix.column_module()
-        # print(kernel.dimension(), image.dimension())
-        # print(kernel.basis())
-        # print(image.basis())
         self._homology_ = kernel.quotient(image)
         self._basis_vectors_ = tuple(
             self._homology_.lift(b) for b in self._homology_.basis()
@@ -658,9 +631,6 @@ class KLRWHomOfPerfectComplexes(Parent):
                 list(current_hom.subdivisions()),
             )
 
-        #        print(len(current_hom.types()), current_hom.types())
-        #        print(len(next_hom.types()), next_hom.types())
-
         # matrix of left multiplication by d.
         for type in current_hom.types():
             column_subdivision_index = current_hom._type_to_subdivision_index_[type]
@@ -696,11 +666,6 @@ class KLRWHomOfPerfectComplexes(Parent):
                                 column_subdivision_index,
                                 submatrix,
                             )
-        #                    for (a, b), scalar in submatrix.dict(copy=False).items():
-        #                        diff_mat[
-        #                            row_subdivision_index + a,
-        #                            column_subdivision_index + b,
-        #                        ] += scalar
 
         # matrix of right multiplication by d.
         # there is a sign -(-1)^degree, it is -self.sign(shift)

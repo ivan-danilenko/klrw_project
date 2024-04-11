@@ -22,13 +22,18 @@ extensions = [
         include_dirs=[numpy.get_include()],
     ),
     Extension(
-        "{}.sparse_multiplication".format(PACKAGE_NAME),
-        sources=["{}/sparse_multiplication.pyx".format(PACKAGE_PATH)],
+        "{}.sparse_addition".format(PACKAGE_NAME),
+        sources=["{}/sparse_addition.pyx".format(PACKAGE_PATH)],
         include_dirs=[numpy.get_include()],
     ),
     Extension(
-        "{}.solver".format(PACKAGE_NAME),
-        sources=["{}/solver.pyx".format(PACKAGE_PATH)],
+        "{}.perfect_complex_corrections_ext".format(PACKAGE_NAME),
+        sources=["{}/perfect_complex_corrections_ext.pyx".format(PACKAGE_PATH)],
+        include_dirs=[numpy.get_include()],
+    ),
+    Extension(
+        "{}.combinatorial_ebranes_ext".format(PACKAGE_NAME),
+        sources=["{}/combinatorial_ebranes_ext.pyx".format(PACKAGE_PATH)],
         include_dirs=[numpy.get_include()],
     ),
 ]

@@ -319,15 +319,6 @@ class QuiverParameter:
         return self.monomial.__repr__()
 
 
-# class VariablesDict(dict):
-#    '''
-#    Introduces default values for variables
-#    '''
-#    variables_dictionary : dict
-#    default_edge_value : object
-#    default_edge_value
-
-
 def is_a_dot_index(index):
     if not isinstance(index, NodeInFramedQuiver):
         if not isinstance(index[1], NodeInFramedQuiver):
@@ -434,9 +425,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         super().__init__(base_ring, len(names_list), names_list, order)
 
         self.number_of_non_dot_params = sum(
-            1
-            for index in names
-            if not is_a_dot_index(index)
+            1 for index in names if not is_a_dot_index(index)
         )
 
         self.degrees = [
@@ -548,7 +537,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
     @cached_method
     def non_dots_characteristic_tuple(self):
-        char_t = ETuple((0,)*len(self.gens()))
+        char_t = ETuple((0,) * len(self.gens()))
         for index, var in self.variables.items():
             if not is_a_dot_index(index):
                 if var.position is not None:
@@ -557,7 +546,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
     @cached_method
     def dots_characteristic_tuple(self):
-        char_t = ETuple((0,)*len(self.gens()))
+        char_t = ETuple((0,) * len(self.gens()))
         for var in self.dot_variables.values():
             char_t = char_t.eadd_p(1, var.position)
         return char_t
@@ -593,7 +582,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
     def etuple_ignoring_dots(self, et: ETuple):
         # we assume that the non-zero dots have first positions
-        return et[:self.number_of_non_dot_params]
+        return et[: self.number_of_non_dot_params]
 
     def hom_from_dots_map(self, codomain, map: MappingProxyType):
         variables_images = [
@@ -617,3 +606,22 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         ]
 
         return self.hom(variables_images, self)
+
+    @cached_method
+    def hom_in_simple(self):
+        """
+        Kill dots, set all multiplicative parameters to 1.
+
+        Gets scalars in a ring R.
+        """
+        variables_images = []
+        for index, var in self.variables.items():
+            if var.name is not None:
+                if is_a_dot_index(index):
+                    # setting all dots to zero
+                    variables_images.append(self.base().zero())
+                else:
+                    # setting all other parameters to 1
+                    variables_images.append(self.base().one())
+
+        return self.hom(variables_images, self.base())
