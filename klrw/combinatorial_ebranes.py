@@ -711,11 +711,42 @@ class CombinatorialEBrane:
 
         return diff_csc, projectives, thimbles
 
-    def complex(self, *brane_indices):
-        differential_csc, projectives, _ = self.differential_and_thimbles(
-            *brane_indices,
-            indices_ordered=False,
-        )
+    def complex(
+        self,
+        *brane_indices,
+        pickle="",
+        link_name="link",
+        folder_path="./",
+    ):
+        """
+        Create a complex.
+
+        If pickle=="save", the pieces of data for complex are pickled.
+        If pickle=="load", the pieces of data for complex are uppickled from files.
+        """
+        if pickle == "load":
+            from pickle import load
+
+            with open(folder_path + link_name + "_differentials.pickle", "rb") as f:
+                differential_csc = load(file=f)
+            with open(folder_path + link_name + "_projectives.pickle", "rb") as f:
+                projectives = load(file=f)
+
+        else:
+            differential_csc, projectives, thimbles = self.differential_and_thimbles(
+                *brane_indices,
+                indices_ordered=False,
+            )
+
+            if pickle == "save":
+                from pickle import dump
+
+                with open(folder_path + link_name + "_differentials.pickle", "wb") as f:
+                    dump(differential_csc, file=f)
+                with open(folder_path + link_name + "_projectives.pickle", "wb") as f:
+                    dump(projectives, file=f)
+                with open(folder_path + link_name + "_thimbles.pickle", "wb") as f:
+                    dump(thimbles, file=f)
 
         differential = {
             hom_deg: matrix(
@@ -784,6 +815,9 @@ class CombinatorialEBrane:
         hom_deg_shift=0,
         equ_deg_shift=0,
         dualize_complex=False,
+        pickle="",
+        link_name="link",
+        folder_path="./",
     ):
         """
         Working over R that is a PID.
@@ -794,7 +828,12 @@ class CombinatorialEBrane:
         if R is the ring of integers
         """
 
-        complex = self.complex(*range(len(self.branes)))
+        complex = self.complex(
+            *range(len(self.branes)),
+            pickle=pickle,
+            link_name=link_name,
+            folder_path=folder_path,
+        )
 
         relevant_state = self.klrw_algebra[len(self.branes)].state(
             [self.W, self.V, self.W] * self.k + [self.W] * (self.n - 2 * self.k)
@@ -806,5 +845,5 @@ class CombinatorialEBrane:
             R=R,
             hom_deg_shift=hom_deg_shift,
             equ_deg_shift=equ_deg_shift,
-            dualize_complex=False,
+            dualize_complex=dualize_complex,
         )

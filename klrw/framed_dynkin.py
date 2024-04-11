@@ -410,8 +410,12 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         order="degrevlex",
         **prefixes
     ):
+        # remember initialization data for pickle/unpickle
+        self.quiver = quiver
+        self.no_deformations = no_deformations
         self.default_vertex_parameter = default_vertex_parameter
         self.default_edge_parameter = default_edge_parameter
+        self.prefixes = prefixes
         no_vertex_parameters = default_vertex_parameter is not None
         no_edge_parameters = default_edge_parameter is not None
         names = quiver.names(
@@ -463,6 +467,21 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
             default_vertex_parameter=default_vertex_parameter,
             default_edge_parameter=default_edge_parameter,
             no_deformations=no_deformations,
+        )
+
+    def __reduce__(self):
+        from functools import partial
+
+        return (
+            partial(self.__class__, **self.prefixes),
+            (
+                self.base_ring(),
+                self.quiver,
+                self.no_deformations,
+                self.default_vertex_parameter,
+                self.default_edge_parameter,
+                self.term_order().name(),
+            ),
         )
 
     @lazy_attribute

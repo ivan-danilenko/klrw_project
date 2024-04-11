@@ -17,6 +17,9 @@ build/
 # explicitly local files
 *_local*
 
+# explicitly local files
+*.pickle
+
 # Python cache
 *__pycache__*
 

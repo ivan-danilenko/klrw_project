@@ -40,7 +40,7 @@ class KLRWElement(IndexedFreeModuleElement):
         for braid, coeff in self:
             if not coeff.is_zero():
                 braid_degree = self.parent().braid_degree(braid)
-                coeff_degree = coeff.parent().element_degree(
+                coeff_degree = self.parent().base().element_degree(
                     coeff, check_if_homogeneous=check_if_homogeneous
                 )
                 term_degree = braid_degree + coeff_degree
