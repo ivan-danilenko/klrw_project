@@ -736,7 +736,6 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
                 max_number_of_dots=max_number_of_dots,
                 as_tuples=True,
             ).items():
-                print(braid, exp)
                 coeff = self.KLRW_algebra.base().monomial(*exp)
                 result[i] = self.KLRW_algebra.term(braid, coeff)
             return MappingProxyType(result)

@@ -30,3 +30,6 @@ build/
 
 # Visual Studio Code files
 .vscode
+
+# KnotInfo Database
+KnotInfoDatabase
