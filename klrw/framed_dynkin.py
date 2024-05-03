@@ -65,14 +65,6 @@ class NodeInFramedQuiverWithMarks(NamedTuple):
         return self.unmarked_node.__repr__() + "_" + self.mark.__repr__()
 
 
-# class Node(UniqueFactory):
-#    def create_key(self, node, is_framing = False):
-#        return (node, is_framing)
-#    def create_object(self, version, key, **extra_args):
-#        # We ignore version and extra_args
-#        return NodeInFramedQuiver(key)
-
-
 class FramedDynkinDiagram_class(DynkinDiagram_class):
     def __init__(self, t=None, **options):
         assert isinstance(t, CartanType_abstract)
@@ -599,25 +591,6 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
         return MappingProxyType(result)
 
-    '''
-    @lazy_attribute
-    def dot_degrees_tuple(self):
-        return tuple(
-            self.degrees[var.position]
-            for index, var in self.variables.items()
-            if is_a_dot_index(index)
-        )
-    '''
-
-    '''
-    @lazy_attribute
-    def dot_monomials_tuple(self):
-        return tuple(
-            var.monomial
-            for index, var in self.variables.items()
-            if is_a_dot_index(index)
-        )
-    '''
     def symmetric_dots_gens(self):
         elementary_symmetric_polynomials = {}
         for index, variable in self.variables.items():
