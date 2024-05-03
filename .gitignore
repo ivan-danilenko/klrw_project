@@ -33,3 +33,6 @@ build/
 
 # KnotInfo Database
 KnotInfoDatabase
+
+# profiler files
+*.prof

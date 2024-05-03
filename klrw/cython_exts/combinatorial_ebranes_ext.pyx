@@ -61,8 +61,10 @@ def d_times_one_piece(
         dtype=np.dtype("O"),
     )
 
-    V, W = klrw_algebra.quiver.vertices()
+    V, _ = klrw_algebra.quiver.vertices()
     number_of_moving_strands = klrw_algebra.quiver[V]
+    dot_algebra = klrw_algebra.base()
+    grading_group = klrw_algebra.grading_group
 
     j: cython.int
     indptr: cython.int
@@ -126,8 +128,8 @@ def d_times_one_piece(
                     new_coeff = hom_to_more_dots(coef)
                     if not new_coeff.is_zero():
                         braid_degree = klrw_algebra.braid_degree(d_times_one_braid)
-                        coeff_degree = klrw_algebra.base().element_degree(
-                            new_coeff, check_if_homogeneous=True
+                        coeff_degree = dot_algebra.element_degree(
+                            new_coeff, grading_group=grading_group, check_if_homogeneous=True
                         )
                         term_degree = braid_degree + coeff_degree
 
@@ -203,8 +205,10 @@ def one_times_d_piece(
         dtype=np.dtype("O"),
     )
 
-    V, W = klrw_algebra.quiver.vertices()
+    V, _ = klrw_algebra.quiver.vertices()
     number_of_moving_strands = klrw_algebra.quiver[V]
+    dot_algebra = klrw_algebra.base()
+    grading_group = klrw_algebra.grading_group
 
     j: cython.int
     indptr: cython.int
@@ -264,8 +268,8 @@ def one_times_d_piece(
                     new_coeff = hom_to_more_dots(coef)
                     if not new_coeff.is_zero():
                         braid_degree = klrw_algebra.braid_degree(d_times_one_braid)
-                        coeff_degree = klrw_algebra.base().element_degree(
-                            new_coeff, check_if_homogeneous=True
+                        coeff_degree = dot_algebra.element_degree(
+                            new_coeff, grading_group=grading_group, check_if_homogeneous=True
                         )
                         term_degree = braid_degree + coeff_degree
 

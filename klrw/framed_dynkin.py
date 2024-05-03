@@ -10,7 +10,10 @@ from sage.rings.polynomial.multi_polynomial_libsingular import (
     MPolynomialRing_libsingular as PolynomialRing,
 )
 from sage.rings.polynomial.polydict import ETuple
-from sage.rings.ring import CommutativeRing
+from sage.rings.ring import CommutativeRing, Ring
+from sage.rings.integer_ring import ZZ
+from sage.combinat.free_module import CombinatorialFreeModule
+from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
 
 from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
@@ -34,6 +37,21 @@ class NodeInFramedQuiver(NamedTuple):
 
     def make_framing(self):
         return self._replace(framing=True)
+
+
+class NonOrientedEdge(frozenset):
+    def __new__(cls, vertex1, vertex2):
+        assert isinstance(vertex1, NodeInFramedQuiver)
+        assert isinstance(vertex2, NodeInFramedQuiver)
+        return super(NonOrientedEdge, cls).__new__(cls, frozenset((vertex1, vertex2)))
+
+    def __repr__(self):
+        if len(self) == 2:
+            vertex1, vertex2 = self
+        if len(self) == 1:
+            (vertex1,) = self
+            vertex2 = vertex1
+        return repr(vertex1) + "--" + repr(vertex2)
 
 
 class NodeInFramedQuiverWithMarks(NamedTuple):
@@ -111,6 +129,7 @@ class FramedDynkinDiagram_class(DynkinDiagram_class):
     def is_simply_laced(self):
         return self.cartan_type().is_simply_laced()
 
+    @cached_method
     def non_framing_nodes(self):
         return self.cartan_type().index_set()
 
@@ -284,7 +303,7 @@ class FramedDynkinDiagram_with_dimensions(FramedDynkinDiagram_class):
         no_deformations=True,
         no_vertex_parameters=False,
         no_edge_parameters=False,
-        **prefixes
+        **prefixes,
     ):
         """
         Returns a dictionary {label: name}
@@ -308,6 +327,81 @@ class FramedDynkinDiagram_with_dimensions(FramedDynkinDiagram_class):
         return names
 
 
+class QuiverGradingGroupElement(IndexedFreeModuleElement):
+    def ordinary_grading(self, as_scalar=True):
+        parent = self.parent()
+        equivariant_grading_name = parent.equivariant_grading_name
+        if as_scalar:
+            return self.coefficient(equivariant_grading_name)
+        else:
+            basis_vector = parent.monomial(equivariant_grading_name)
+            return self.ordinary_grading(as_scalar=True)*basis_vector
+
+    def extra_gradings(self):
+        return self - self.ordinary_grading(as_scalar=False)
+
+
+class QuiverGradingGroup(CombinatorialFreeModule):
+    def __init__(
+        self,
+        quiver: FramedDynkinDiagram_class,
+        R: Ring = ZZ,
+        equivariant_grading_name=0,
+        vertex_scaling=True,
+        edge_scaling=True,
+        **kwrds,
+    ):
+        self.equivariant_grading_name = equivariant_grading_name
+        self.quiver = quiver
+        names = []
+        if vertex_scaling:
+            names += quiver.non_framing_nodes()
+        if edge_scaling:
+            # we keep only non-oriented pairs and remove doubles
+            non_oriented_edges = set(
+                NonOrientedEdge(v1, v2) for v1, v2, _ in quiver.edges()
+            )
+            names += list(non_oriented_edges)
+        names += [equivariant_grading_name]
+
+        if "prefix" not in kwrds:
+            kwrds["prefix"] = "d_"
+        if "bracket" not in kwrds:
+            kwrds["bracket"] = "{"
+
+        super().__init__(R, names, element_class=QuiverGradingGroupElement, **kwrds)
+
+    def crossing_grading(self, vertex1, vertex2):
+        result = self.term(
+            self.equivariant_grading_name,
+            -self.quiver.scalar_product_of_simple_roots(vertex1, vertex2),
+        )
+        if vertex1 == vertex2:
+            if vertex1 in self.indices():
+                result += self.monomial(vertex1)
+        elif NonOrientedEdge(vertex1, vertex2) in self.indices():
+            result += self.monomial(NonOrientedEdge(vertex1, vertex2))
+        return result
+
+    def dot_algebra_grading(self, index):
+        if is_a_dot_index(index, only_non_framing=False):
+            if not index[0].is_framing():
+                return self.term(
+                    self.equivariant_grading_name,
+                    self.quiver.scalar_product_of_simple_roots(index[0], index[0]),
+                )
+        elif isinstance(index, NodeInFramedQuiver):
+            if index in self.indices():
+                return self.monomial(index)
+        else:
+            assert len(index) == 2
+            edge = NonOrientedEdge(*index)
+            if edge in self.indices():
+                return 2 * self.monomial(edge)
+
+        return self.zero()
+
+
 @dataclass(slots=True)
 class QuiverParameter:
     # index : object
@@ -319,27 +413,32 @@ class QuiverParameter:
         return self.monomial.__repr__()
 
 
-def is_a_dot_index(index):
+def is_a_dot_index(index, only_non_framing=True):
     if not isinstance(index, NodeInFramedQuiver):
         if not isinstance(index[1], NodeInFramedQuiver):
+            if not only_non_framing:
+                return True
             if not index[0].is_framing():
                 return True
     return False
 
 
-def exps_for_dots_of_degree(list_of_degrees, degree):
-    if len(list_of_degrees) == 1:
-        if degree >= 0:
-            if int(degree) % int(list_of_degrees[0]) == 0:
-                yield (int(degree) // int(list_of_degrees[0]),)
+def exps_for_dots_of_degree(etuples_degrees: MappingProxyType | tuple, degree):
+    if isinstance(etuples_degrees, MappingProxyType):
+        etuples_degrees = tuple(x for x in etuples_degrees.items())
+    et, deg = etuples_degrees[0]
+    if len(etuples_degrees) == 1:
+        if int(degree) % int(deg) == 0:
+            yield et.emul(int(degree) // int(deg))
         return
     else:
-        power_of_first = int(degree) // int(list_of_degrees[0])
+        power_of_first = int(degree) // int(deg)
         for power in range(power_of_first + 1):
-            for exps in exps_for_dots_of_degree(
-                list_of_degrees[1:], degree - power * list_of_degrees[0]
+            for rec_et in exps_for_dots_of_degree(
+                etuples_degrees[1:],
+                degree - power * deg,
             ):
-                yield (power,) + exps
+                yield rec_et.eadd_scaled(et, power)
 
 
 # TODO: add an abstract class KLRWDotsAlgebra(CoomutativeRing, UniqueRep),
@@ -408,7 +507,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         default_vertex_parameter=None,
         default_edge_parameter=None,
         order="degrevlex",
-        **prefixes
+        **prefixes,
     ):
         # remember initialization data for pickle/unpickle
         self.quiver = quiver
@@ -416,58 +515,35 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         self.default_vertex_parameter = default_vertex_parameter
         self.default_edge_parameter = default_edge_parameter
         self.prefixes = prefixes
+
         no_vertex_parameters = default_vertex_parameter is not None
         no_edge_parameters = default_edge_parameter is not None
-        names = quiver.names(
+        self.names = quiver.names(
             no_deformations=no_deformations,
             no_vertex_parameters=no_vertex_parameters,
             no_edge_parameters=no_edge_parameters,
-            **prefixes
+            **prefixes,
         )
-        names_list = [name for _, name in names.items()]
 
+        names_list = [name for _, name in self.names.items()]
         super().__init__(base_ring, len(names_list), names_list, order)
-
-        self.number_of_non_dot_params = sum(
-            1 for index in names if not is_a_dot_index(index)
-        )
-
-        self.degrees = [
-            (
-                quiver.scalar_product_of_simple_roots(index[0], index[0])
-                if is_a_dot_index(index)
-                else 0
-            )
-            for index in names
-        ]
-        # if we scale dots and vertex parameter of some type,
-        # this gives the weight of this scaling
-        self.scaling_weights = {}
-        for v in quiver.non_framing_nodes():
-            weights = []
-            for index in names:
-                if index == v:
-                    weights.append(1)
-                    continue
-                if is_a_dot_index(index):
-                    if index[0] == v:
-                        weights.append(1)
-                        continue
-                weights.append(0)
-            self.scaling_weights[v] = weights
 
         # type of variables is uniquely determined by its index data
         self.variables = {
             index: QuiverParameter(name, position, self(name))
-            for position, (index, name) in enumerate(names.items())
+            for position, (index, name) in enumerate(self.names.items())
         }
 
+        # adds default values to self.variables
         self.assign_default_values(
             quiver,
             default_vertex_parameter=default_vertex_parameter,
             default_edge_parameter=default_edge_parameter,
             no_deformations=no_deformations,
         )
+
+        # make immutable
+        self.variables = MappingProxyType(self.variables)
 
     def __reduce__(self):
         from functools import partial
@@ -485,64 +561,148 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         )
 
     @lazy_attribute
-    def dot_variables(self):
+    def number_of_non_dot_params(self):
+        return sum(1 for index in self.names if not is_a_dot_index(index))
+
+    @cached_method
+    def dot_exptuples_and_degrees(self, grading_group: QuiverGradingGroup):
         result = {}
+        relevant_grading_index = grading_group.equivariant_grading_name
+        for index, var in self.variables.items():
+            if is_a_dot_index(index):
+                exps = var.monomial.exponents(as_ETuples=True)
+                # must be a monomial
+                assert len(exps) == 1
+                grading = grading_group.dot_algebra_grading(index)
+                result[exps[0]] = grading.coefficient(relevant_grading_index)
+        return MappingProxyType(result)
+
+    @cached_method
+    def degrees_by_position(self, grading_group: QuiverGradingGroup):
+        result = [list() for _ in range(self.ngens())]
+        for index, var in self.variables.items():
+            if var.position is not None:
+                result[var.position] = grading_group.dot_algebra_grading(index)
+
+        return tuple(result)
+
+    @lazy_attribute
+    def dot_variables(self):
+        result = defaultdict(list)
         for index, variable in self.variables.items():
             if is_a_dot_index(index):
-                result[index] = variable
+                result[index[0]].append(variable)
 
-        return result
+        # make everything immutable
+        for key in result:
+            result[key] = tuple(result[key])
 
+        return MappingProxyType(result)
+
+    '''
+    @lazy_attribute
+    def dot_degrees_tuple(self):
+        return tuple(
+            self.degrees[var.position]
+            for index, var in self.variables.items()
+            if is_a_dot_index(index)
+        )
+    '''
+
+    '''
+    @lazy_attribute
+    def dot_monomials_tuple(self):
+        return tuple(
+            var.monomial
+            for index, var in self.variables.items()
+            if is_a_dot_index(index)
+        )
+    '''
     def symmetric_dots_gens(self):
         elementary_symmetric_polynomials = {}
-        for index, variable in self.dot_variables.items():
-            if index[0] in elementary_symmetric_polynomials:
-                e_list = elementary_symmetric_polynomials[index[0]]
-                # add the top elementary symmetric polynomial
-                e_list.append(variable.monomial * e_list[-1])
-                # modify intermediate symmetric polynomials
-                for i in range(len(e_list) - 2, 0, -1):
-                    e_list[i] += variable.monomial * e_list[i - 1]
-                # modify the first elementary symmetric polynomial
-                e_list[0] += variable.monomial
-            else:
-                # for one variable there is only
-                # the first elementary symmetric polynomial
-                elementary_symmetric_polynomials[index[0]] = [variable.monomial]
+        for index, variable in self.variables.items():
+            if is_a_dot_index(index):
+                if index[0] in elementary_symmetric_polynomials:
+                    e_list = elementary_symmetric_polynomials[index[0]]
+                    # add the top elementary symmetric polynomial
+                    e_list.append(variable.monomial * e_list[-1])
+                    # modify intermediate symmetric polynomials
+                    for i in range(len(e_list) - 2, 0, -1):
+                        e_list[i] += variable.monomial * e_list[i - 1]
+                    # modify the first elementary symmetric polynomial
+                    e_list[0] += variable.monomial
+                else:
+                    # for one variable there is only
+                    # the first elementary symmetric polynomial
+                    elementary_symmetric_polynomials[index[0]] = [variable.monomial]
 
         for _, e_list in elementary_symmetric_polynomials.items():
             yield from e_list
 
-    def exps_for_dots_of_degree(self, degree):
-        # should we make it separately?
-        for mon in self.dots_of_degree(degree):
-            yield from mon.exponents()
+    def basis_by_degree(self, degree):
+        return tuple(self.monomial(*et) for et in self.exps_by_degree(degree))
 
-    def dots_of_degree(self, degree):
-        variables = [
-            v.monomial
-            for index, v in self.dot_variables.items()
-            if is_a_dot_index(index)
-        ]
-        degrees = [
-            self.degrees[v.position]
-            for index, v in self.dot_variables.items()
-            if is_a_dot_index(index)
-        ]
+    @cached_method
+    def exps_by_degree(self, degree):
+        result = self.one()
+        for index, coeff in degree:
+            if isinstance(index, NodeInFramedQuiver):
+                if coeff < 0:
+                    return tuple()
+                result *= self.variables[index].monomial ** coeff
+            elif isinstance(index, NonOrientedEdge):
+                if int(coeff) % int(2) != 0 or coeff < 0:
+                    return tuple()
+                d = int(coeff) // int(2)
+                v1, v2 = index
+                if v2.is_framing():
+                    new_part = self.variables[v1, v2].monomial ** d
+                elif v1.is_framing():
+                    new_part = self.variables[v2, v1].monomial ** d
+                else:
+                    new_part = sum(
+                        self.variables[v1, v2].monomial ** k
+                        * self.variables[v2, v1].monomial ** (d - k)
+                        for k in range(d + 1)
+                    )
+                result *= new_part
+            elif index == degree.parent().equivariant_grading_name:
+                if int(coeff) % int(2) != 0 or coeff < 0:
+                    return tuple()
+                new_part = sum(
+                    self.monomial(*etuple)
+                    for etuple in exps_for_dots_of_degree(
+                        self.dot_exptuples_and_degrees(degree.parent()),
+                        coeff,
+                    )
+                )
+                result *= new_part
+            else:
+                raise ValueError("Unknown type of grading: {}".format(index))
+        return tuple(x for x in result.exponents())
 
-        for exp in exps_for_dots_of_degree(degrees, degree):
-            yield prod(v**d for v, d in zip(variables, exp))
+    def exp_degree(
+        self, exp: ETuple, grading_group: QuiverGradingGroup
+    ):
+        degrees_by_position = self.degrees_by_position(grading_group)
+        return grading_group.linear_combination(
+            (degrees_by_position[position], power)
+            for position, power in exp.sparse_iter()
+        )
 
-    # libsingular wrapper in Sage does not allow to change elements to a wrapper,
+    # libsingular wrapper in Sage does not allow to change elements for a wrapper,
     # so we define degree in the parent
-    def element_degree(self, element, check_if_homogeneous=False):
+    def element_degree(
+        self, element, grading_group: QuiverGradingGroup, check_if_homogeneous=False
+    ):
+        degrees_by_position = self.degrees_by_position(grading_group)
         # zero elements return None as degree
         degree = None
-        variables_degrees = self.degrees
         for exp, scalar in element.iterator_exp_coeff():
             if not scalar.is_zero():
-                term_degree = sum(
-                    deg * power for deg, power in zip(variables_degrees, exp)
+                term_degree = grading_group.linear_combination(
+                    (degrees_by_position[position], power)
+                    for position, power in exp.sparse_iter()
                 )
 
                 if not check_if_homogeneous:
@@ -553,51 +713,6 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
                     raise ValueError("The dots are not homogeneous!")
 
         return degree
-
-    @cached_method
-    def non_dots_characteristic_tuple(self):
-        char_t = ETuple((0,) * len(self.gens()))
-        for index, var in self.variables.items():
-            if not is_a_dot_index(index):
-                if var.position is not None:
-                    char_t = char_t.eadd_p(1, var.position)
-        return char_t
-
-    @cached_method
-    def dots_characteristic_tuple(self):
-        char_t = ETuple((0,) * len(self.gens()))
-        for var in self.dot_variables.values():
-            char_t = char_t.eadd_p(1, var.position)
-        return char_t
-
-    @cached_method
-    def exp_number_of_dots(self, exp: ETuple):
-        return exp.dotprod(self.dots_characteristic_tuple())
-
-    def element_max_number_of_dots(self, element):
-        # zero elements return 0 as degree
-        n_dots = 0
-        for exp, scalar in element.iterator_exp_coeff():
-            if not scalar.is_zero():
-                term_dots = self.exp_number_of_dots(exp)
-
-                if term_dots > n_dots:
-                    n_dots = term_dots
-
-        return n_dots
-
-    def scale_dots_in_element(self, element, multipliers: dict):
-        result = self.zero()
-        for exp, scalar in element.iterator_exp_coeff():
-            multiplier = self.one()
-            for vertex in multipliers:
-                monomial_weight = sum(
-                    deg * power for deg, power in zip(self.scaling_weights[vertex], exp)
-                )
-                multiplier *= multipliers[vertex] ** monomial_weight
-            result += scalar * multiplier * self.monomial(*exp)
-
-        return result
 
     def etuple_ignoring_dots(self, et: ETuple):
         # we assume that the non-zero dots have first positions
@@ -615,16 +730,6 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         ]
 
         return self.hom(variables_images, codomain)
-
-    @cached_method
-    def hom_ignore_non_dots(self):
-        variables_images = [
-            self.variables[index].monomial if is_a_dot_index(index) else self.one()
-            for index in self.variables
-            if self.variables[index].name is not None
-        ]
-
-        return self.hom(variables_images, self)
 
     @cached_method
     def hom_in_simple(self):

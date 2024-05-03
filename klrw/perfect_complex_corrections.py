@@ -109,86 +109,65 @@ def corrected_diffirential_csc(
         {hom_deg: mat.to_csr() for hom_deg, mat in d_geom_csc.items()}
     )
 
-    V, W = klrw_algebra.quiver.vertices()
-    u = klrw_algebra.base().variables[V, W].monomial
-    h = klrw_algebra.base().variables[V].monomial
+    dot_algebra = klrw_algebra.base()
+    grading_group = klrw_algebra.grading_group
 
     ignore = {}
     for hom_deg in d_geom_csc:
         ignore[hom_deg] = frozenset(d_geom_csc[hom_deg].dict().keys())
 
     exp = min_exp_in_square(d_csr, d_csc, degree=degree)
-
     if exp is None:
         print("Differential closes!")
         return d_csc
 
     assert exp != ETuple(
         (0,) * len(exp)
-    ), "The initial differential does not square to zero mod (u,h)."
-    lhs_by_number_of_dots = {}
-    basis_in_product_by_number_of_dots = {}
-    corrections_by_number_of_dots = {}
-    h_deg, u_deg = klrw_algebra.base().etuple_ignoring_dots(exp)
+    ), "The initial differential does not square to zero mod extra variables."
+
+    relevant_coeff_degree = dot_algebra.exp_degree(exp, grading_group)
 
     for k in range(max_iterations_for_corrections):
-        assert u_deg >= h_deg, "Don't know how to correct this."
-        print("Correcting h^{}*u^{}".format(h_deg, u_deg))
+        print("Correcting degree {}".format(relevant_coeff_degree))
 
-        relevant_monomial_etuple = (u**u_deg * h**h_deg).exponents()[0]
-        number_of_dots = u_deg - h_deg
+        corrections = possible_corrections(
+            klrw_algebra,
+            projectives,
+            degree=degree,
+            relevant_coeff_degree=relevant_coeff_degree,
+            ignore=ignore,
+        )
 
-        if number_of_dots in lhs_by_number_of_dots:
-            corrections = corrections_by_number_of_dots[number_of_dots]
-            lhs = lhs_by_number_of_dots[number_of_dots]
-            basis_in_product = basis_in_product_by_number_of_dots[number_of_dots]
-        else:
-            corrections = possible_corrections(
-                klrw_algebra,
-                projectives,
-                degree=degree,
-                min_number_of_dots=number_of_dots,
-                max_number_of_dots=number_of_dots,
-                ignore=ignore,
-            )
-            corrections_by_number_of_dots[number_of_dots] = corrections
-
-            basis_in_product_by_number_of_dots[number_of_dots] = {}
-            basis_in_product = basis_in_product_by_number_of_dots[number_of_dots]
-            lhs = system_on_corrections_lhs(
-                klrw_algebra=klrw_algebra,
-                d_geom_csc=d_geom_csc,
-                d_geom_csr=d_geom_csr,
-                projectives=projectives,
-                corrections=corrections,
-                basis_appearing_in_product=basis_in_product,
-                degree=degree,
-                relevant_monomial={
-                    u: 0,
-                    h: 0,
-                },
-            )
-            lhs_by_number_of_dots[number_of_dots] = lhs
+        basis_in_product = {}
+        lhs = system_on_corrections_lhs(
+            klrw_algebra=klrw_algebra,
+            d_geom_csc=d_geom_csc,
+            d_geom_csr=d_geom_csr,
+            projectives=projectives,
+            corrections=corrections,
+            basis_appearing_in_product=basis_in_product,
+            degree=degree,
+            relevant_coeff_degree=relevant_coeff_degree,
+        )
 
         rhs = system_on_corrections_rhs(
             dot_algebra=klrw_algebra.base(),
+            grading_group=klrw_algebra.grading_group,
             d_csc=d_csc,
             d_csr=d_csr,
             projectives=projectives,
             basis_appearing_in_product=basis_in_product,
             degree=degree,
-            relevant_monomial_etuple=relevant_monomial_etuple,
+            relevant_coeff_degree=relevant_coeff_degree,
         )
 
         x = solve_system(lhs, rhs)
 
-        multiplier = (u**u_deg) * (h**h_deg)
         d_csc = update_differential(
             klrw_algebra,
             d_csc,
             corrections,
             x,
-            multiplier,
             projectives,
         )
         d_csr = {key: mat.to_csr() for key, mat in d_csc.items()}
@@ -197,7 +176,7 @@ def corrected_diffirential_csc(
         if exp is None:
             print("Differential closes!")
             break
-        h_deg, u_deg = klrw_algebra.base().etuple_ignoring_dots(exp)
+        relevant_coeff_degree = dot_algebra.exp_degree(exp, grading_group)
     else:
         raise RuntimeError(
             "Could not make differential closed in under {} iterations".format(
@@ -212,8 +191,7 @@ def possible_corrections(
     klrw_algebra,
     projectives,
     degree,
-    min_number_of_dots,
-    max_number_of_dots,
+    relevant_coeff_degree,
     ignore: dict[frozenset] | None = None,
 ):
     if ignore is None:
@@ -226,12 +204,16 @@ def possible_corrections(
             if hom_deg in ignore:
                 ignore_in_degree = ignore[hom_deg]
         if hom_deg + degree in projectives:
+            print(
+                "Finding possible corrections for C_{} -> C_{}".format(
+                    hom_deg, hom_deg + degree
+                )
+            )
             corrections[hom_deg] = possible_corrections_in_hom_degree(
                 klrw_algebra=klrw_algebra,
                 projectives_domain=projectives[hom_deg],
                 projectives_codomain=projectives[hom_deg + degree],
-                min_number_of_dots=min_number_of_dots,
-                max_number_of_dots=max_number_of_dots,
+                relevant_coeff_degree=relevant_coeff_degree,
                 ignore=ignore_in_degree,
             )
 
@@ -242,8 +224,7 @@ def possible_corrections_in_hom_degree(
     klrw_algebra: KLRWAlgebra,
     projectives_domain: list,
     projectives_codomain: list,
-    min_number_of_dots,
-    max_number_of_dots,
+    relevant_coeff_degree,
     ignore: frozenset = frozenset(),
 ):
     # To record all corrections we have a data structure similar
@@ -275,12 +256,9 @@ def possible_corrections_in_hom_degree(
             graded_component = klrw_algebra[
                 left_projective.state : right_projective.state : equ_degree
             ]
-            basis = list(
-                graded_component.basis(
-                    min_number_of_dots=min_number_of_dots,
-                    max_number_of_dots=max_number_of_dots,
-                    as_tuples=True,
-                ).values()
+            basis = graded_component.basis(
+                relevant_coeff_degree=relevant_coeff_degree,
+                as_tuples=True,
             )
 
             if not basis:
@@ -333,7 +311,7 @@ def system_on_corrections_lhs(
     corrections: dict[CorrectionsMatrix],
     basis_appearing_in_product: dict,
     degree,
-    relevant_monomial={},
+    relevant_coeff_degree,
 ):
     matrix_blocks = [[None] * len(projectives) for _ in range(len(projectives))]
     # To have a good block-band matrix
@@ -348,7 +326,11 @@ def system_on_corrections_lhs(
         if hom_deg + degree not in hom_deg_to_index:
             continue
 
-        print("<<<<<", hom_deg, ">>>>>")
+        print(
+            "Making the left hand side for the corrections C_{} -> C_{}".format(
+                hom_deg, hom_deg + 2*degree
+            )
+        )
         hom_deg_index = hom_deg_to_index[hom_deg]
         hom_deg_next_index = hom_deg_to_index[hom_deg + degree]
         basis_appearing_in_product[hom_deg] = {}
@@ -358,7 +340,7 @@ def system_on_corrections_lhs(
                 klrw_algebra=klrw_algebra,
                 d_geom_csc=d_geom_csc[hom_deg],
                 d1_csc=corrections[hom_deg + degree],
-                relevant_monomial=relevant_monomial,
+                relevant_coeff_degree=relevant_coeff_degree,
                 basis_appearing_in_product=basis_dict,
             )
         if hom_deg in corrections and hom_deg + degree in d_geom_csc:
@@ -366,7 +348,7 @@ def system_on_corrections_lhs(
                 klrw_algebra=klrw_algebra,
                 d_geom_csr=d_geom_csr[hom_deg + degree],
                 d1_csc=corrections[hom_deg],
-                relevant_monomial=relevant_monomial,
+                relevant_coeff_degree=relevant_coeff_degree,
                 basis_appearing_in_product=basis_dict,
             )
             if matrix_blocks[hom_deg_index][hom_deg_next_index] is not None:
@@ -381,12 +363,13 @@ def system_on_corrections_lhs(
 
 def system_on_corrections_rhs(
     dot_algebra,
+    grading_group,
     d_csc: dict[CSC_Mat],
     d_csr: dict[CSR_Mat],
     projectives: dict[list],
     basis_appearing_in_product: dict,
     degree,
-    relevant_monomial_etuple: ETuple,
+    relevant_coeff_degree,
 ):
     augment_blocks = [[None] for _ in range(len(projectives))]
     # To have a good block-band matrix
@@ -401,16 +384,21 @@ def system_on_corrections_rhs(
         if hom_deg + degree not in hom_deg_to_index:
             continue
 
-        print("<<<<<", hom_deg, ">>>>>")
+        print(
+            "Making the right hand side for the corrections C_{} -> C_{}".format(
+                hom_deg, hom_deg + 2*degree
+            )
+        )
         hom_deg_index = hom_deg_to_index[hom_deg]
         basis_dict = basis_appearing_in_product[hom_deg]
         if hom_deg + degree in d_csr and hom_deg in d_csc:
             augment_blocks[hom_deg_index] = [
                 system_d_squared_piece(
                     dot_algebra,
+                    grading_group,
                     d_csr=d_csr[hom_deg],
                     d_csc=d_csc[hom_deg + degree],
-                    relevant_monomial_etuple=relevant_monomial_etuple,
+                    relevant_coeff_degree=relevant_coeff_degree,
                     basis_appearing_in_product=basis_dict,
                 )
             ]

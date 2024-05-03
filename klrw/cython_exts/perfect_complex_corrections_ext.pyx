@@ -15,6 +15,11 @@ from sage.structure.element import Element
 
 
 from klrw.klrw_algebra import KLRWAlgebra
+from klrw.framed_dynkin import (
+    QuiverGradingGroupElement,
+    KLRWUpstairsDotsAlgebra,
+    QuiverGradingGroup,
+)
 from cython.cimports.klrw.cython_exts.sparse_csc import CSC_Mat
 from cython.cimports.klrw.cython_exts.sparse_csr import CSR_Mat
 from klrw.cython_exts.sparse_addition import add
@@ -133,9 +138,11 @@ def system_d_geom_d1_piece(
     klrw_algebra: KLRWAlgebra,
     d_geom_csc: CSC_Mat,
     d1_csc: CorrectionsMatrix,
-    relevant_monomial: object,
+    relevant_coeff_degree: QuiverGradingGroupElement,
     basis_appearing_in_product: dict,
 ):
+    dot_algebra = klrw_algebra.base()
+    grading_group = klrw_algebra.grading_group
     system_piece = dok_matrix(
         (len(basis_appearing_in_product), d1_csc.number_of_corrections()),
         dtype="intc",
@@ -169,7 +176,7 @@ def system_d_geom_d1_piece(
                 correction_braid = d1_csc.corrections_braid[variable_number]
                 correction_exp = d1_csc.corrections_exp[variable_number]
                 correction = klrw_algebra.term(
-                    correction_braid, klrw_algebra.base().monomial(*correction_exp)
+                    correction_braid, dot_algebra.monomial(*correction_exp)
                 )
                 for indptr0 in range(d_geom_csc.indptrs[k], d_geom_csc.indptrs[k + 1]):
                     i = d_geom_csc.indices[indptr0]
@@ -177,21 +184,21 @@ def system_d_geom_d1_piece(
                     # caution: order of multiplication!
                     # this is in accordance with conventions in perfect_complex
                     for braid, poly in d_geom_entry * correction:
-                        relevant_poly = poly.coefficient(relevant_monomial)
-                        for exp, scalar in relevant_poly.iterator_exp_coeff():
-                            key = (i, j, braid.word(), exp)
-                            result_index: cython.int
-                            if key in basis_appearing_in_product:
-                                result_index = basis_appearing_in_product[key]
-                            else:
-                                result_index = len(basis_appearing_in_product)
-                                basis_appearing_in_product[key] = result_index
-                                # need to add one more row
-                                system_piece.resize(
-                                    result_index + 1, system_piece.shape[1]
-                                )
+                        for exp, scalar in poly.iterator_exp_coeff():
+                            if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
+                                key = (i, j, braid.word(), exp)
+                                result_index: cython.int
+                                if key in basis_appearing_in_product:
+                                    result_index = basis_appearing_in_product[key]
+                                else:
+                                    result_index = len(basis_appearing_in_product)
+                                    basis_appearing_in_product[key] = result_index
+                                    # need to add one more row
+                                    system_piece.resize(
+                                        result_index + 1, system_piece.shape[1]
+                                    )
 
-                            system_piece[result_index, variable_number] = scalar
+                                system_piece[result_index, variable_number] = scalar
 
     return system_piece
 
@@ -201,9 +208,11 @@ def system_d1_d_geom_piece(
     klrw_algebra: KLRWAlgebra,
     d_geom_csr: CSR_Mat,
     d1_csc: CorrectionsMatrix,
-    relevant_monomial: object,
+    relevant_coeff_degree: QuiverGradingGroupElement,
     basis_appearing_in_product: dict,
 ):
+    dot_algebra = klrw_algebra.base()
+    grading_group = klrw_algebra.grading_group
     system_piece = dok_matrix(
         (len(basis_appearing_in_product), d1_csc.number_of_corrections()),
         dtype="intc",
@@ -237,7 +246,7 @@ def system_d1_d_geom_piece(
                 correction_braid = d1_csc.corrections_braid[variable_number]
                 correction_exp = d1_csc.corrections_exp[variable_number]
                 correction = klrw_algebra.term(
-                    correction_braid, klrw_algebra.base().monomial(*correction_exp)
+                    correction_braid, dot_algebra.monomial(*correction_exp)
                 )
                 for indptr0 in range(d_geom_csr.indptrs[k], d_geom_csr.indptrs[k + 1]):
                     j = d_geom_csr.indices[indptr0]
@@ -245,38 +254,37 @@ def system_d1_d_geom_piece(
                     # caution: order of multiplication!
                     # this is in accordance with conventions in perfect_complex
                     for braid, poly in correction * d_geom_entry:
-                        relevant_poly = poly.coefficient(relevant_monomial)
-                        for exp, scalar in relevant_poly.iterator_exp_coeff():
-                            key = (i, j, braid.word(), exp)
-                            result_index: cython.int
-                            if key in basis_appearing_in_product:
-                                result_index = basis_appearing_in_product[key]
-                            else:
-                                result_index = len(basis_appearing_in_product)
-                                basis_appearing_in_product[key] = result_index
-                                # need to add one more row
-                                system_piece.resize(
-                                    result_index + 1, system_piece.shape[1]
-                                )
+                        for exp, scalar in poly.iterator_exp_coeff():
+                            if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
+                                key = (i, j, braid.word(), exp)
+                                result_index: cython.int
+                                if key in basis_appearing_in_product:
+                                    result_index = basis_appearing_in_product[key]
+                                else:
+                                    result_index = len(basis_appearing_in_product)
+                                    basis_appearing_in_product[key] = result_index
+                                    # need to add one more row
+                                    system_piece.resize(
+                                        result_index + 1, system_piece.shape[1]
+                                    )
 
-                            system_piece[result_index, variable_number] = scalar
+                                system_piece[result_index, variable_number] = scalar
 
     return system_piece
 
 
 @cython.ccall
 def system_d_squared_piece(
-    dot_algebra,
+    dot_algebra: KLRWUpstairsDotsAlgebra,
+    grading_group: QuiverGradingGroup,
     d_csr: CSR_Mat,
     d_csc: CSC_Mat,
-    relevant_monomial_etuple: ETuple,
+    relevant_coeff_degree: QuiverGradingGroupElement,
     basis_appearing_in_product: dict,
 ):
     assert d_csr._number_of_columns() == d_csc._number_of_rows(), (
         repr(d_csr._number_of_columns()) + " != " + repr(d_csc._number_of_rows())
     )
-
-    non_dots_characteristic_tuple = dot_algebra.non_dots_characteristic_tuple()
 
     system_piece = dok_matrix(
         (len(basis_appearing_in_product), 1),
@@ -319,22 +327,15 @@ def system_d_squared_piece(
                 if not dot_product.is_zero():
                     for braid, poly in dot_product:
                         for exp, scalar in poly.iterator_exp_coeff(as_ETuples=True):
-                            if relevant_monomial_etuple.divides(exp):
-                                modified_exp: ETuple = exp.esub(
-                                    relevant_monomial_etuple
-                                )
-                                # check if non-dot powers are not higher
-                                if not modified_exp.dotprod(
-                                    non_dots_characteristic_tuple
-                                ):
-                                    key = (i, j, braid.word(), modified_exp)
-                                    result_index: cython.int
-                                    assert (
-                                        key in basis_appearing_in_product
-                                    ), "Inconsistent system:" + repr(key)
-                                    result_index = basis_appearing_in_product[key]
+                            if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
+                                key = (i, j, braid.word(), exp)
+                                result_index: cython.int
+                                assert (
+                                    key in basis_appearing_in_product
+                                ), "Inconsistent system:" + repr(key)
+                                result_index = basis_appearing_in_product[key]
 
-                                    system_piece[result_index, 0] = scalar
+                                system_piece[result_index, 0] = scalar
                 entry_can_be_non_zero = False
 
     return system_piece
@@ -345,11 +346,12 @@ def correction_piece_csc(
     klrw_algebra,
     d1_piece_csc: CorrectionsMatrix,
     x_piece_csc: csc_matrix,
-    multiplier,
     projectives_left,
     projectives_right,
 ):
     assert x_piece_csc.shape[1] == 1, "x must be a column"
+
+    dot_algebra = klrw_algebra.base()
 
     corretion_csc_indptrs: cython.int[::1] = np.zeros(
         len(d1_piece_csc.indptrs), dtype=np.dtype("intc")
@@ -389,7 +391,7 @@ def correction_piece_csc(
                 braid = d1_piece_csc.corrections_braid[var_number]
                 exp = d1_piece_csc.corrections_exp[var_number]
                 scalar = x_piece_csc.data[ptr_x]
-                poly = scalar * klrw_algebra.base().monomial(*exp)
+                poly = scalar * dot_algebra.monomial(*exp)
                 entry_element += klrw_algebra.term(braid, poly)
 
                 ptr_x += 1
@@ -401,7 +403,7 @@ def correction_piece_csc(
             corretion_csc_indices[non_zero_entries_so_far] = d1_piece_csc.indices[
                 entry_index
             ]
-            elem = multiplier * entry_element
+            elem = entry_element
             corretion_csc_data[non_zero_entries_so_far] = elem
             assert (
                 elem.right_state(check_if_all_have_same_right_state=True)
@@ -434,7 +436,6 @@ def update_differential(
         dict[Element, CorrectionsMatrix] | MappingProxyType[Element, CorrectionsMatrix]
     ),
     x_csc: csc_matrix,
-    multiplier,
     projectives,
 ):
     corrected_differential = {}
@@ -452,7 +453,6 @@ def update_differential(
                 klrw_algebra,
                 d1_csc[hom_deg],
                 x_csc_piece,
-                multiplier,
                 projectives[hom_deg],
                 projectives[hom_deg - 1],
             )
@@ -475,36 +475,32 @@ def min_exp_in_product(left: CSR_Mat, right: CSC_Mat) -> ETuple | None:
 
     i: cython.int
     j: cython.int
-    indptr_left: cython.int
-    indptr_right: cython.int
+    indptr1: cython.int
+    indptr2: cython.int
+    indptr1_end: cython.int
+    indptr2_end: cython.int
 
     entry_can_be_non_zero: cython.bint = False
 
     for i in range(left_number_of_rows):
-        indices_in_row = left.indices[left.indptrs[i] : left.indptrs[i + 1]]
         for j in range(right_number_of_columns):
-            for indptr_right in range(right.indptrs[j], right.indptrs[j + 1]):
-                index_right = right.indices[indptr_right]
-                indptr_left = np.searchsorted(
-                    indices_in_row,
-                    index_right,
-                    side="left",
-                )
-                indptr_left += left.indptrs[i]
-                # indptr_left == left.indptrs[i + 1]
-                # if right.indices[indptr_right] is larger than
-                # any index in left.indices[left.indptrs[i]:left.indptrs[i + 1]]
-                if indptr_left < left.indptrs[i + 1]:
-                    if left.indices[indptr_left] == index_right:
-                        if not entry_can_be_non_zero:
-                            dot_product = (
-                                left.data[indptr_left] * right.data[indptr_right]
-                            )
-                            entry_can_be_non_zero = True
-                        else:
-                            dot_product += (
-                                left.data[indptr_left] * right.data[indptr_right]
-                            )
+            indptr1 = left.indptrs[i]
+            indptr2 = right.indptrs[j]
+            indptr1_end = left.indptrs[i + 1]
+            indptr2_end = right.indptrs[j + 1]
+            while indptr1 != indptr1_end and indptr2 != indptr2_end:
+                if left.indices[indptr1] == right.indices[indptr2]:
+                    if not entry_can_be_non_zero:
+                        dot_product = left.data[indptr1] * right.data[indptr2]
+                        entry_can_be_non_zero = True
+                    else:
+                        dot_product += left.data[indptr1] * right.data[indptr2]
+                    indptr1 += 1
+                    indptr2 += 1
+                elif left.indices[indptr1] < right.indices[indptr2]:
+                    indptr1 += 1
+                else:
+                    indptr2 += 1
 
             if entry_can_be_non_zero:
                 for _, poly in dot_product:

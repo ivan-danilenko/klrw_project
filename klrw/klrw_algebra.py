@@ -23,6 +23,8 @@ from .klrw_braid import KLRWbraid, KLRWbraid_set
 from .framed_dynkin import (
     FramedDynkinDiagram_with_dimensions,
     KLRWUpstairsDotsAlgebra,
+    QuiverGradingGroupElement,
+    QuiverGradingGroup,
 )
 from .bimodule_monoid import LeftFreeBimoduleMonoid
 
@@ -40,8 +42,14 @@ class KLRWElement(IndexedFreeModuleElement):
         for braid, coeff in self:
             if not coeff.is_zero():
                 braid_degree = self.parent().braid_degree(braid)
-                coeff_degree = self.parent().base().element_degree(
-                    coeff, check_if_homogeneous=check_if_homogeneous
+                coeff_degree = (
+                    self.parent()
+                    .base()
+                    .element_degree(
+                        coeff,
+                        grading_group=self.parent().grading_group,
+                        check_if_homogeneous=check_if_homogeneous,
+                    )
                 )
                 term_degree = braid_degree + coeff_degree
 
@@ -248,26 +256,58 @@ class RightDotAction(Action):
 
 
 class KLRWAlgebra(LeftFreeBimoduleMonoid):
-    # Element = KLRWElement
+    @staticmethod
+    def __classcall__(
+        cls,
+        base_R,
+        quiver: FramedDynkinDiagram_with_dimensions,
+        grading_group=None,
+        dot_algebra_order="degrevlex",
+        warnings=False,
+        **kwrds,
+    ):
+        return super().__classcall__(
+            cls,
+            base_R=base_R,
+            quiver=deepcopy(quiver),
+            grading_group=grading_group,
+            dot_algebra_order=dot_algebra_order,
+            warnings=warnings,
+            **kwrds,
+        )
 
     def __init__(
         self,
         base_R,
         quiver: FramedDynkinDiagram_with_dimensions,
+        grading_group=None,
         dot_algebra_order="degrevlex",
         warnings=False,
-        **prefixes
+        **kwrds
     ):
         """
         Makes a KLRW algebra for a quiver.
         base_R is the base ring.
         if warnings, then extra warnings can be printed
+
+        Warning: default parameters in the dot algebra
+        may work incorrectly with extra gradings
         """
         self.warnings = warnings
-        self.quiver = deepcopy(quiver)  # .copy()
+        self.quiver = quiver
         self.KLRWBraid = KLRWbraid_set(self.quiver, state_on_right=True)
+
+        if grading_group is None:
+            self.grading_group = QuiverGradingGroup(
+                quiver,
+                vertex_scaling=False,
+                edge_scaling=False,
+            )
+        else:
+            self.grading_group = grading_group
+
         dots_algebra = KLRWUpstairsDotsAlgebra(
-            base_R, self.quiver, order=dot_algebra_order, **prefixes
+            base_R, self.quiver, order=dot_algebra_order, **kwrds
         )
         category = FiniteDimensionalAlgebrasWithBasis(dots_algebra)
         super().__init__(R=dots_algebra, element_class=KLRWElement, category=category)
@@ -279,7 +319,9 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         the graded finite-dimensional component
         """
         if isinstance(key, slice):
-            return KLRWAlgebraGradedComponent(self, key.start, key.stop, key.step)
+            return KLRWAlgebraGradedComponent(
+                self, key.start, key.stop, self.grading_group(key.step)
+            )
 
     @lazy_attribute
     def ideal_of_symmetric_dots(self):
@@ -347,12 +389,13 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         ):
             yield self.term(braid, dot_poly)
 
+    @cached_method
     def braid_degree(self, braid):
         degree = 0
         current_state = braid.right_state()
 
         for i in reversed(braid.word()):
-            degree += -self.quiver.scalar_product_of_simple_roots(
+            degree += self.grading_group.crossing_grading(
                 current_state[i - 1], current_state[i]
             )
             current_state = current_state.act_by_s(i)
@@ -678,7 +721,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
     KLRW_algebra: KLRWAlgebra
     left_state: KLRWstate
     right_state: KLRWstate
-    degree: int
+    degree: QuiverGradingGroupElement
 
     #    def __getattr__(self, name):
     #        if hasattr(self.KLRW_algebra, name):
@@ -688,7 +731,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         return len(self.basis(as_tuples=False))
 
     @cached_method
-    def basis(self, min_number_of_dots=0, max_number_of_dots=None, as_tuples=False):
+    def basis(self, relevant_coeff_degree=None, as_tuples=False):
         """
         Generates a basis in a component
         If as_tuples=True returns tuples (braid, exp)
@@ -697,48 +740,17 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         exp is a tuple of exponents in the polynomial coefficients.
         """
         if as_tuples:
-            if max_number_of_dots is None:
-                if min_number_of_dots == 0:
-                    # MappingProxyType makes sure it's immutable
-                    return MappingProxyType(
-                        dict(enumerate(self._basis_iter_as_tuples_()))
-                    )
-                else:
-                    return MappingProxyType(
-                        {
-                            key: (braid, exp)
-                            for key, (braid, exp) in self.basis(
-                                min_number_of_dots=0,
-                                max_number_of_dots=None,
-                                as_tuples=True,
-                            ).items()
-                            if self.KLRW_algebra.base().exp_number_of_dots(exp)
-                            >= min_number_of_dots
-                        }
-                    )
-            else:
-                return MappingProxyType(
-                    {
-                        key: (braid, exp)
-                        for key, (braid, exp) in self.basis(
-                            min_number_of_dots=min_number_of_dots,
-                            max_number_of_dots=None,
-                            as_tuples=True,
-                        ).items()
-                        if self.KLRW_algebra.base().exp_number_of_dots(exp)
-                        <= max_number_of_dots
-                    }
-                )
+            # MappingProxyType makes sure it's immutable
+            return tuple(self._basis_iter_as_tuples_(relevant_coeff_degree))
         else:
-            result = {}
-            for i, (braid, exp) in self.basis(
-                min_number_of_dots=min_number_of_dots,
-                max_number_of_dots=max_number_of_dots,
+            result = []
+            for braid, exp in self.basis(
+                relevant_coeff_degree=relevant_coeff_degree,
                 as_tuples=True,
-            ).items():
+            ):
                 coeff = self.KLRW_algebra.base().monomial(*exp)
-                result[i] = self.KLRW_algebra.term(braid, coeff)
-            return MappingProxyType(result)
+                result.append(self.KLRW_algebra.term(braid, coeff))
+            return tuple(result)
 
     @lazy_attribute
     def _word_exp_to_index_(self) -> dict:
@@ -749,19 +761,23 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         part of the braid data that differs
         """
         result = {}
-        for i, (braid, exp) in self.basis(as_tuples=True).items():
+        for i, (braid, exp) in enumerate(self.basis(as_tuples=True)):
             result[braid.word(), exp] = i
         return MappingProxyType(result)
 
-    def _basis_iter_as_tuples_(self):
-        for braid in self.KLRW_algebra.KLRWBraid._braids_with_left_state_iter_(
-            self.left_state
+    def _basis_iter_as_tuples_(self, relevant_coeff_degree=None):
+        dot_algebra = self.KLRW_algebra.base()
+        for braid in self.KLRW_algebra.KLRWBraid.braids_by_states(
+            self.left_state, self.right_state
         ):
-            if braid.right_state() == self.right_state:
-                for exp in self.KLRW_algebra.base().exps_for_dots_of_degree(
-                    self.degree - self.KLRW_algebra.braid_degree(braid)
-                ):
-                    yield (braid, exp)
+            dot_degree = self.degree - self.KLRW_algebra.braid_degree(braid)
+            if relevant_coeff_degree is not None:
+                if dot_degree != relevant_coeff_degree:
+                    continue
+            for exp in dot_algebra.exps_by_degree(
+                self.degree - self.KLRW_algebra.braid_degree(braid),
+            ):
+                yield (braid, exp)
 
     def _element_from_vector_(self, vector):
         assert len(vector) == len(self.basis())
@@ -818,7 +834,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
             sparse=True,
         )
 
-        for _, basis_elem in domain_basis.items():
+        for basis_elem in domain_basis:
             if acting_on_left:
                 new_element = element * basis_elem
             else:

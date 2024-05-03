@@ -1,4 +1,6 @@
+from collections import defaultdict
 from collections.abc import Iterable
+from types import MappingProxyType
 from typing import NamedTuple
 from itertools import chain, count
 
@@ -397,6 +399,25 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
     def __iter__(self):
         for state in self.KLRWstate_set:
             yield from self._braids_with_left_state_iter_(state)
+
+    @cached_method
+    def braids_with_left_state_by_right_state(self, left_state):
+        '''
+        Return dictionary right_state:tuple(braids)
+        with braids having given left and right state
+        '''
+        result = defaultdict(list)
+        for br in self._braids_with_left_state_iter_(left_state):
+            result[br.right_state()].append(br)
+
+        # make entries immutable
+        for index in result:
+            result[index] = tuple(result[index])
+
+        return MappingProxyType(result)
+
+    def braids_by_states(self, left_state, right_state):
+        return self.braids_with_left_state_by_right_state(left_state)[right_state]
 
     def total_number_of_strands(self):
         return self.KLRWstate_set.total_number_of_strands()

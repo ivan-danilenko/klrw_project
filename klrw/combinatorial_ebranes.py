@@ -8,7 +8,7 @@ from sage.matrix.constructor import matrix
 from sage.combinat.root_system.cartan_type import CartanType
 
 from .klrw_algebra import KLRWAlgebra
-from .framed_dynkin import FramedDynkinDiagram_with_dimensions
+from .framed_dynkin import FramedDynkinDiagram_with_dimensions, QuiverGradingGroup
 from .klrw_state import KLRWstate
 from .perfect_complex import KLRWProjectiveModule, KLRWPerfectComplex
 from .perfect_complex_corrections import corrected_diffirential_csc
@@ -46,6 +46,12 @@ class CombinatorialEBrane:
         self.V, self.W = self.quiver.vertices()
         self.quiver[self.W] = self.n
 
+        grading_group = QuiverGradingGroup(
+            self.quiver,
+            vertex_scaling=True,
+            edge_scaling=True,
+        )
+
         # we will use several KLRW algebras
         # one for each of the subset of the moving strands
         self.klrw_algebra = {}
@@ -54,6 +60,7 @@ class CombinatorialEBrane:
             self.klrw_algebra[i] = KLRWAlgebra(
                 ZZ,
                 self.quiver,
+                grading_group=grading_group,
                 vertex_prefix="h",
                 framing_prefix="u",
                 warnings=True,
@@ -134,12 +141,12 @@ class CombinatorialEBrane:
 
         # keeps track of branch in log(yi-yj)
         # initially everything in the principal branch
-        self.pairwise_equ_deg = {}
+        self.pairwise_equ_deg_halved = {}
         for b1 in range(len(self.branes)):
             for b0 in range(b1):
                 for pt0 in self.branes[b0]:
                     for pt1 in self.branes[b1]:
-                        self.pairwise_equ_deg[pt0, pt1] = 0
+                        self.pairwise_equ_deg_halved[pt0, pt1] = 0
 
         self.number_of_intersections = (
             number_of_E_branes * intersection_points_in_E_brane
@@ -230,7 +237,7 @@ class CombinatorialEBrane:
         # now modify the pairwise contributions to the equivariant degree
         # we do it only on this step because of the case when lefth points
         # are on i-th segement
-        old_keys = [x for x in self.pairwise_equ_deg]
+        old_keys = [x for x in self.pairwise_equ_deg_halved]
         for pts in old_keys:
             # pts is a 2-tuple
             if_pt_on_the_segment = [p in self.intersections[i] for p in pts]
@@ -242,54 +249,54 @@ class CombinatorialEBrane:
                 left_points = [new_points_left[j] for j in js]
                 right_points = [new_points_right[j] for j in js]
 
-                self.pairwise_equ_deg[left_points[0], left_points[1]] = (
-                    self.pairwise_equ_deg[pts]
+                self.pairwise_equ_deg_halved[left_points[0], left_points[1]] = (
+                    self.pairwise_equ_deg_halved[pts]
                 )
-                self.pairwise_equ_deg[right_points[0], right_points[1]] = (
-                    self.pairwise_equ_deg[pts]
+                self.pairwise_equ_deg_halved[right_points[0], right_points[1]] = (
+                    self.pairwise_equ_deg_halved[pts]
                 )
                 # for many cases the value depents on relative positions
                 # of points on the segment
                 if js[0] < js[1]:
-                    self.pairwise_equ_deg[left_points[0], pts[1]] = (
-                        self.pairwise_equ_deg[pts]
+                    self.pairwise_equ_deg_halved[left_points[0], pts[1]] = (
+                        self.pairwise_equ_deg_halved[pts]
                     )
-                    self.pairwise_equ_deg[left_points[0], right_points[1]] = (
-                        self.pairwise_equ_deg[pts]
+                    self.pairwise_equ_deg_halved[left_points[0], right_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts]
                     )
-                    self.pairwise_equ_deg[pts[0], left_points[1]] = (
-                        self.pairwise_equ_deg[pts] + 2 * sign
+                    self.pairwise_equ_deg_halved[pts[0], left_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts] - sign
                     )
-                    self.pairwise_equ_deg[pts[0], right_points[1]] = (
-                        self.pairwise_equ_deg[pts]
+                    self.pairwise_equ_deg_halved[pts[0], right_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts]
                     )
-                    self.pairwise_equ_deg[right_points[0], left_points[1]] = (
-                        self.pairwise_equ_deg[pts] + 2 * sign
+                    self.pairwise_equ_deg_halved[right_points[0], left_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts] - sign
                     )
-                    self.pairwise_equ_deg[right_points[0], pts[1]] = (
-                        self.pairwise_equ_deg[pts] + 2 * sign
+                    self.pairwise_equ_deg_halved[right_points[0], pts[1]] = (
+                        self.pairwise_equ_deg_halved[pts] - sign
                     )
                 else:
-                    self.pairwise_equ_deg[left_points[0], pts[1]] = (
-                        self.pairwise_equ_deg[pts] + 2 * sign
+                    self.pairwise_equ_deg_halved[left_points[0], pts[1]] = (
+                        self.pairwise_equ_deg_halved[pts] - sign
                     )
-                    self.pairwise_equ_deg[left_points[0], right_points[1]] = (
-                        self.pairwise_equ_deg[pts] + 2 * sign
+                    self.pairwise_equ_deg_halved[left_points[0], right_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts] - sign
                     )
-                    self.pairwise_equ_deg[pts[0], left_points[1]] = (
-                        self.pairwise_equ_deg[pts]
+                    self.pairwise_equ_deg_halved[pts[0], left_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts]
                     )
-                    self.pairwise_equ_deg[pts[0], right_points[1]] = (
-                        self.pairwise_equ_deg[pts] + 2 * sign
+                    self.pairwise_equ_deg_halved[pts[0], right_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts] - sign
                     )
-                    self.pairwise_equ_deg[right_points[0], left_points[1]] = (
-                        self.pairwise_equ_deg[pts]
+                    self.pairwise_equ_deg_halved[right_points[0], left_points[1]] = (
+                        self.pairwise_equ_deg_halved[pts]
                     )
-                    self.pairwise_equ_deg[right_points[0], pts[1]] = (
-                        self.pairwise_equ_deg[pts]
+                    self.pairwise_equ_deg_halved[right_points[0], pts[1]] = (
+                        self.pairwise_equ_deg_halved[pts]
                     )
                 # we change this the last because it's used in all the other cases
-                self.pairwise_equ_deg[pts] += 2 * sign
+                self.pairwise_equ_deg_halved[pts] += -sign
 
             elif if_pt_on_the_segment[0]:
                 # and p1 is not on the segment from if statement above
@@ -297,9 +304,13 @@ class CombinatorialEBrane:
                 j = self.intersections[i].index(pts[0])
                 left_point = new_points_left[j]
                 right_point = new_points_right[j]
-                # keep self.pairwise_equ_deg[pt0,pt1] the same
-                self.pairwise_equ_deg[left_point, pts[1]] = self.pairwise_equ_deg[pts]
-                self.pairwise_equ_deg[right_point, pts[1]] = self.pairwise_equ_deg[pts]
+                # keep self.pairwise_equ_deg_halved[pt0,pt1] the same
+                self.pairwise_equ_deg_halved[left_point, pts[1]] = (
+                    self.pairwise_equ_deg_halved[pts]
+                )
+                self.pairwise_equ_deg_halved[right_point, pts[1]] = (
+                    self.pairwise_equ_deg_halved[pts]
+                )
 
             elif if_pt_on_the_segment[1]:
                 # and p1 is not on the segment from if statement above
@@ -307,9 +318,13 @@ class CombinatorialEBrane:
                 j = self.intersections[i].index(pts[1])
                 left_point = new_points_left[j]
                 right_point = new_points_right[j]
-                # keep self.pairwise_equ_deg[pt0,pt1] the same
-                self.pairwise_equ_deg[pts[0], left_point] = self.pairwise_equ_deg[pts]
-                self.pairwise_equ_deg[pts[0], right_point] = self.pairwise_equ_deg[pts]
+                # keep self.pairwise_equ_deg_halved[pt0,pt1] the same
+                self.pairwise_equ_deg_halved[pts[0], left_point] = (
+                    self.pairwise_equ_deg_halved[pts]
+                )
+                self.pairwise_equ_deg_halved[pts[0], right_point] = (
+                    self.pairwise_equ_deg_halved[pts]
+                )
 
         self.intersections[i - 1] = self.intersections[i - 1] + new_points_left
         self.intersections[i + 1] = new_points_right + self.intersections[i + 1]
@@ -406,19 +421,23 @@ class CombinatorialEBrane:
             for j in range(len(brane)):
                 brane[j] = old_to_new_index[brane[j]]
 
-        new_pairwise_equ_deg = {
+        new_pairwise_equ_deg_halved = {
             (
                 old_to_new_index[pt1],
                 old_to_new_index[pt2],
             ): deg
-            for (pt1, pt2), deg in self.pairwise_equ_deg.items()
+            for (pt1, pt2), deg in self.pairwise_equ_deg_halved.items()
         }
-        self.pairwise_equ_deg = new_pairwise_equ_deg
+        self.pairwise_equ_deg_halved = new_pairwise_equ_deg_halved
 
     def one_dimensional_differential_geometric(self, i):
         brane = self.branes[i]
         projectives = defaultdict(list)
         thimbles = defaultdict(list)
+
+        vw_crossing_degree = self.klrw_algebra[1].grading_group.crossing_grading(
+            self.V, self.W
+        )
 
         differential_dicts = defaultdict(dict)
         for current_index in range(len(brane)):
@@ -455,7 +474,7 @@ class CombinatorialEBrane:
             projectives[current_hom_deg].append(
                 KLRWProjectiveModule(
                     state=current_state,
-                    equivariant_degree=current_equ_deg,
+                    equivariant_degree=current_equ_deg * vw_crossing_degree,
                 )
             )
             current_index_within_hom_deg = len(projectives[current_hom_deg]) - 1
@@ -478,7 +497,9 @@ class CombinatorialEBrane:
                 )
 
                 braid_degree = self.klrw_algebra[1].braid_degree(KLRWbraid)
-                assert current_equ_deg - next_equ_deg == braid_degree, (
+                assert (
+                    current_equ_deg - next_equ_deg == braid_degree.ordinary_grading()
+                ), (
                     current_equ_deg.__repr__()
                     + " "
                     + next_equ_deg.__repr__()
@@ -508,7 +529,9 @@ class CombinatorialEBrane:
                 )
 
                 braid_degree = self.klrw_algebra[1].braid_degree(KLRWbraid)
-                assert next_equ_deg - current_equ_deg == braid_degree, (
+                assert (
+                    next_equ_deg - current_equ_deg == braid_degree.ordinary_grading()
+                ), (
                     current_equ_deg.__repr__()
                     + " "
                     + next_equ_deg.__repr__()
@@ -565,6 +588,7 @@ class CombinatorialEBrane:
         thimbles_next,
     ):
         klrw_algebra = self.klrw_algebra[number_of_moving_strands]
+        vv_crossing_degree = klrw_algebra.grading_group.crossing_grading(self.V, self.V)
         thimbles = {}
         projectives_subdivided = {}
         for hom_deg in hom_degrees:
@@ -603,7 +627,10 @@ class CombinatorialEBrane:
                         # from terms log(1-y_i/y_j)
                         for pt_curr in thim_curr.points:
                             for pt_next in thim_next.points:
-                                equ_deg += self.pairwise_equ_deg[pt_curr, pt_next]
+                                equ_deg += (
+                                    self.pairwise_equ_deg_halved[pt_curr, pt_next]
+                                    * vv_crossing_degree
+                                )
 
                         new_proj = KLRWProjectiveModule(state, equ_deg)
 

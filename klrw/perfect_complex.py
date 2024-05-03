@@ -5,7 +5,7 @@ from types import MappingProxyType
 from copy import copy
 
 from sage.structure.parent import Parent
-from sage.structure.element import Element
+from sage.groups.abelian_gps.abelian_group_element import AbelianGroupElement
 from sage.combinat.free_module import CombinatorialFreeModule
 
 from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
@@ -21,11 +21,12 @@ from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
 
 from .klrw_state import KLRWstate
+from .framed_dynkin import QuiverGradingGroupElement
 
 
 class KLRWProjectiveModule(NamedTuple):
     state: KLRWstate
-    equivariant_degree: int
+    equivariant_degree: QuiverGradingGroupElement | int
 
     def __repr__(self):
         return (
@@ -41,8 +42,10 @@ class KLRWPerfectComplex(Parent):
     def __init__(
         self,
         KLRW_algebra,
-        differentials: dict[Element, Matrix],
-        projectives: dict[Element, Iterable[KLRWProjectiveModule]] | None = None,
+        differentials: dict[AbelianGroupElement, Matrix],
+        projectives: (
+            dict[AbelianGroupElement, Iterable[KLRWProjectiveModule]] | None
+        ) = None,
         degree=-1,
         grading_group=ZZ,
         mod2grading=IntegerModRing(2).coerce_map_from(ZZ),
@@ -68,9 +71,9 @@ class KLRWPerfectComplex(Parent):
             assert projectives.default_factory is list
             self.projectives = projectives
         else:
-            self.projectives: defaultdict[Element, Iterable[KLRWProjectiveModule]] = (
-                defaultdict(list)
-            )
+            self.projectives: defaultdict[
+                AbelianGroupElement, Iterable[KLRWProjectiveModule]
+            ] = defaultdict(list)
             self.projectives |= projectives
 
         self.grading_group = grading_group
@@ -115,13 +118,13 @@ class KLRWPerfectComplex(Parent):
             for index, proj in enumerate(self.projectives[hom_deg]):
                 if proj.state == simple:
                     eq_deg = proj.equivariant_degree
-                    grading = grading_group((hom_deg, eq_deg))
-                    if (hom_deg, eq_deg) in relevant_indices:
-                        new_index = len(relevant_indices[hom_deg, eq_deg])
+                    grading_pair = (hom_deg, eq_deg.ordinary_grading(as_scalar=True))
+                    if grading_pair in relevant_indices:
+                        new_index = len(relevant_indices[grading_pair])
                     else:
-                        relevant_indices[hom_deg, eq_deg] = {}
+                        relevant_indices[grading_pair] = {}
                         new_index = 0
-                    relevant_indices[hom_deg, eq_deg][index] = new_index
+                    relevant_indices[grading_pair][index] = new_index
 
         rhom_diff = {}
         for hom_deg, eq_deg in relevant_indices:
@@ -163,7 +166,9 @@ class KLRWPerfectComplex(Parent):
                         if braid.word() == ():
                             new_elem = hom(coeff)
                             if not new_elem.is_zero():
-                                eq_deg = left_proj.equivariant_degree
+                                eq_deg = left_proj.equivariant_degree.ordinary_grading(
+                                    as_scalar=True
+                                )
                                 if dualize_complex:
                                     i_new = relevant_indices[
                                         hom_deg + self.degree, eq_deg
