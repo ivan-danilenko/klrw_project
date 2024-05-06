@@ -86,7 +86,7 @@ class KLRWPerfectComplex(Parent):
                         self.differentials[n] * self.differentials[n + self.degree]
                     ).is_zero(), "d_{} * d_{} != 0".format(n, n + self.degree)
 
-                for (i, j), elem in self.differentials[n].items():
+                for (i, j), elem in self.differentials[n].dict(copy=False).items():
                     assert self.projectives[n + degree][j].state == elem.right_state(
                         check_if_all_have_same_right_state=True
                     )
