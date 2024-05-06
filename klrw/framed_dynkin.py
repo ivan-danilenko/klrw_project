@@ -1,6 +1,6 @@
 from typing import NamedTuple
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from types import MappingProxyType
 
 from sage.combinat.root_system.dynkin_diagram import DynkinDiagram_class
@@ -14,6 +14,7 @@ from sage.rings.ring import CommutativeRing, Ring
 from sage.rings.integer_ring import ZZ
 from sage.combinat.free_module import CombinatorialFreeModule
 from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
+from sage.structure.sage_object import SageObject
 
 from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
@@ -45,13 +46,24 @@ class NonOrientedEdge(frozenset):
         assert isinstance(vertex2, NodeInFramedQuiver)
         return super(NonOrientedEdge, cls).__new__(cls, frozenset((vertex1, vertex2)))
 
-    def __repr__(self):
+    def vertices(self):
         if len(self) == 2:
             vertex1, vertex2 = self
         if len(self) == 1:
             (vertex1,) = self
             vertex2 = vertex1
+        return vertex1, vertex2
+
+    def __repr__(self):
+        vertex1, vertex2 = self.vertices()
         return repr(vertex1) + "--" + repr(vertex2)
+
+    def __reduce__(self):
+        vertex1, vertex2 = self.vertices()
+        return (
+            self.__class__,
+            (vertex1, vertex2),
+        )
 
 
 class NodeInFramedQuiverWithMarks(NamedTuple):
@@ -65,7 +77,7 @@ class NodeInFramedQuiverWithMarks(NamedTuple):
         return self.unmarked_node.__repr__() + "_" + self.mark.__repr__()
 
 
-class FramedDynkinDiagram_class(DynkinDiagram_class):
+class FramedDynkinDiagram_class(UniqueRepresentation, DynkinDiagram_class):
     def __init__(self, t=None, **options):
         assert isinstance(t, CartanType_abstract)
         # add a property framing = False to all labels
@@ -182,18 +194,39 @@ class FramedDynkinDiagram_class(DynkinDiagram_class):
         return special_edge_names
 
 
-class FramedDynkinDiagram_with_dimensions(FramedDynkinDiagram_class):
-    def __init__(self, t=None, **options):
-        assert isinstance(t, CartanType_abstract)
-        super().__init__(t)
-        self._dimensions = defaultdict(int)
+@dataclass(repr=False)
+class FramedDynkinDiagram_with_dimensions(SageObject):
+    ct: InitVar[CartanType_abstract | None] = None
+    quiver: FramedDynkinDiagram_class | None = None
+    dimensions_dict: dict | defaultdict | MappingProxyType | None = None
+
+    def __post_init__(self, ct: CartanType_abstract | None):
+        if ct is not None:
+            assert isinstance(ct, CartanType_abstract), (
+                "Don't know how to make a Framed Dynkin Diagram"
+                + " with dimensions from {}".format(ct.__class__)
+            )
+            if self.quiver is not None:
+                assert self.quiver.cartan_type() == ct
+            else:
+                self.quiver = FramedDynkinDiagram_class(ct)
+        else:
+            assert self.quiver is not None, "Quiver must be given"
+
+        if self.dimensions_dict is None:
+            self.dimensions_dict = defaultdict(int)
+        if isinstance(self.dimensions_dict, list):
+            self.dimensions_dict = {key: value for key, value in self.dimensions_dict}
 
     def __hash__(self):
         """
         We need hash to be able pass instances of this class to __init__'s
         of UniqueRepresentation classes [e.g. KLRW algebra]
         """
-        return hash((self.dimensions_list(), self.cartan_type()))
+        return hash((self.dimensions_list(), self.quiver.cartan_type()))
+
+    #    def __getattr__(self, name):
+    #        return getattr(self.quiver, name)
 
     def __getitem__(self, key):
         """
@@ -201,31 +234,31 @@ class FramedDynkinDiagram_with_dimensions(FramedDynkinDiagram_class):
         Otherwise returns an element of the Cartan matrix.
         """
         if isinstance(key, NodeInFramedQuiver):
-            return self._dimensions[key]
+            return self.dimensions_dict[key]
         else:
-            return super().__getitem__(key)
+            return self.quiver[key]
 
     def __setitem__(self, key, dim):
         """
         A more convenient way to set dimentions
         """
         if isinstance(key, NodeInFramedQuiver):
-            self._dimensions[key] = dim
+            self.dimensions_dict[key] = dim
         if isinstance(key, tuple):
             node = NodeInFramedQuiver(*key)
         else:
             node = NodeInFramedQuiver(key)
-        assert node in self.vertices()
-        self._dimensions[node] = dim
+        assert node in self.quiver.vertices()
+        self.dimensions_dict[node] = dim
 
     def dimensions_list(self):
-        return tuple(sorted(self._dimensions.items()))
+        return tuple(sorted(self.dimensions_dict.items()))
 
     def dimensions(self, copy=False):
         if copy:
-            return self._dimensions.copy()
+            return self.dimensions_dict.copy()
         else:
-            return self._dimensions
+            return self.dimensions_dict
 
     def get_dim(self, *index):
         """
@@ -234,38 +267,59 @@ class FramedDynkinDiagram_with_dimensions(FramedDynkinDiagram_class):
         """
         if len(index) == 1:
             if isinstance(index[0], NodeInFramedQuiver):
-                return self._dimensions[index]
+                return self.dimensions_dict[index]
             node = NodeInFramedQuiver(index[0], False)
-            if node in self.cartan_type().index_set():
-                return self._dimensions[node]
+            if node in self.quiver.cartan_type().index_set():
+                return self.dimensions_dict[node]
         if len(index) == 2:
             assert isinstance(index[1], bool)
-            return self._dimensions[NodeInFramedQuiver(*index)]
+            return self.dimensions_dict[NodeInFramedQuiver(*index)]
 
         raise ValueError("Incorrect index")
 
     def set_dim(self, dim, index, is_framing=False):
         node = NodeInFramedQuiver(index, is_framing)
-        assert node in self.vertices()
-        self._dimensions[node] = dim
+        assert node in self.quiver.vertices()
+        self.dimensions_dict[node] = dim
+
+    def scalar_product_of_simple_roots(self, *args, **kwargs):
+        return self.quiver.scalar_product_of_simple_roots(*args, **kwargs)
+
+    def is_simply_laced(self, *args, **kwargs):
+        return self.quiver.is_simply_laced(*args, **kwargs)
+
+    def non_framing_nodes(self, *args, **kwargs):
+        return self.quiver.non_framing_nodes(*args, **kwargs)
+
+    def inject_nodes(self, *args, **kwargs):
+        self.quiver.inject_nodes(*args, **kwargs)
+
+    def KLRW_vertex_param_names(self, *args, **kwargs):
+        return self.quiver.KLRW_vertex_param_names(*args, **kwargs)
+
+    def KLRW_edge_param_names(self, *args, **kwargs):
+        return self.quiver.KLRW_edge_param_names(*args, **kwargs)
+
+    def KLRW_special_edge_param_names(self, *args, **kwargs):
+        return self.quiver(*args, **kwargs)
 
     def _repr_(self):
-        ct = self.cartan_type()
+        ct = self.quiver.cartan_type()
         is_linear = ct.type() == "A" or ct.type() == "B" or ct.type() == "C"
         is_linear &= ct.is_finite()
         if is_linear:
             result = (
                 "".join(
-                    "{!s:4}".format(self._dimensions[v])
-                    for v in self.vertices()
+                    "{!s:4}".format(self.dimensions_dict[v])
+                    for v in self.quiver.vertices()
                     if v.is_framing()
                 )
                 + "\n"
             )
-            result += super()._repr_() + "\n"
+            result += self.quiver._repr_() + "\n"
             result += "".join(
-                "{!s:4}".format(self._dimensions[v])
-                for v in self.vertices()
+                "{!s:4}".format(self.dimensions_dict[v])
+                for v in self.quiver.vertices()
                 if not v.is_framing()
             )
         else:
@@ -275,16 +329,16 @@ class FramedDynkinDiagram_with_dimensions(FramedDynkinDiagram_class):
     def KLRW_dots_names(self, dots_prefix="x"):
         dots_names = {}
         # iterating over non-framing vertices
-        for v in self.cartan_type().index_set():
-            for k in range(self._dimensions[v]):
+        for v in self.quiver.cartan_type().index_set():
+            for k in range(self.dimensions_dict[v]):
                 dots_names[v, k + 1] = dots_prefix + "_{}_{}".format(v.node, k + 1)
         return dots_names
 
     def KLRW_deformations_names(self, deformations_prefix="z"):
         deformations_names = {}
-        for v in self.cartan_type().index_set():
+        for v in self.quiver.cartan_type().index_set():
             w = v.make_framing()
-            for k in range(self._dimensions[w]):
+            for k in range(self.dimensions_dict[w]):
                 deformations_names[w, k + 1] = deformations_prefix + "_{}_{}".format(
                     w.node, k + 1
                 )
@@ -318,6 +372,43 @@ class FramedDynkinDiagram_with_dimensions(FramedDynkinDiagram_class):
 
         return names
 
+    def immutable_copy(self):
+        return FramedDynkinDiagram_with_dimensions_immutable(
+            quiver=self.quiver,
+            dimensions_dict=self.dimensions_dict,
+        )
+
+
+class FramedDynkinDiagram_with_dimensions_immutable(
+    FramedDynkinDiagram_with_dimensions
+):
+    def __post_init__(self, *args, **kwargs):
+        super().__post_init__(*args, **kwargs)
+        self.dimensions_dict = MappingProxyType(self.dimensions_dict)
+
+    def __hash__(self):
+        """
+        We need hash to be able pass instances of this class to __init__'s
+        of UniqueRepresentation classes [e.g. KLRW algebra]
+        """
+        return hash((self.dimensions_list(), self.quiver.cartan_type()))
+
+    def __setitem__(self, key, dim):
+        raise AttributeError("The dimensions are immutable")
+
+    def set_dim(self, dim, index, is_framing=False):
+        raise AttributeError("The dimensions are immutable")
+
+    def __reduce__(self):
+        return (
+            self.__class__,
+            (
+                self.quiver.cartan_type(),
+                self.quiver,
+                dict(self.dimensions_dict),
+            ),
+        )
+
 
 class QuiverGradingGroupElement(IndexedFreeModuleElement):
     def ordinary_grading(self, as_scalar=True):
@@ -327,7 +418,7 @@ class QuiverGradingGroupElement(IndexedFreeModuleElement):
             return self.coefficient(equivariant_grading_name)
         else:
             basis_vector = parent.monomial(equivariant_grading_name)
-            return self.ordinary_grading(as_scalar=True)*basis_vector
+            return self.ordinary_grading(as_scalar=True) * basis_vector
 
     def extra_gradings(self):
         return self - self.ordinary_grading(as_scalar=False)
@@ -347,13 +438,12 @@ class QuiverGradingGroup(CombinatorialFreeModule):
         self.quiver = quiver
         names = []
         if vertex_scaling:
-            names += quiver.non_framing_nodes()
+            self.vertices = quiver.non_framing_nodes()
+            names += self.vertices
         if edge_scaling:
             # we keep only non-oriented pairs and remove doubles
-            non_oriented_edges = set(
-                NonOrientedEdge(v1, v2) for v1, v2, _ in quiver.edges()
-            )
-            names += list(non_oriented_edges)
+            self.edges = set(NonOrientedEdge(v1, v2) for v1, v2, _ in quiver.edges())
+            names += list(self.edges)
         names += [equivariant_grading_name]
 
         if "prefix" not in kwrds:
@@ -392,6 +482,47 @@ class QuiverGradingGroup(CombinatorialFreeModule):
                 return 2 * self.monomial(edge)
 
         return self.zero()
+
+    '''
+    @staticmethod
+    def coerce_map(parent, x):
+        mon_coeff = {}
+        for index, coeff in x._monomial_coefficients:
+            if isinstance(index, NonOrientedEdge):
+                if index in self.edges:
+                    mon_coeff[index] = coeff
+                else:
+                    raise ValueError(
+                        "No edge {} in quiver for grading".format(index)
+                    )
+            if isinstance(index, NodeInFramedQuiver):
+                if index in self.vertices:
+                    mon_coeff[index] = coeff
+                else:
+                    raise ValueError(
+                        "No vertex {} in quiver for grading".format(index)
+                    )
+        return
+
+    def _coerce_map_from_(self, G):
+        """
+        Return coerse map from gradings for similar quivers
+        """
+        if isinstance(G, QuiverGradingGroup):
+            # assert that quivers match?
+
+            try:
+                CR = R.base_extend(self.base_ring())
+            except (NotImplementedError, TypeError):
+                pass
+            else:
+                if CR == self:
+                    return lambda parent, x: self._from_dict(
+                        x._monomial_coefficients, coerce=True, remove_zeros=True
+                    )
+        else:
+            raise ValueError("Don't know thow to coerce from {}".format(G.__class__))
+    '''
 
 
 @dataclass(slots=True)
@@ -439,7 +570,7 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
     # have to define self.variables
     def assign_default_values(
         self,
-        quiver,
+        quiver_data,
         no_deformations=True,
         default_vertex_parameter=None,
         default_edge_parameter=None,
@@ -447,6 +578,7 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
         # TODO: add default parameters' options,
         # maybe by changing self.variables to a custom dictionary
         # second set of framing variables rescaled to 1
+        quiver = quiver_data.quiver
         if default_edge_parameter is None:
             for n1, n2 in product(quiver.vertices(), quiver.vertices()):
                 if (n1, n2) not in self.variables:
@@ -462,7 +594,7 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
                     None, None, self(default_vertex_parameter)
                 )
         if no_deformations:
-            for key in quiver.KLRW_deformations_names():
+            for key in quiver_data.KLRW_deformations_names():
                 self.variables[key] = QuiverParameter(None, None, self.zero())
 
     def center_gens(self):
@@ -494,7 +626,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
     def __init__(
         self,
         base_ring,
-        quiver: FramedDynkinDiagram_with_dimensions,
+        quiver_data: FramedDynkinDiagram_with_dimensions,
         no_deformations=True,
         default_vertex_parameter=None,
         default_edge_parameter=None,
@@ -502,7 +634,8 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         **prefixes,
     ):
         # remember initialization data for pickle/unpickle
-        self.quiver = quiver
+        self.quiver_data = quiver_data
+        self.quiver = quiver_data.quiver
         self.no_deformations = no_deformations
         self.default_vertex_parameter = default_vertex_parameter
         self.default_edge_parameter = default_edge_parameter
@@ -510,7 +643,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
         no_vertex_parameters = default_vertex_parameter is not None
         no_edge_parameters = default_edge_parameter is not None
-        self.names = quiver.names(
+        self.names = quiver_data.names(
             no_deformations=no_deformations,
             no_vertex_parameters=no_vertex_parameters,
             no_edge_parameters=no_edge_parameters,
@@ -528,7 +661,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
 
         # adds default values to self.variables
         self.assign_default_values(
-            quiver,
+            quiver_data,
             default_vertex_parameter=default_vertex_parameter,
             default_edge_parameter=default_edge_parameter,
             no_deformations=no_deformations,
@@ -544,7 +677,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
             partial(self.__class__, **self.prefixes),
             (
                 self.base_ring(),
-                self.quiver,
+                self.quiver_data,
                 self.no_deformations,
                 self.default_vertex_parameter,
                 self.default_edge_parameter,
@@ -654,9 +787,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
                 raise ValueError("Unknown type of grading: {}".format(index))
         return tuple(x for x in result.exponents())
 
-    def exp_degree(
-        self, exp: ETuple, grading_group: QuiverGradingGroup
-    ):
+    def exp_degree(self, exp: ETuple, grading_group: QuiverGradingGroup):
         degrees_by_position = self.degrees_by_position(grading_group)
         return grading_group.linear_combination(
             (degrees_by_position[position], power)

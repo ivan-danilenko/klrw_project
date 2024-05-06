@@ -96,7 +96,13 @@ class KLRWPerfectComplex(Parent):
                     assert (
                         self.projectives[n + degree][j].equivariant_degree
                         - self.projectives[n][i].equivariant_degree
-                    ) == elem.degree(check_if_homogeneous=True)
+                    ) == elem.degree(check_if_homogeneous=True), (
+                        repr(self.projectives[n + degree][j].equivariant_degree)
+                        + " "
+                        + repr(self.projectives[n][i].equivariant_degree)
+                        + " "
+                        + repr(elem.degree(check_if_homogeneous=True))
+                    )
 
     def rhom_to_simple(
         self,

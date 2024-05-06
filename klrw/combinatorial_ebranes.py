@@ -8,7 +8,7 @@ from sage.matrix.constructor import matrix
 from sage.combinat.root_system.cartan_type import CartanType
 
 from .klrw_algebra import KLRWAlgebra
-from .framed_dynkin import FramedDynkinDiagram_with_dimensions, QuiverGradingGroup
+from .framed_dynkin import FramedDynkinDiagram_with_dimensions
 from .klrw_state import KLRWstate
 from .perfect_complex import KLRWProjectiveModule, KLRWPerfectComplex
 from .perfect_complex_corrections import corrected_diffirential_csc
@@ -42,25 +42,21 @@ class CombinatorialEBrane:
         self.n = number_of_punctures
         self.k = number_of_E_branes
 
-        self.quiver = FramedDynkinDiagram_with_dimensions(CartanType(["A", 1]))
+        quiver_data = FramedDynkinDiagram_with_dimensions(CartanType(["A", 1]))
+        self.quiver = quiver_data.quiver
         self.V, self.W = self.quiver.vertices()
-        self.quiver[self.W] = self.n
-
-        grading_group = QuiverGradingGroup(
-            self.quiver,
-            vertex_scaling=True,
-            edge_scaling=True,
-        )
+        quiver_data[self.W] = self.n
 
         # we will use several KLRW algebras
         # one for each of the subset of the moving strands
         self.klrw_algebra = {}
         for i in range(1, self.k + 1):
-            self.quiver[self.V] = i
+            quiver_data[self.V] = i
             self.klrw_algebra[i] = KLRWAlgebra(
                 ZZ,
-                self.quiver,
-                grading_group=grading_group,
+                quiver_data,
+                vertex_scaling=True,
+                edge_scaling=True,
                 vertex_prefix="h",
                 framing_prefix="u",
                 warnings=True,
@@ -76,18 +72,20 @@ class CombinatorialEBrane:
         self.hom_one_to_many_dots = {}
         domain_dots_algebra = self.klrw_algebra[1].base()
         for i in range(1, self.k):
+            self.hom_one_to_many_dots[i] = {}
             codomain_dots_algebra = self.klrw_algebra[i + 1].base()
             for j in range(1, i + 2):
                 # dots on the only strand go to dots on j-th strand
                 map = {(self.V, 1): (self.V, j)}
                 hom = domain_dots_algebra.hom_from_dots_map(codomain_dots_algebra, map)
-                self.hom_one_to_many_dots[i, j] = hom
+                self.hom_one_to_many_dots[i][j] = hom
 
         # self.hom_add_one_more_strand[i,j] is the homomorphism
         # from the algebra of dots on i strands to the algebra
         # on i+1 strands keeping j-th strand without dots.
         self.hom_add_one_more_strand = {}
         for i in range(1, self.k):
+            self.hom_add_one_more_strand[i] = {}
             domain_dots_algebra = self.klrw_algebra[i].base()
             codomain_dots_algebra = self.klrw_algebra[i + 1].base()
             for j in range(1, i + 2):
@@ -97,7 +95,7 @@ class CombinatorialEBrane:
                     for k in range(1, i + 1)
                 }
                 hom = domain_dots_algebra.hom_from_dots_map(codomain_dots_algebra, map)
-                self.hom_add_one_more_strand[i, j] = hom
+                self.hom_add_one_more_strand[i][j] = hom
 
         E_brane_cyclic = [0, 1, 2, 3]
         E_brane_intersections = [[0], [1, 3], [2]]
@@ -697,7 +695,9 @@ class CombinatorialEBrane:
                             next_thimbles=thimbles_next[hom_deg_next],
                             right_projectives=right_projectives[column_multiindex],
                             left_projectives=left_projectives[row_multiindex],
-                            hom_add_one_more_strand=self.hom_add_one_more_strand,
+                            hom_add_one_more_strand=self.hom_add_one_more_strand[
+                                len(brane_indices) - 1
+                            ],
                         )
                         matrix_blocks[row_multiindex, column_multiindex] = block
 
@@ -717,7 +717,9 @@ class CombinatorialEBrane:
                             next_left_thimbles=thimbles_next[hom_deg_next],
                             right_projectives=right_projectives[column_multiindex],
                             left_projectives=left_projectives[row_multiindex],
-                            hom_one_to_many_dots=self.hom_one_to_many_dots,
+                            hom_one_to_many_dots=self.hom_one_to_many_dots[
+                                len(brane_indices) - 1
+                            ],
                             sign=sign,
                         )
                         matrix_blocks[row_multiindex, column_multiindex] = block

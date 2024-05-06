@@ -316,7 +316,7 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
 
     def __init__(
         self,
-        framed_quiver: FramedDynkinDiagram_with_dimensions | None = None,
+        quiver_data: FramedDynkinDiagram_with_dimensions | None = None,
         state_on_right=True,
     ):
         """
@@ -326,7 +326,7 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
             self.Element = KLRWbraid_state_on_right
         else:
             self.Element = KLRWbraid_state_on_left
-        self.KLRWstate_set = KLRWstate_set(framed_quiver)
+        self.KLRWstate_set = KLRWstate_set(quiver_data)
         self._check = False
 
     def enable_checks(self):

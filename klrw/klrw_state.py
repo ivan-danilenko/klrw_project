@@ -76,15 +76,15 @@ class KLRWstate_set(UniqueRepresentation, Set_generic):
         return self.element_class(self, tuple)
 
     #    def __init__(self, **dimensions):
-    def __init__(self, quiver=None):
+    def __init__(self, quiver_data=None):
         """
         Dimentions have to be given as a tuple of (node,dimension)
         """
         self._category = Sets().Facade()
         self._check = False
 
-        if quiver is not None:
-            self._dimensions = quiver.dimensions()
+        if quiver_data is not None:
+            self._dimensions = quiver_data.dimensions()
 
             # self._dimensions = {n:d for n,d in dimensions.values()}
             self._total_number_of_strands = sum(d for d in self._dimensions.values())

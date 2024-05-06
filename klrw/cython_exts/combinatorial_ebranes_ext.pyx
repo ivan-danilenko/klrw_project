@@ -62,7 +62,6 @@ def d_times_one_piece(
     )
 
     V, _ = klrw_algebra.quiver.vertices()
-    number_of_moving_strands = klrw_algebra.quiver[V]
     dot_algebra = klrw_algebra.base()
     grading_group = klrw_algebra.grading_group
 
@@ -97,9 +96,7 @@ def d_times_one_piece(
                 left_position_of_new_strand = left_number_of_next_strand + segment_next
 
                 # see conventions in CombinatorialEBrane.__init__()
-                hom_to_more_dots = hom_add_one_more_strand[
-                    number_of_moving_strands - 1, left_number_of_next_strand + 1
-                ]
+                hom_to_more_dots = hom_add_one_more_strand[left_number_of_next_strand + 1]
 
                 entry = klrw_algebra.zero()
                 for braid, coef in entry_curr:
@@ -205,8 +202,6 @@ def one_times_d_piece(
         dtype=np.dtype("O"),
     )
 
-    V, _ = klrw_algebra.quiver.vertices()
-    number_of_moving_strands = klrw_algebra.quiver[V]
     dot_algebra = klrw_algebra.base()
     grading_group = klrw_algebra.grading_group
 
@@ -247,9 +242,7 @@ def one_times_d_piece(
                 )
 
                 # see conventions in CombinatorialEBrane.__init__()
-                hom_to_more_dots = hom_one_to_many_dots[
-                    number_of_moving_strands - 1, left_number_of_next_strand + 1
-                ]
+                hom_to_more_dots = hom_one_to_many_dots[left_number_of_next_strand + 1]
 
                 entry = klrw_algebra.zero()
                 assert len(entry_next) == 1

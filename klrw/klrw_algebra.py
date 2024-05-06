@@ -1,7 +1,6 @@
 from itertools import product
 from collections.abc import Iterable
 from dataclasses import dataclass
-from copy import deepcopy
 
 from types import MappingProxyType
 import operator
@@ -27,12 +26,6 @@ from .framed_dynkin import (
     QuiverGradingGroup,
 )
 from .bimodule_monoid import LeftFreeBimoduleMonoid
-
-from .klrw_endomorphism import (
-    KLRWEndomorphismAlgebra,
-    LeftKLRWEndomorphismAction,
-    RightKLRWEndomorphismAction,
-)
 
 
 class KLRWElement(IndexedFreeModuleElement):
@@ -154,6 +147,7 @@ class KLRWElement(IndexedFreeModuleElement):
 class RightDotAction(Action):
     # @cached_method
     def _act_(self, p, x: IndexedFreeModuleElement) -> IndexedFreeModuleElement:
+        p = self.codomain().base()(p)
         return self.codomain().linear_combination(
             (self._act_on_bases_(exp_tuple, braid), coeff * left_poly)
             for exp_tuple, coeff in p.iterator_exp_coeff(as_ETuples=True)
@@ -167,19 +161,24 @@ class RightDotAction(Action):
     def _act_on_bases_iter_(self, p_exp_tuple: ETuple, braid: KLRWbraid):
         # idempotents commute with dots
         if len(braid.word()) == 0:
-            yield self.codomain().term(braid, self.actor().monomial(*p_exp_tuple))
+            yield self.codomain().term(
+                braid, self.codomain().base().monomial(*p_exp_tuple)
+            )
         else:
             last_letter = braid.word()[-1]
             c1, c2 = braid.intersection_colors(-1)
             if c1 == c2:
                 index_of_dots_on_left_strand = (
-                    self.actor()
+                    self.codomain()
+                    .base()
                     .variables[
                         c1, braid.right_state().index_among_same_color(last_letter - 1)
                     ]
                     .position
                 )
-                index_of_special_coefficient = self.actor().variables[c1].position
+                index_of_special_coefficient = (
+                    self.codomain().base().variables[c1].position
+                )
                 # terms where crossing stays
                 coeff_of_crossing = self._coeff_of_crossing_(
                     p_exp_tuple, index_of_dots_on_left_strand
@@ -216,7 +215,7 @@ class RightDotAction(Action):
         """
         new_exp = list(p_exp_tuple)
         new_exp[i + 1], new_exp[i] = new_exp[i], new_exp[i + 1]
-        return self.actor().monomial(*new_exp)
+        return self.codomain().base().monomial(*new_exp)
 
     def _coeff_of_correction_(self, p_exp_tuple: ETuple, i: int, j: int) -> Iterable:
         """
@@ -242,15 +241,18 @@ class RightDotAction(Action):
             # multiplying by t_{...}
             if j is None:
                 # if we use default edge parameters
-                coeff = self.actor().base()(delta) * self.actor().default_edge_parameter
+                coeff = (
+                    self.codomain().scalars()(delta)
+                    * self.codomain().base().default_edge_parameter
+                )
             else:
-                coeff = self.actor().base()(delta)
+                coeff = self.codomain().scalars()(delta)
                 new_exp[j] += 1
 
             while new_exp[i] != end_degree_at_i:
                 # we do tuple() to make a copy
                 # and plug it in later into :meth:G.monomial
-                yield coeff * self.actor().monomial(*tuple(new_exp))
+                yield coeff * self.codomain().base().monomial(*tuple(new_exp))
                 new_exp[i] += -delta
                 new_exp[i + 1] += delta
 
@@ -260,7 +262,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
     def __classcall__(
         cls,
         base_R,
-        quiver: FramedDynkinDiagram_with_dimensions,
+        quiver_data: FramedDynkinDiagram_with_dimensions,
         grading_group=None,
         dot_algebra_order="degrevlex",
         warnings=False,
@@ -269,7 +271,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         return super().__classcall__(
             cls,
             base_R=base_R,
-            quiver=deepcopy(quiver),
+            quiver_data=quiver_data.immutable_copy(),
             grading_group=grading_group,
             dot_algebra_order=dot_algebra_order,
             warnings=warnings,
@@ -279,11 +281,12 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
     def __init__(
         self,
         base_R,
-        quiver: FramedDynkinDiagram_with_dimensions,
-        grading_group=None,
+        quiver_data: FramedDynkinDiagram_with_dimensions,
+        vertex_scaling=False,
+        edge_scaling=False,
         dot_algebra_order="degrevlex",
         warnings=False,
-        **kwrds
+        **kwrds,
     ):
         """
         Makes a KLRW algebra for a quiver.
@@ -294,20 +297,17 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         may work incorrectly with extra gradings
         """
         self.warnings = warnings
-        self.quiver = quiver
-        self.KLRWBraid = KLRWbraid_set(self.quiver, state_on_right=True)
+        self.quiver = quiver_data.quiver
+        self.KLRWBraid = KLRWbraid_set(quiver_data, state_on_right=True)
 
-        if grading_group is None:
-            self.grading_group = QuiverGradingGroup(
-                quiver,
-                vertex_scaling=False,
-                edge_scaling=False,
-            )
-        else:
-            self.grading_group = grading_group
+        self.grading_group = QuiverGradingGroup(
+            self.quiver,
+            vertex_scaling=vertex_scaling,
+            edge_scaling=edge_scaling,
+        )
 
         dots_algebra = KLRWUpstairsDotsAlgebra(
-            base_R, self.quiver, order=dot_algebra_order, **kwrds
+            base_R, quiver_data, order=dot_algebra_order, **kwrds
         )
         category = FiniteDimensionalAlgebrasWithBasis(dots_algebra)
         super().__init__(R=dots_algebra, element_class=KLRWElement, category=category)
@@ -433,22 +433,13 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         )
 
     def _get_action_(self, other, op, self_on_left):
-        is_left = not self_on_left
         if op == operator.mul:
             if self_on_left is True:
-                if self.base() == other:
-                    # if self.base().has_coerce_map_from(other):
-                    return RightDotAction(other, self, is_left=is_left, op=operator.mul)
-                if self.endomorphisms == other:
-                    return RightKLRWEndomorphismAction(
-                        other, self, is_left=is_left, op=operator.mul
+                if self.base().has_coerce_map_from(other):
+                    return RightDotAction(
+                        other, self, is_left=not self_on_left, op=operator.mul
                     )
-            else:
-                # if self.endomorphisms.has_coerce_map_from(other):
-                if self.endomorphisms == other:
-                    return LeftKLRWEndomorphismAction(
-                        other, self, is_left=is_left, op=operator.mul
-                    )
+        return super()._get_action_(other, op, self_on_left)
 
     def braid_set(self):
         return self.KLRWBraid
@@ -461,14 +452,6 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
 
     def state(self, iterable):
         return self.state_set()._element_constructor_(iterable)
-
-    @lazy_attribute
-    def endomorphisms(self):
-        number_of_moving_strands = 0
-        for node, dim in self.quiver.dimensions().items():
-            if not node.is_framing():
-                number_of_moving_strands += dim
-        return KLRWEndomorphismAlgebra(self, number_of_moving_strands)
 
     def clear_cache(self, verbose=True):
         """
@@ -814,7 +797,9 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         codomain_degree = self.degree
         codomain_degree += self.KLRW_algebra.braid_degree(braid)
         codomain_degree += coeff.parent().element_degree(
-            coeff, check_if_homogeneous=True
+            coeff,
+            grading_group=self.KLRW_algebra.grading_group,
+            check_if_homogeneous=True,
         )
 
         if acting_on_left:
