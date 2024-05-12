@@ -263,7 +263,8 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         cls,
         base_R,
         quiver_data: FramedDynkinDiagram_with_dimensions,
-        grading_group=None,
+        vertex_scaling=False,
+        edge_scaling=False,
         dot_algebra_order="degrevlex",
         warnings=False,
         **kwrds,
@@ -272,7 +273,8 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             cls,
             base_R=base_R,
             quiver_data=quiver_data.immutable_copy(),
-            grading_group=grading_group,
+            vertex_scaling=vertex_scaling,
+            edge_scaling=edge_scaling,
             dot_algebra_order=dot_algebra_order,
             warnings=warnings,
             **kwrds,
@@ -465,13 +467,20 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
                 if verbose:
                     print("Cleared cache of", name)
 
-    # slightly modified coercion defined in CombinatorialFreeModule
-    #    def _coerce_map_from_(self, A):
-    #        if isinstance(A, KLRWAlgebra):
-    #            if self.base().has_coerce_map_from(A.base()):
-    #                return True
+    def _coerce_map_from_(self, other):
+        if isinstance(other, KLRWAlgebra):
+            can_coerce = self.braid_set().has_coerce_map_from(other.braid_set())
+            can_coerce &= self.base().has_coerce_map_from(other.base())
+            if can_coerce:
+                return lambda parent, x: parent._from_dict(
+                    {
+                        parent.braid_set().coerce(braid): parent.base().coerce(coeff)
+                        for braid, coeff in x
+                    }
+                )
+            return
 
-    #        return super()._coerce_map_from_(A)
+        return super()._coerce_map_from_(other)
 
     #    def _element_constructor_(self, x):
     #        if isinstance(x.parent(), KLRWAlgebra):
@@ -723,20 +732,16 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         exp is a tuple of exponents in the polynomial coefficients.
         """
         if as_tuples:
-            # MappingProxyType makes sure it's immutable
             return tuple(self._basis_iter_as_tuples_(relevant_coeff_degree))
         else:
             result = []
-            for braid, exp in self.basis(
-                relevant_coeff_degree=relevant_coeff_degree,
-                as_tuples=True,
-            ):
+            for braid, exp in self._basis_iter_as_tuples_(relevant_coeff_degree):
                 coeff = self.KLRW_algebra.base().monomial(*exp)
                 result.append(self.KLRW_algebra.term(braid, coeff))
             return tuple(result)
 
     @lazy_attribute
-    def _word_exp_to_index_(self) -> dict:
+    def _word_exp_to_index_(self) -> MappingProxyType:
         """
         Makes a dictionary where for each word and tuple of dot exponents
         we get the index of a basis element representing this combination
@@ -764,9 +769,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
 
     def _element_from_vector_(self, vector):
         assert len(vector) == len(self.basis())
-        assert (
-            self.KLRW_algebra.base().base().has_coerce_map_from(vector.parent().base())
-        )
+        assert self.KLRW_algebra.scalars().has_coerce_map_from(vector.parent().base())
         basis = self.basis(as_tuples=False)
         result = self.KLRW_algebra.zero()
         for i, c in enumerate(vector):
@@ -775,7 +778,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
 
     def _vector_from_element_(self, element):
         assert element.parent() is self.KLRW_algebra
-        vec = vector(self.KLRW_algebra.base().base(), len(self.basis()))
+        vec = vector(self.KLRW_algebra.scalars(), len(self.basis()))
         for braid, poly in element:
             assert braid.left_state() == self.left_state
             assert braid.right_state() == self.right_state
@@ -795,12 +798,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         domain_basis = self.basis(as_tuples=False)
 
         codomain_degree = self.degree
-        codomain_degree += self.KLRW_algebra.braid_degree(braid)
-        codomain_degree += coeff.parent().element_degree(
-            coeff,
-            grading_group=self.KLRW_algebra.grading_group,
-            check_if_homogeneous=True,
-        )
+        codomain_degree += element.degree(check_if_homogeneous=True)
 
         if acting_on_left:
             codomain_left_state = braid.left_state()
@@ -813,7 +811,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         ]
 
         mat_transposed = matrix(
-            self.KLRW_algebra.base().base(),
+            self.KLRW_algebra.scalars(),
             0,
             codomain_graded_component.dimension(),
             sparse=True,

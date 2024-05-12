@@ -6,7 +6,8 @@ from sage.matrix.constructor import matrix
 from sage.functions.other import Function_factorial
 
 from .framed_dynkin import NodeInFramedQuiverWithMarks
-from .perfect_complex import KLRWProjectiveModule, KLRWPerfectComplex
+from .perfect_complex import KLRWProjectiveModule
+from .perfect_complex_corrections import PerfectComplex
 
 
 def terms_in_homology_degree(n, k):
@@ -83,7 +84,11 @@ def unmark(iterable):
 
 
 def stable_envelope(
-    KLRW, left_framing, right_framing, sequence, dots_on_left, check=True
+    KLRW,
+    left_framing,
+    right_framing,
+    sequence,
+    dots_on_left,
 ):
     """
     TODO: Make independent of global variables
@@ -117,8 +122,8 @@ def stable_envelope(
     )
     state = State._element_constructor_(unmark(marked_state))
     index_in_chain_by_multi_index[multiindex] = 0
-    equivariant_degree_by_multi_index[multiindex] = 0
-    projectives[0] = [KLRWProjectiveModule(state, 0)]
+    equivariant_degree_by_multi_index[multiindex] = KLRW.grading_group.zero()
+    projectives[0] = [KLRWProjectiveModule(state, KLRW.grading_group.zero())]
 
     for multiindex in multi_index_iterator:
         homological_degree = sum(multiindex)
@@ -166,8 +171,14 @@ def stable_envelope(
             KLRWProjectiveModule(state, equivariant_degree_by_multi_index[multiindex])
         )
 
-    stab = KLRWPerfectComplex(
-        KLRW, differentials=differentials, projectives=projectives, check=check
-    )
+    try:
+        stab = PerfectComplex(
+            KLRW,
+            differentials=differentials,
+            projectives=projectives,
+            degree=-1,
+        )
+    except AssertionError:
+        return differentials, projectives
 
     return stab

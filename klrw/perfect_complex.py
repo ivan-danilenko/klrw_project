@@ -1,6 +1,7 @@
 from typing import NamedTuple
 from typing import Iterable
 from collections import defaultdict
+from dataclasses import dataclass, InitVar, replace
 from types import MappingProxyType
 from copy import copy
 
@@ -21,12 +22,26 @@ from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
 
 from .klrw_state import KLRWstate
-from .framed_dynkin import QuiverGradingGroupElement
+from .klrw_algebra import KLRWAlgebra
+from .framed_dynkin import QuiverGradingGroup, QuiverGradingGroupElement
 
 
-class KLRWProjectiveModule(NamedTuple):
+@dataclass(frozen=True)
+class KLRWProjectiveModule:
     state: KLRWstate
     equivariant_degree: QuiverGradingGroupElement | int
+    grading_group: InitVar[QuiverGradingGroup | None] = None
+
+    def __post_init__(self, grading_group: QuiverGradingGroup | None):
+        """
+        If grading_group was given coerse grading into an element of it
+        """
+        if grading_group is not None:
+            # bypass protection in frozen=True to change the entry
+            super().__setattr__(
+                "equivariant_degree",
+                grading_group(self.equivariant_degree),
+            )
 
     def __repr__(self):
         return (
@@ -41,7 +56,7 @@ class KLRWProjectiveModule(NamedTuple):
 class KLRWPerfectComplex(Parent):
     def __init__(
         self,
-        KLRW_algebra,
+        KLRW_algebra: KLRWAlgebra,
         differentials: dict[AbelianGroupElement, Matrix],
         projectives: (
             dict[AbelianGroupElement, Iterable[KLRWProjectiveModule]] | None
@@ -78,13 +93,20 @@ class KLRWPerfectComplex(Parent):
 
         self.grading_group = grading_group
         self.mod2grading = mod2grading
+        self.check = check
 
         if check:
             for n in self.differentials:
                 if n + self.degree in self.differentials:
                     assert (
                         self.differentials[n] * self.differentials[n + self.degree]
-                    ).is_zero(), "d_{} * d_{} != 0".format(n, n + self.degree)
+                    ).is_zero(), (
+                        "d_{} * d_{} != 0".format(n, n + self.degree)
+                        + "\n"
+                        + repr(
+                            self.differentials[n] * self.differentials[n + self.degree]
+                        )
+                    )
 
                 for (i, j), elem in self.differentials[n].dict(copy=False).items():
                     assert self.projectives[n + degree][j].state == elem.right_state(
@@ -103,6 +125,34 @@ class KLRWPerfectComplex(Parent):
                         + " "
                         + repr(elem.degree(check_if_homogeneous=True))
                     )
+
+    def base_change(self, other_klrw_algebra: KLRWAlgebra):
+        new_differentials = {
+            hom_deg: diff.change_ring(other_klrw_algebra)
+            for hom_deg, diff in self.differentials.items()
+        }
+        new_projectives = {
+            hom_deg: [
+                KLRWProjectiveModule(
+                    state=other_klrw_algebra.state_set().coerce(proj.state),
+                    equivariant_degree=other_klrw_algebra.grading_group.coerce(
+                        proj.equivariant_degree
+                    ),
+                )
+                for proj in list_of_projs
+            ]
+            for hom_deg, list_of_projs in self.projectives.items()
+        }
+
+        return self.__class__(
+            KLRW_algebra=other_klrw_algebra,
+            differentials=new_differentials,
+            projectives=new_projectives,
+            degree=self.degree,
+            grading_group=self.grading_group,
+            mod2grading=self.mod2grading,
+            check=self.check,
+        )
 
     def rhom_to_simple(
         self,
@@ -242,7 +292,7 @@ class KLRWPerfectComplex(Parent):
         shifted_projectives = defaultdict(list)
         for grading, projectives_in_grading in self.projectives.items():
             shifted_projectives[grading - hom_shift] = [
-                proj._replace(equivariant_degree=proj.equivariant_degree + eq_shift)
+                replace(proj, equivariant_degree=proj.equivariant_degree + eq_shift)
                 for proj in projectives_in_grading
             ]
 

@@ -65,9 +65,7 @@ class KLRWbraid(ElementWrapper):
     def find_intersection(self, i, j, right_state=True):
         raise NotImplementedError()
 
-    def find_position_on_other_side(
-        self, index: int, reverse: bool = False
-    ):
+    def find_position_on_other_side(self, index: int, reverse: bool = False):
         return self.parent().find_position_on_other_side(
             index=index, word=self.word(), reverse=reverse
         )
@@ -329,6 +327,19 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
         self.KLRWstate_set = KLRWstate_set(quiver_data)
         self._check = False
 
+    def _coerce_map_from_(self, other):
+        """
+        Despite UniqueRepresentation, sets with idential data can be different
+        if created in different modules. Make a coersion possible.
+        """
+        if isinstance(other, KLRWbraid_set):
+            coerce_map = self.KLRWstate_set._coerce_map_from_(other.KLRWstate_set)
+            if coerce_map is not None:
+                return lambda parent, x: parent._element_constructor_(
+                    state=coerce_map(self.KLRWstate_set, x.state()),
+                    word=x.word(),
+                )
+
     def enable_checks(self):
         self.KLRWstate_set.enable_checks()
         self._check = True
@@ -402,10 +413,10 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
 
     @cached_method
     def braids_with_left_state_by_right_state(self, left_state):
-        '''
+        """
         Return dictionary right_state:tuple(braids)
         with braids having given left and right state
-        '''
+        """
         result = defaultdict(list)
         for br in self._braids_with_left_state_iter_(left_state):
             result[br.right_state()].append(br)

@@ -96,6 +96,16 @@ class KLRWstate_set(UniqueRepresentation, Set_generic):
                     raise ValueError("Node dimensions must be integers.")
                 assert dim >= 0, "Node dimensions must be non-negative."
 
+    @cached_method
+    def _coerce_map_from_(self, other):
+        """
+        Despite UniqueRepresentation, sets with idential data can be different
+        if created in different modules. Make a coersion possible.
+        """
+        if isinstance(other, KLRWstate_set):
+            if self._reduction == other._reduction:
+                return lambda parent, x: parent._element_constructor_(x)
+
     def total_number_of_strands(self):
         return self._total_number_of_strands
 

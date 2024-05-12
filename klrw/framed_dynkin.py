@@ -194,7 +194,7 @@ class FramedDynkinDiagram_class(UniqueRepresentation, DynkinDiagram_class):
         return special_edge_names
 
 
-@dataclass(repr=False)
+@dataclass(frozen=True, repr=False)
 class FramedDynkinDiagram_with_dimensions(SageObject):
     ct: InitVar[CartanType_abstract | None] = None
     quiver: FramedDynkinDiagram_class | None = None
@@ -209,14 +209,26 @@ class FramedDynkinDiagram_with_dimensions(SageObject):
             if self.quiver is not None:
                 assert self.quiver.cartan_type() == ct
             else:
-                self.quiver = FramedDynkinDiagram_class(ct)
+                # bypass protection in frozen=True to change the entry
+                super().__setattr__(
+                    "quiver",
+                    FramedDynkinDiagram_class(ct),
+                )
         else:
             assert self.quiver is not None, "Quiver must be given"
 
         if self.dimensions_dict is None:
-            self.dimensions_dict = defaultdict(int)
+            # bypass protection in frozen=True to change the entry
+            super().__setattr__(
+                "dimensions_dict",
+                defaultdict(int),
+            )
         if isinstance(self.dimensions_dict, list):
-            self.dimensions_dict = {key: value for key, value in self.dimensions_dict}
+            # bypass protection in frozen=True to change the entry
+            super().__setattr__(
+                "dimensions_dict",
+                {key: value for key, value in self.dimensions_dict},
+            )
 
     def __hash__(self):
         """
@@ -384,7 +396,11 @@ class FramedDynkinDiagram_with_dimensions_immutable(
 ):
     def __post_init__(self, *args, **kwargs):
         super().__post_init__(*args, **kwargs)
-        self.dimensions_dict = MappingProxyType(self.dimensions_dict)
+        # bypass protection in frozen=True to change the entry
+        super(FramedDynkinDiagram_with_dimensions, self).__setattr__(
+            "dimensions_dict",
+            MappingProxyType(self.dimensions_dict),
+        )
 
     def __hash__(self):
         """
@@ -392,12 +408,6 @@ class FramedDynkinDiagram_with_dimensions_immutable(
         of UniqueRepresentation classes [e.g. KLRW algebra]
         """
         return hash((self.dimensions_list(), self.quiver.cartan_type()))
-
-    def __setitem__(self, key, dim):
-        raise AttributeError("The dimensions are immutable")
-
-    def set_dim(self, dim, index, is_framing=False):
-        raise AttributeError("The dimensions are immutable")
 
     def __reduce__(self):
         return (
@@ -435,6 +445,8 @@ class QuiverGradingGroup(CombinatorialFreeModule):
         **kwrds,
     ):
         self.equivariant_grading_name = equivariant_grading_name
+        self.vertex_scaling = vertex_scaling
+        self.edge_scaling = edge_scaling
         self.quiver = quiver
         names = []
         if vertex_scaling:
@@ -483,32 +495,36 @@ class QuiverGradingGroup(CombinatorialFreeModule):
 
         return self.zero()
 
-    '''
-    @staticmethod
-    def coerce_map(parent, x):
-        mon_coeff = {}
-        for index, coeff in x._monomial_coefficients:
-            if isinstance(index, NonOrientedEdge):
-                if index in self.edges:
-                    mon_coeff[index] = coeff
-                else:
-                    raise ValueError(
-                        "No edge {} in quiver for grading".format(index)
-                    )
-            if isinstance(index, NodeInFramedQuiver):
-                if index in self.vertices:
-                    mon_coeff[index] = coeff
-                else:
-                    raise ValueError(
-                        "No vertex {} in quiver for grading".format(index)
-                    )
-        return
+    def _coerce_map_from_(self, other):
+        """
+        Integers are treated as ordinary equivariant gradings
+        """
+        if other == ZZ:
+            return lambda parent, x: self.term(self.equivariant_grading_name, x)
 
-    def _coerce_map_from_(self, G):
+        if isinstance(other, QuiverGradingGroup):
+            if self.quiver == other.quiver:
+                can_coerce = True
+                if self.vertex_scaling is True:
+                    can_coerce &= self.vertex_scaling == other.vertex_scaling
+                if self.edge_scaling is True:
+                    can_coerce &= self.edge_scaling == other.edge_scaling
+                if can_coerce:
+                    map = {}
+                    for index in other.indices():
+                        if index == other.equivariant_grading_name:
+                            map[index] = self.monomial(self.equivariant_grading_name)
+                        elif index in self.indices():
+                            map[index] = self.monomial(index)
+                        else:
+                            map[index] = self.zero()
+
+                    def on_basis(index, map_dict=map):
+                        return map_dict[index]
+
+                    return other.module_morphism(on_basis=on_basis, codomain=self)
         """
-        Return coerse map from gradings for similar quivers
-        """
-        if isinstance(G, QuiverGradingGroup):
+        if isinstance(other, QuiverGradingGroup):
             # assert that quivers match?
 
             try:
@@ -522,7 +538,7 @@ class QuiverGradingGroup(CombinatorialFreeModule):
                     )
         else:
             raise ValueError("Don't know thow to coerce from {}".format(G.__class__))
-    '''
+        """
 
 
 @dataclass(slots=True)
@@ -834,6 +850,29 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         ]
 
         return self.hom(variables_images, codomain)
+
+    def _coerce_map_from_(self, other):
+        if isinstance(other, KLRWUpstairsDotsAlgebra):
+            if self.quiver_data == other.quiver_data:
+                can_coerce = self.base().has_coerce_map_from(other.base())
+                if other.default_vertex_parameter is not None:
+                    can_coerce &= (
+                        self.default_vertex_parameter == other.default_vertex_parameter
+                    )
+                if other.default_edge_parameter is not None:
+                    can_coerce &= (
+                        self.default_edge_parameter == other.default_edge_parameter
+                    )
+                if can_coerce:
+                    variables_images = [None] * other.ngens()
+                    for index, var in other.variables.items():
+                        if var.name is not None:
+                            var_image = self.variables[index].monomial
+                            variables_images[var.position] = var_image
+                    return other.hom(tuple(variables_images), self)
+            return
+
+        return super()._coerce_map_from_(other)
 
     @cached_method
     def hom_in_simple(self):
