@@ -27,7 +27,7 @@ def minuscule_weights(Phi: RootSystem):
 
 def index_of_a_simple_root(root: WeightSpaceElement, Phi: RootSystem):
     root = Phi.weight_space()(root)
-    for ind, al in Phi.weight_space().simple_roots().items():
+    for ind, al in Phi.weight_space().simple_roots()._dictionary.items():
         if al == root:
             return ind
     else:
