@@ -87,8 +87,10 @@ def stable_envelope(
     KLRW,
     left_framing,
     right_framing,
-    sequence,
-    dots_on_left,
+    sequence=None,
+    dots_on_left=None,
+    left_sequence=None,
+    right_sequence=None,
 ):
     """
     TODO: Make independent of global variables
@@ -100,21 +102,40 @@ def stable_envelope(
     differentials = {}
     projectives = defaultdict(list)
 
+    if dots_on_left is not None:
+        assert sequence is not None
+    if sequence is not None:
+        assert dots_on_left is not None
+        if left_sequence is not None:
+            assert tuple(left_sequence) == tuple(sequence[:dots_on_left])
+        else:
+            left_sequence = sequence[:dots_on_left]
+
+        if right_sequence is not None:
+            assert tuple(right_sequence) == tuple(sequence[dots_on_left:])
+        else:
+            right_sequence = sequence[dots_on_left:]
+
+    else:
+        assert left_sequence is not None
+        assert right_sequence is not None
+
+    left_sequence = tuple(
+        NodeInFramedQuiverWithMarks(node, i) for i, node in enumerate(left_sequence)
+    )
+    right_sequence = tuple(
+        NodeInFramedQuiverWithMarks(node, i + len(left_sequence))
+        for i, node in enumerate(right_sequence)
+    )
+    sequence_len = len(left_sequence) + len(right_sequence)
+
     index_in_chain_by_multi_index = {}
     equivariant_degree_by_multi_index = {}
-
-    # mark moving strands to distinguish them
-    sequence = tuple(
-        NodeInFramedQuiverWithMarks(node, i) for i, node in enumerate(sequence)
-    )
 
     left_framing = NodeInFramedQuiverWithMarks(left_framing, 0)
     right_framing = NodeInFramedQuiverWithMarks(right_framing, 1)
 
-    left_sequence = sequence[:dots_on_left]
-    right_sequence = sequence[dots_on_left:]
-
-    multi_index_iterator = product(*([range(2)] * len(sequence)))
+    multi_index_iterator = product(*([range(2)] * sequence_len))
     # The zeroeth term we treat differently
     multiindex = next(multi_index_iterator)
     marked_state = state_by_index(
@@ -132,8 +153,8 @@ def stable_envelope(
         if index_in_chain == 0:
             differentials[homological_degree] = matrix(
                 KLRW,
-                terms_in_homology_degree(len(sequence), homological_degree),
-                terms_in_homology_degree(len(sequence), homological_degree - 1),
+                terms_in_homology_degree(sequence_len, homological_degree),
+                terms_in_homology_degree(sequence_len, homological_degree - 1),
                 sparse=True,
             )
 

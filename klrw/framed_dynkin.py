@@ -523,22 +523,6 @@ class QuiverGradingGroup(CombinatorialFreeModule):
                         return map_dict[index]
 
                     return other.module_morphism(on_basis=on_basis, codomain=self)
-        """
-        if isinstance(other, QuiverGradingGroup):
-            # assert that quivers match?
-
-            try:
-                CR = R.base_extend(self.base_ring())
-            except (NotImplementedError, TypeError):
-                pass
-            else:
-                if CR == self:
-                    return lambda parent, x: self._from_dict(
-                        x._monomial_coefficients, coerce=True, remove_zeros=True
-                    )
-        else:
-            raise ValueError("Don't know thow to coerce from {}".format(G.__class__))
-        """
 
 
 @dataclass(slots=True)
