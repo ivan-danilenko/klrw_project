@@ -220,17 +220,16 @@ def possible_corrections(
         for hom_deg in possible_corrections_hom_degrees
     ]
     if parallel_processes == 1:
-        corrections = dict(
-            starmap(possible_corrections_in_hom_degree_and_print, tasks)
-        )
+        corrections = dict(starmap(possible_corrections_in_hom_degree_and_print, tasks))
     else:
         mp_context = mp.get_context("spawn")
-        manager = mp_context.Manager()
-        corrections = manager.dict()
-        with mp.Pool(processes=parallel_processes) as pool:
-            corrections = dict(
-                pool.starmap(possible_corrections_in_hom_degree_and_print, tasks)
+        # manager = mp_context.Manager()
+        # corrections = manager.dict()
+        with mp_context.Pool(processes=parallel_processes) as pool:
+            corrections_async_list = pool.starmap_async(
+                possible_corrections_in_hom_degree_and_print, tasks
             )
+            corrections = dict(corrections_async_list.get())
 
     return corrections
 
