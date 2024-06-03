@@ -399,7 +399,7 @@ class FramedDynkinDiagram_with_dimensions_immutable(
         # bypass protection in frozen=True to change the entry
         super(FramedDynkinDiagram_with_dimensions, self).__setattr__(
             "dimensions_dict",
-            MappingProxyType(self.dimensions_dict),
+            MappingProxyType(self.dimensions_dict.copy()),
         )
 
     def __hash__(self):

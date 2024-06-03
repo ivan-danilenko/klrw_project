@@ -1,7 +1,8 @@
-from collections import defaultdict
 from types import MappingProxyType
 from typing import Iterable
+import multiprocessing as mp
 import numpy as np
+from itertools import starmap
 
 from scipy.sparse import block_array
 
@@ -30,6 +31,7 @@ def PerfectComplex(
     differentials: dict[Element, object],
     projectives: dict[Element, Iterable[KLRWProjectiveModule]] | None = None,
     degree=-1,
+    parallel_processes=8,
     max_iterations_for_corrections=10,
 ):
     if max_iterations_for_corrections == 0:
@@ -45,6 +47,7 @@ def PerfectComplex(
         differentials=differentials,
         projectives=projectives,
         degree=degree,
+        parallel_processes=parallel_processes,
         max_iterations_for_corrections=max_iterations_for_corrections,
     )
 
@@ -72,6 +75,7 @@ def corrected_diffirential_csc(
     differentials: dict[Element, object] | MappingProxyType[Element, object],
     projectives: dict[Element, Iterable[KLRWProjectiveModule]] | None = None,
     degree=-1,
+    parallel_processes=1,
     max_iterations_for_corrections=10,
 ):
     d_csc = {}
@@ -135,6 +139,7 @@ def corrected_diffirential_csc(
             projectives,
             degree=degree,
             relevant_coeff_degree=relevant_coeff_degree,
+            parallel_processes=parallel_processes,
             ignore=ignore,
         )
 
@@ -192,32 +197,74 @@ def possible_corrections(
     projectives,
     degree,
     relevant_coeff_degree,
+    parallel_processes=1,
     ignore: dict[frozenset] | None = None,
 ):
     if ignore is None:
-        ignore = defaultdict(lambda: None)
-    corrections = {}
-    for hom_deg in sorted(projectives.keys()):
-        # terms of differential exist only between adjacent coh degrees
-        ignore_in_degree = frozenset()
-        if ignore is not None:
-            if hom_deg in ignore:
-                ignore_in_degree = ignore[hom_deg]
-        if hom_deg + degree in projectives:
-            print(
-                "Finding possible corrections for C_{} -> C_{}".format(
-                    hom_deg, hom_deg + degree
-                )
-            )
-            corrections[hom_deg] = possible_corrections_in_hom_degree(
-                klrw_algebra=klrw_algebra,
-                projectives_domain=projectives[hom_deg],
-                projectives_codomain=projectives[hom_deg + degree],
-                relevant_coeff_degree=relevant_coeff_degree,
-                ignore=ignore_in_degree,
+        ignore = {hom_deg: frozenset() for hom_deg in projectives}
+
+    # terms of differential exist only between adjacent coh degrees
+    possible_corrections_hom_degrees = frozenset(
+        hom_deg for hom_deg in projectives.keys() if hom_deg + degree in projectives
+    )
+    tasks = [
+        (
+            klrw_algebra,
+            projectives[hom_deg],
+            projectives[hom_deg + degree],
+            relevant_coeff_degree,
+            hom_deg,
+            degree,
+            ignore[hom_deg],
+        )
+        for hom_deg in possible_corrections_hom_degrees
+    ]
+    if parallel_processes == 1:
+        corrections = dict(
+            starmap(possible_corrections_in_hom_degree_and_print, tasks)
+        )
+    else:
+        mp_context = mp.get_context("spawn")
+        manager = mp_context.Manager()
+        corrections = manager.dict()
+        with mp.Pool(processes=parallel_processes) as pool:
+            corrections = dict(
+                pool.starmap(possible_corrections_in_hom_degree_and_print, tasks)
             )
 
     return corrections
+
+
+def possible_corrections_in_hom_degree_and_print(
+    klrw_algebra: KLRWAlgebra,
+    projectives_domain: list,
+    projectives_codomain: list,
+    relevant_coeff_degree,
+    hom_deg,
+    degree,
+    ignore: frozenset = frozenset(),
+):
+    print(
+        "Start: Finding possible corrections for C_{} -> C_{}".format(
+            hom_deg, hom_deg + degree
+        )
+    )
+
+    corrections_in_hom_deg = possible_corrections_in_hom_degree(
+        klrw_algebra=klrw_algebra,
+        projectives_domain=projectives_domain,
+        projectives_codomain=projectives_codomain,
+        relevant_coeff_degree=relevant_coeff_degree,
+        ignore=ignore,
+    )
+
+    print(
+        "End: Finding possible corrections for C_{} -> C_{}".format(
+            hom_deg, hom_deg + degree
+        )
+    )
+
+    return hom_deg, corrections_in_hom_deg
 
 
 def possible_corrections_in_hom_degree(
@@ -328,7 +375,7 @@ def system_on_corrections_lhs(
 
         print(
             "Making the left hand side for the corrections C_{} -> C_{}".format(
-                hom_deg, hom_deg + 2*degree
+                hom_deg, hom_deg + 2 * degree
             )
         )
         hom_deg_index = hom_deg_to_index[hom_deg]
@@ -386,7 +433,7 @@ def system_on_corrections_rhs(
 
         print(
             "Making the right hand side for the corrections C_{} -> C_{}".format(
-                hom_deg, hom_deg + 2*degree
+                hom_deg, hom_deg + 2 * degree
             )
         )
         hom_deg_index = hom_deg_to_index[hom_deg]

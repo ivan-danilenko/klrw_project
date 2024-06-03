@@ -36,3 +36,6 @@ KnotInfoDatabase
 
 # profiler files
 *.prof
+
+# Sage files
+*.sage

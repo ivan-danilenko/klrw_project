@@ -3,7 +3,6 @@ from sage.structure.unique_representation import UniqueRepresentation
 from sage.structure.parent import Set_generic
 from sage.categories.sets_cat import Sets
 from sage.misc.cachefunc import cached_method
-from sage.combinat.permutation import Permutations
 
 
 class KLRWstate(ElementWrapper):
@@ -114,6 +113,8 @@ class KLRWstate_set(UniqueRepresentation, Set_generic):
         lowest_state = []
         for node, dim in self._dimensions.items():
             lowest_state += [node] * dim
+
+        from sage.combinat.permutation import Permutations
         for state in Permutations(lowest_state):
             yield self._element_constructor_(state)
 

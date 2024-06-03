@@ -111,6 +111,7 @@ class CorrectionsMatrix:
             np.asarray(self.entry_ptrs),
             np.asarray(self.indices),
             np.asarray(self.indptrs),
+            self.number_of_rows,
         )
 
     def number_of_corrections(self):

@@ -551,7 +551,9 @@ class CombinatorialEBrane:
 
         return differential_dicts, projectives, thimbles
 
-    def one_dimensional_differential_projectives_thimbles(self, i):
+    def one_dimensional_differential_projectives_thimbles(
+        self, i, parallel_processes=1
+    ):
         differential_dicts, projectives, thimbles = (
             self.one_dimensional_differential_geometric(i)
         )
@@ -560,6 +562,7 @@ class CombinatorialEBrane:
             self.klrw_algebra[1],
             differential_dicts,
             projectives,
+            parallel_processes=parallel_processes,
             degree=self.degree,
         )
 
@@ -636,7 +639,9 @@ class CombinatorialEBrane:
 
         return thimbles, projectives_subdivided
 
-    def differential_and_thimbles(self, *brane_indices, indices_ordered=False):
+    def differential_and_thimbles(
+        self, *brane_indices, parallel_processes=1, indices_ordered=False
+    ):
         assert brane_indices, "There has to be at least one E-brane."
 
         if not indices_ordered:
@@ -650,10 +655,14 @@ class CombinatorialEBrane:
             )
 
         diff_curr, projectives_curr, thimbles_curr = self.differential_and_thimbles(
-            *brane_indices[:-1], indices_ordered=True
+            *brane_indices[:-1],
+            parallel_processes=parallel_processes,
+            indices_ordered=True,
         )
         diff_next, projectives_next, thimbles_next = self.differential_and_thimbles(
-            *brane_indices[-1:], indices_ordered=True
+            *brane_indices[-1:],
+            parallel_processes=parallel_processes,
+            indices_ordered=True,
         )
 
         print(
@@ -735,6 +744,7 @@ class CombinatorialEBrane:
             klrw_algebra,
             differential,
             projectives,
+            parallel_processes=parallel_processes,
             degree=self.degree,
         )
 
@@ -746,6 +756,7 @@ class CombinatorialEBrane:
         pickle="",
         link_name="link",
         folder_path="./",
+        parallel_processes=1,
     ):
         """
         Create a complex.
@@ -764,6 +775,7 @@ class CombinatorialEBrane:
         else:
             differential_csc, projectives, thimbles = self.differential_and_thimbles(
                 *brane_indices,
+                parallel_processes=parallel_processes,
                 indices_ordered=False,
             )
 
@@ -847,6 +859,7 @@ class CombinatorialEBrane:
         pickle="",
         link_name="link",
         folder_path="./",
+        parallel_processes=1,
     ):
         """
         Working over R that is a PID.
@@ -862,6 +875,7 @@ class CombinatorialEBrane:
             pickle=pickle,
             link_name=link_name,
             folder_path=folder_path,
+            parallel_processes=parallel_processes,
         )
 
         relevant_state = self.klrw_algebra[len(self.branes)].state(
