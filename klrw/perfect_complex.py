@@ -550,8 +550,8 @@ class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
 
         return vect
 
-    def _repr_(self):
-        return "Graded morphims between graded modules"
+    #def _repr_(self):
+    #    return "Graded morphims between graded modules"
 
     def one(self, as_vector=False):
         assert self.shift == 0

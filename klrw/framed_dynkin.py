@@ -3,6 +3,8 @@ from collections import defaultdict
 from dataclasses import dataclass, InitVar
 from types import MappingProxyType
 
+import sage.all
+
 from sage.combinat.root_system.dynkin_diagram import DynkinDiagram_class
 from sage.combinat.root_system.cartan_type import CartanType_abstract
 from sage.structure.unique_representation import UniqueRepresentation
