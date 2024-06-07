@@ -894,6 +894,9 @@ class KLRWExtOfGradedProjectives(Parent):
             hom = self.hom_of_graded()
             return tuple(hom._element_from_vector_(b) for b in self._basis_vectors_)
 
+    def dimension(self):
+        return len(self._basis_vectors_)
+    
     def relations(self, as_vectors=False):
         if as_vectors:
             return self._relations_vectors_

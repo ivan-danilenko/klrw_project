@@ -4,11 +4,14 @@ from Cython.Build import cythonize
 import numpy
 
 import os
+from pathlib import Path
 # directory of setup.py
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
+
 PACKAGE_NAME = "klrw.cython_exts"
 PACKAGE_PATH = dir_path + "/klrw/cython_exts"
+PICKLES_DIR = dir_path + "/pickles/"
 
 extensions = [
     Extension(
@@ -52,3 +55,6 @@ if __name__ == "__main__":
         packages=[PACKAGE_NAME],
         package_dir={PACKAGE_NAME: PACKAGE_PATH},
     )
+    
+    # Additionally make the pickles directory if it doesn't exist
+    Path(PICKLES_DIR).mkdir(parents=True, exist_ok=True)
