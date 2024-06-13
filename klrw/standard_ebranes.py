@@ -197,6 +197,7 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
         e_brane = v.cone()
 
     print(e_brane)
+    return e_brane
 
     left_seq, right_seq = next(iter(sequences_by_weight.values()))
     relevant_state = KLRW_one_grading.state(

@@ -8,7 +8,7 @@ from sage.matrix.constructor import matrix
 from sage.combinat.root_system.cartan_type import CartanType
 
 from .klrw_algebra import KLRWAlgebra
-from .framed_dynkin import FramedDynkinDiagram_with_dimensions
+from .framed_dynkin import FramedDynkinDiagram_with_dimensions, DotVariableIndex
 from .klrw_state import KLRWstate
 from .perfect_complex import KLRWProjectiveModule, KLRWPerfectComplex
 from .perfect_complex_corrections import corrected_diffirential_csc
@@ -76,7 +76,7 @@ class CombinatorialEBrane:
             codomain_dots_algebra = self.klrw_algebra[i + 1].base()
             for j in range(1, i + 2):
                 # dots on the only strand go to dots on j-th strand
-                map = {(self.V, 1): (self.V, j)}
+                map = {DotVariableIndex(self.V, 1): DotVariableIndex(self.V, j)}
                 hom = domain_dots_algebra.hom_from_dots_map(codomain_dots_algebra, map)
                 self.hom_one_to_many_dots[i][j] = hom
 
@@ -91,7 +91,11 @@ class CombinatorialEBrane:
             for j in range(1, i + 2):
                 # dots on the only strand go to dots on j-th strand
                 map = {
-                    (self.V, k): (self.V, k) if k < j else (self.V, k + 1)
+                    DotVariableIndex(self.V, k): (
+                        DotVariableIndex(self.V, k)
+                        if k < j
+                        else DotVariableIndex(self.V, k + 1)
+                    )
                     for k in range(1, i + 1)
                 }
                 hom = domain_dots_algebra.hom_from_dots_map(codomain_dots_algebra, map)

@@ -192,14 +192,11 @@ def stable_envelope(
             KLRWProjectiveModule(state, equivariant_degree_by_multi_index[multiindex])
         )
 
-    try:
-        stab = PerfectComplex(
-            KLRW,
-            differentials=differentials,
-            projectives=projectives,
-            degree=-1,
-        )
-    except AssertionError:
-        return differentials, projectives
+    stab = PerfectComplex(
+        KLRW,
+        differentials=differentials,
+        projectives=projectives,
+        degree=-1,
+    )
 
     return stab

@@ -154,11 +154,13 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                 if state[i] == state[i + 1]:
                     if not state[i].is_framing():
                         dot_index = state.index_among_same_color(i)
-                        dot_left = self.base().variables[state[i], dot_index].monomial
-                        dot_right = (
-                            self.base().variables[state[i], dot_index + 1].monomial
+                        dot_left = (
+                            self.base().dot_variable(state[i], dot_index).monomial
                         )
-                        r = self.base().variables[state[i]].monomial
+                        dot_right = (
+                            self.base().dot_variable(state[i], dot_index + 1).monomial
+                        )
+                        r = self.base().vertex_variable(state[i]).monomial
                         x = self.KLRWmonomial(state=state, word=(i + 1,))
                         # print(r.__class__, dot_left.__class__, dot_right.__class__)
                         # print(dot_left*x - x*dot_right, r*self.idempotent(state))
@@ -180,11 +182,13 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                 if state[i] == state[i + 1]:
                     if not state[i].is_framing():
                         dot_index = state.index_among_same_color(i)
-                        dot_left = self.base().variables[state[i], dot_index].monomial
-                        dot_right = (
-                            self.base().variables[state[i], dot_index + 1].monomial
+                        dot_left = (
+                            self.base().dot_variable(state[i], dot_index).monomial
                         )
-                        r = self.base().variables[state[i]].monomial
+                        dot_right = (
+                            self.base().dot_variable(state[i], dot_index + 1).monomial
+                        )
+                        r = self.base().vertex_variable(state[i]).monomial
                         x = self.KLRWmonomial(state=state, word=(i + 1,))
                         assert x * dot_left - dot_right * x == r * self.idempotent(
                             state
@@ -200,25 +204,29 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                 if state[i] != state[i + 1]:
                     if not state[i].is_framing() or not state[i + 1].is_framing():
                         d_ij = -self.quiver[state[i], state[i + 1]]
-                        t_ij = self.base().variables[state[i], state[i + 1]].monomial
+                        t_ij = (
+                            self.base().edge_variable(state[i], state[i + 1]).monomial
+                        )
                         if d_ij > 0:
                             d_ji = -self.quiver[state[i + 1], state[i]]
                             t_ji = (
-                                self.base().variables[state[i + 1], state[i]].monomial
+                                self.base()
+                                .edge_variable(state[i + 1], state[i])
+                                .monomial
                             )
                             dot_left_index = state.index_among_same_color(i)
                             dot_right_index = state.index_among_same_color(i + 1)
                             dot_left = (
-                                self.base().variables[state[i], dot_left_index].monomial
+                                self.base()
+                                .dot_variable(state[i], dot_left_index)
+                                .monomial
                             )
                             dot_right = (
                                 self.base()
-                                .variables[state[i + 1], dot_right_index]
+                                .dot_variable(state[i + 1], dot_right_index)
                                 .monomial
                             )
-                            coeff = t_ij * (dot_left**d_ij) + t_ji * (
-                                dot_right**d_ji
-                            )
+                            coeff = t_ij * (dot_left**d_ij) + t_ji * (dot_right**d_ji)
                         else:
                             coeff = t_ij
                         x1 = self.KLRWmonomial(
@@ -240,7 +248,7 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                 if state[i] != state[i + 1]:
                     if not state[i].is_framing() or not state[i + 1].is_framing():
                         dot_index = state.index_among_same_color(i + 1)
-                        dot = self.base().variables[state[i + 1], dot_index].monomial
+                        dot = self.base().dot_variable(state[i + 1], dot_index).monomial
                         x = self.KLRWmonomial(state=state, word=(i + 1,))
                         assert dot * x == x * dot
                         assert dot * x != self.zero() or dot.is_zero()
@@ -253,7 +261,7 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                 if state[i] != state[i + 1]:
                     if not state[i].is_framing() or not state[i + 1].is_framing():
                         dot_index = state.index_among_same_color(i)
-                        dot = self.base().variables[state[i], dot_index].monomial
+                        dot = self.base().dot_variable(state[i], dot_index).monomial
                         x = self.KLRWmonomial(state=state, word=(i + 1,))
                         assert dot * x == x * dot
                         assert dot * x != self.zero() or dot.is_zero()
@@ -318,15 +326,19 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                         y1 = self.KLRWmonomial(
                             state=state.act_by_s(i + 2).act_by_s(i + 1), word=(i + 2,)
                         )
-                        r_i = self.base().variables[state[i]].monomial
+                        r_i = self.base().vertex_variable(state[i]).monomial
                         d_ij = -self.quiver[state[i], state[i + 1]]
-                        t_ij = self.base().variables[state[i], state[i + 1]].monomial
+                        t_ij = (
+                            self.base().edge_variable(state[i], state[i + 1]).monomial
+                        )
                         dot_left_index = state.index_among_same_color(i)
                         dot_left = (
-                            self.base().variables[state[i], dot_left_index].monomial
+                            self.base().dot_variable(state[i], dot_left_index).monomial
                         )
                         dot_right = (
-                            self.base().variables[state[i], dot_left_index + 1].monomial
+                            self.base()
+                            .dot_variable(state[i], dot_left_index + 1)
+                            .monomial
                         )
                         coeff = (
                             t_ij

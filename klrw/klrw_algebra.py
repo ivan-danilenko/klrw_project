@@ -171,13 +171,14 @@ class RightDotAction(Action):
                 index_of_dots_on_left_strand = (
                     self.codomain()
                     .base()
-                    .variables[
-                        c1, braid.right_state().index_among_same_color(last_letter - 1)
-                    ]
+                    .dot_variable(
+                        c1,
+                        braid.right_state().index_among_same_color(last_letter - 1),
+                    )
                     .position
                 )
                 index_of_special_coefficient = (
-                    self.codomain().base().variables[c1].position
+                    self.codomain().base().vertex_variable(c1).position
                 )
                 # terms where crossing stays
                 coeff_of_crossing = self._coeff_of_crossing_(
@@ -265,6 +266,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         quiver_data: FramedDynkinDiagram_with_dimensions,
         vertex_scaling=False,
         edge_scaling=False,
+        dot_scaling=False,
         dot_algebra_order="degrevlex",
         warnings=False,
         **kwrds,
@@ -275,6 +277,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             quiver_data=quiver_data.immutable_copy(),
             vertex_scaling=vertex_scaling,
             edge_scaling=edge_scaling,
+            dot_scaling=dot_scaling,
             dot_algebra_order=dot_algebra_order,
             warnings=warnings,
             **kwrds,
@@ -286,6 +289,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         quiver_data: FramedDynkinDiagram_with_dimensions,
         vertex_scaling=False,
         edge_scaling=False,
+        dot_scaling=False,
         dot_algebra_order="degrevlex",
         warnings=False,
         **kwrds,
@@ -306,6 +310,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             self.quiver,
             vertex_scaling=vertex_scaling,
             edge_scaling=edge_scaling,
+            dot_scaling=dot_scaling,
         )
 
         dots_algebra = KLRWUpstairsDotsAlgebra(
@@ -566,8 +571,8 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
                     )
                     current_ind = ind
                     current_ind_in_original_word = ind + new_intersection_index
-                    r_i = self.base().variables[left_color].monomial
-                    t_ij = self.base().variables[left_color, right_color].monomial
+                    r_i = self.base().vertex_variable(left_color).monomial
+                    t_ij = self.base().edge_variable(left_color, right_color).monomial
                     # obsolete, but in the else case we can mltiply faster
                     # because there are no dots
                     lower_part = (-r_i * t_ij) * self.KLRWmonomial(
@@ -577,16 +582,18 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
                     if d_ij > 1:
                         x_left = (
                             self.base()
-                            .variables[
-                                left_color, left_strand_position_among_same_color - 1
-                            ]
+                            .dot_variable(
+                                left_color,
+                                left_strand_position_among_same_color - 1,
+                            )
                             .monomial
                         )
                         x_right = (
                             self.base()
-                            .variables[
-                                left_color, left_strand_position_among_same_color
-                            ]
+                            .dot_variable(
+                                left_color,
+                                left_strand_position_among_same_color,
+                            )
                             .monomial
                         )
                         lower_part = lower_part * sum(
@@ -617,18 +624,21 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             if left_color != right_color:
                 d_ij = -self.quiver[left_color, right_color]
                 if d_ij >= 0:
-                    t_ij = self.base().variables[left_color, right_color].monomial
+                    t_ij = self.base().edge_variable(left_color, right_color).monomial
                     lower_part = self.KLRWmonomial(
                         state=current_state, word=m.word()[:intersection_index]
                     )
                     if d_ij > 0:
                         d_ji = -self.quiver[right_color, left_color]
-                        t_ji = self.base().variables[right_color, left_color].monomial
+                        t_ji = (
+                            self.base().edge_variable(right_color, left_color).monomial
+                        )
                         x_left = (
                             self.base()
-                            .variables[
-                                left_color, left_strand_position_among_same_color
-                            ]
+                            .dot_variable(
+                                left_color,
+                                left_strand_position_among_same_color,
+                            )
                             .monomial
                         )
                         right_strand_position_among_same_color = (
@@ -638,9 +648,10 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
                         )
                         x_right = (
                             self.base()
-                            .variables[
-                                right_color, right_strand_position_among_same_color
-                            ]
+                            .dot_variable(
+                                right_color,
+                                right_strand_position_among_same_color,
+                            )
                             .monomial
                         )
                         lower_part = lower_part * (
