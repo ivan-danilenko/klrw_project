@@ -2,6 +2,7 @@ from typing import NamedTuple
 from collections import defaultdict
 from dataclasses import dataclass, InitVar, replace
 from types import MappingProxyType
+from itertools import product
 
 import sage.all
 
@@ -9,8 +10,13 @@ from sage.combinat.root_system.dynkin_diagram import DynkinDiagram_class
 from sage.combinat.root_system.cartan_type import CartanType_abstract
 from sage.structure.unique_representation import UniqueRepresentation
 from sage.rings.polynomial.multi_polynomial_libsingular import (
-    MPolynomialRing_libsingular as PolynomialRing,
+    MPolynomialRing_libsingular as PolynomialRing_sing,
 )
+from sage.rings.polynomial.laurent_polynomial_ring import (
+    LaurentPolynomialRing_mpair as LaurentPolynomialRing,
+)
+from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+from sage.rings.polynomial.laurent_polynomial import LaurentPolynomial_mpair
 from sage.rings.polynomial.polydict import ETuple
 from sage.rings.ring import CommutativeRing, Ring
 from sage.rings.integer_ring import ZZ
@@ -21,8 +27,6 @@ from sage.structure.sage_object import SageObject
 from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.misc_c import prod
-
-from itertools import product
 
 
 class NodeInFramedQuiver(NamedTuple):
@@ -373,25 +377,30 @@ class FramedDynkinDiagram_with_dimensions(SageObject):
         **prefixes,
     ):
         """
-        Returns a dictionary {label: name}
+        Returns a two dictionaries {label: name}
+        The first one is for non-dot variables
+        The second one is for dot variables
         """
         # We need the dictionary to keep the order of elements
         # In Python 3.7 and higher it is guaranteed
         # We also use |= from Python 3.9 and higher
-        names = {}
+        nondot_names = {}
         if not no_vertex_parameters:
-            names |= self.KLRW_vertex_param_names(prefixes.get("vertex_prefix", "r"))
+            nondot_names |= self.KLRW_vertex_param_names(
+                prefixes.get("vertex_prefix", "r")
+            )
         if not no_edge_parameters:
-            names |= self.KLRW_edge_param_names(
+            nondot_names |= self.KLRW_edge_param_names(
                 prefixes.get("edge_prefix", "t"), prefixes.get("framing_prefix", "u")
             )
-        names |= self.KLRW_dots_names(prefixes.get("dots_prefix", "x"))
+        dot_names = {}
+        dot_names |= self.KLRW_dots_names(prefixes.get("dots_prefix", "x"))
         if not no_deformations:
-            names |= self.KLRW_deformations_names(
+            dot_names |= self.KLRW_deformations_names(
                 prefixes.get("deformations_prefix", "z")
             )
 
-        return names
+        return nondot_names, dot_names
 
     def immutable_copy(self):
         return FramedDynkinDiagram_with_dimensions_immutable(
@@ -455,22 +464,24 @@ class QuiverGradingUnorientedCrossingLabel(QuiverGradingLabel):
     vertex_tails: InitVar[NodeInFramedQuiver | None] = None
     vertex_heads: InitVar[NodeInFramedQuiver | None] = None
 
-    def __post_init__(self, *args, **kwargs):
-        assert (self.vertex_tails is None) == (
-            self.vertex_heads is None
-        ), "Only one vertex it assigned"
+    def __post_init__(
+        self,
+        vertex_tails: NodeInFramedQuiver | None,
+        vertex_heads: NodeInFramedQuiver | None,
+    ):
+        assert (vertex_tails is None) == (
+            vertex_heads is None
+        ), "Only one vertex is assigned"
 
         # if vertices were given, we need to make sure the edge is right
-        if self.vertex_tails is not None:
+        if vertex_tails is not None:
             if self.edge is not None:
-                assert (
-                    NonOrientedEdge(self.vertex_tails, self.vertex_heads) == self.edge
-                )
+                assert NonOrientedEdge(vertex_tails, vertex_heads) == self.edge
             else:
                 # bypass protection in frozen=True to change the entry
                 super(QuiverGradingUnorientedCrossingLabel, self).__setattr__(
                     "edge",
-                    NonOrientedEdge(self.vertex_tails, self.vertex_heads),
+                    NonOrientedEdge(vertex_tails, vertex_heads),
                 )
 
     def __repr__(self):
@@ -688,7 +699,97 @@ def exps_for_dots_of_degree(etuples_degrees: MappingProxyType | tuple, degree):
 # TODO: add an abstract class KLRWDotsAlgebra(CoomutativeRing, UniqueRep),
 # inherit upstairs and downstairs versions
 class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
-    # have to define self.variables
+    @staticmethod
+    def __classcall_private__(cls, *args, invertible_parameters=False, **kwargs):
+        if not invertible_parameters:
+            # TODO: add the case when the list of invertible parameters is empty
+            return KLRWUpstairsDotsAlgebra(
+                invertible_parameters=invertible_parameters, *args, **kwargs
+            )
+        else:
+            return KLRWUpstairsDotsAlgebra_invertible_parameters(
+                invertible_parameters=invertible_parameters, *args, **kwargs
+            )
+
+    def __init__(
+        self,
+        base_ring,
+        quiver_data: FramedDynkinDiagram_with_dimensions,
+        no_deformations=True,
+        default_vertex_parameter=None,
+        default_edge_parameter=None,
+        invertible_parameters=False,
+        order="degrevlex",
+        **prefixes,
+    ):
+        # remember initialization data for pickle/unpickle
+        self.quiver_data = quiver_data.immutable_copy()
+        self.no_deformations = no_deformations
+        self.default_vertex_parameter = default_vertex_parameter
+        self.default_edge_parameter = default_edge_parameter
+        self.invertible_parameters = invertible_parameters
+        self.prefixes = prefixes
+
+        no_vertex_parameters = default_vertex_parameter is not None
+        no_edge_parameters = default_edge_parameter is not None
+        nondot_names, dot_names = quiver_data.names(
+            no_deformations=no_deformations,
+            no_vertex_parameters=no_vertex_parameters,
+            no_edge_parameters=no_edge_parameters,
+            **prefixes,
+        )
+
+        nondot_names_list = [name for _, name in nondot_names.items()]
+        dot_names_list = [name for _, name in dot_names.items()]
+        self.init_algebra(base_ring, nondot_names_list, dot_names_list, order)
+
+        # type of variables is uniquely determined by its index data
+        self.variables = {
+            index: QuiverParameter(
+                name,
+                position,
+                self(name),
+                invertible_parameters,
+            )
+            for position, (index, name) in enumerate(nondot_names.items())
+        }
+        self.variables |= {
+            index: QuiverParameter(
+                name,
+                position + len(self.variables),  # dots follow non-dots
+                self(name),
+                False,  # dots are not invertible
+            )
+            for position, (index, name) in enumerate(dot_names.items())
+        }
+
+        # adds default values to self.variables
+        self.assign_default_values(
+            quiver_data,
+            default_vertex_parameter=default_vertex_parameter,
+            default_edge_parameter=default_edge_parameter,
+            no_deformations=no_deformations,
+        )
+
+        # make immutable
+        self.variables = MappingProxyType(self.variables)
+
+    def __reduce__(self):
+        from functools import partial
+
+        return (
+            partial(self.__class__, **self.prefixes),
+            (
+                self.base(),
+                self.quiver_data,
+                self.no_deformations,
+                self.default_vertex_parameter,
+                self.default_edge_parameter,
+                self.invertible_parameters,
+                self.term_order().name(),
+            ),
+        )
+
     def assign_default_values(
         self,
         quiver_data,
@@ -736,9 +837,6 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
                 yield variable.monomial
         yield from self.symmetric_dots_gens()
 
-    def symmetric_dots_gens(self):
-        raise NotImplementedError()
-
     def basis_modulo_symmetric_dots(self):
         variables = []
         degree_ranges = []
@@ -751,74 +849,6 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
         for degree in degree_iterator:
             yield prod(var**deg for var, deg in zip(variables, degree))
 
-
-class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
-    def __init__(
-        self,
-        base_ring,
-        quiver_data: FramedDynkinDiagram_with_dimensions,
-        no_deformations=True,
-        default_vertex_parameter=None,
-        default_edge_parameter=None,
-        order="degrevlex",
-        **prefixes,
-    ):
-        # remember initialization data for pickle/unpickle
-        self.quiver_data = quiver_data.immutable_copy()
-        self.no_deformations = no_deformations
-        self.default_vertex_parameter = default_vertex_parameter
-        self.default_edge_parameter = default_edge_parameter
-        self.prefixes = prefixes
-
-        no_vertex_parameters = default_vertex_parameter is not None
-        no_edge_parameters = default_edge_parameter is not None
-        self.names = quiver_data.names(
-            no_deformations=no_deformations,
-            no_vertex_parameters=no_vertex_parameters,
-            no_edge_parameters=no_edge_parameters,
-            **prefixes,
-        )
-
-        names_list = [name for _, name in self.names.items()]
-        super().__init__(base_ring, len(names_list), names_list, order)
-
-        # type of variables is uniquely determined by its index data
-        self.variables = {
-            index: QuiverParameter(
-                name,
-                position,
-                self(name),
-                False,  # in this implementation all parameters are not invertible
-            )
-            for position, (index, name) in enumerate(self.names.items())
-        }
-
-        # adds default values to self.variables
-        self.assign_default_values(
-            quiver_data,
-            default_vertex_parameter=default_vertex_parameter,
-            default_edge_parameter=default_edge_parameter,
-            no_deformations=no_deformations,
-        )
-
-        # make immutable
-        self.variables = MappingProxyType(self.variables)
-
-    def __reduce__(self):
-        from functools import partial
-
-        return (
-            partial(self.__class__, **self.prefixes),
-            (
-                self.base_ring(),
-                self.quiver_data,
-                self.no_deformations,
-                self.default_vertex_parameter,
-                self.default_edge_parameter,
-                self.term_order().name(),
-            ),
-        )
-
     @lazy_attribute
     def number_of_non_dot_params(self):
         return sum(1 for index in self.names if not isinstance(index, DotVariableIndex))
@@ -830,7 +860,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         for index, var in self.variables.items():
             if isinstance(index, DotVariableIndex):
                 if not index.vertex.is_framing():
-                    exps = var.monomial.exponents(as_ETuples=True)
+                    exps = var.monomial.exponents()
                     # must be a monomial
                     assert len(exps) == 1, repr(var)
                     grading = grading_group.dot_algebra_grading(index)
@@ -914,31 +944,35 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
                     index
                 )
                 result *= variable.monomial**coeff
+
             elif isinstance(label, QuiverGradingUnorientedCrossingLabel):
-                if int(coeff) % int(2) != 0 or coeff < 0:
+                if int(coeff) % int(2) != 0:
                     return tuple()
                 d = int(coeff) // int(2)
                 v1, v2 = label.edge
                 edge_index = EdgeVariableIndex(v1, v2)
                 edge_opp_index = EdgeVariableIndex(v2, v1)
                 if v2.is_framing():
-                    result *= self.variables[edge_index].monomial ** d
-                    degrees_taken_into_account += d * grading_group.dot_algebra_grading(
-                        edge_index
-                    )
+                    variable = self.variables[edge_index]
+                    degree_part = grading_group.dot_algebra_grading(edge_index)
                 elif v1.is_framing():
-                    result *= self.variables[edge_opp_index].monomial ** d
-                    degrees_taken_into_account += d * grading_group.dot_algebra_grading(
-                        edge_opp_index
-                    )
+                    variable = self.variables[edge_opp_index]
+                    degree_part = grading_group.dot_algebra_grading(edge_opp_index)
                 elif not grading_group.dot_scaling:
                     # in this case t_ij and t_ji have the same grading,
                     # t_ij/t_ji is in the subalgebra of degree zero elements
-                    result *= self.variables[edge_index].monomial ** d
-                    degrees_taken_into_account += d * grading_group.dot_algebra_grading(
-                        edge_index
-                    )
-                # in other cases this degree has to be treated later by an ILP.
+                    variable = self.variables[edge_index]
+                    degree_part = grading_group.dot_algebra_grading(edge_index)
+                else:
+                    # in other cases this degree has to be treated later by an ILP.
+                    continue
+
+                if d < 0:
+                    if not variable.invertible:
+                        return tuple()
+                result *= variable.monomial**d
+                degrees_taken_into_account += d * degree_part
+
             elif label != grading_group.equivariant_grading_label and not isinstance(
                 label, QuiverGradingDotLabel
             ):
@@ -1090,16 +1124,17 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
                     m.addConstr(A_inv @ x_inv + A_non_inv @ x_non_inv == y_transposed)
 
                 m.optimize()
-                # if model is infeasible
+                # if the system is inconsistent
                 if m.Status == 3:
-                    m.computeIIS()
-                    m.write("model.ilp")
-                    raise ValueError("Inconsistent system. Check model.ilp")
+                    return zeros(
+                        shape=(0, x_inv.size + x_non_inv.size),
+                        dtype=intc,
+                    )
 
                 n_solutions = m.SolCount
 
                 solutions = zeros(
-                    shape=(n_solutions, x_non_inv.size),
+                    shape=(n_solutions, x_inv.size + x_non_inv.size),
                     dtype=intc,
                 )
                 for n in range(n_solutions):
@@ -1158,7 +1193,7 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         return self.hom(variables_images, codomain)
 
     def _coerce_map_from_(self, other):
-        if isinstance(other, KLRWUpstairsDotsAlgebra):
+        if isinstance(other, KLRWDotsAlgebra):
             if self.quiver_data == other.quiver_data:
                 can_coerce = self.base().has_coerce_map_from(other.base())
                 if other.default_vertex_parameter is not None:
@@ -1236,3 +1271,41 @@ class KLRWUpstairsDotsAlgebra(PolynomialRing, KLRWDotsAlgebra):
         images = [self.dot_variable(vertex_of_dots, i + 1) for i in range(n_vars)]
         m = h_n.parent().hom(images, self)
         return m(h_n)
+
+
+class KLRWUpstairsDotsAlgebra(KLRWDotsAlgebra, PolynomialRing_sing):
+    def init_algebra(self, base_ring, nondot_names_list, dot_names_list, order):
+        super(KLRWDotsAlgebra, self).__init__(
+            base_ring,
+            len(nondot_names_list) + len(dot_names_list),
+            nondot_names_list + dot_names_list,
+            order,
+        )
+
+
+class DotAlgebraElement_invertible_parameters(LaurentPolynomial_mpair):
+    # TODO: can speed up __init__ by using reduce=False
+    # need Cython
+    pass
+    # def __getattribute__(self, name):
+    #     print("Element :: Accessing attribute {}".format(name))
+    #     return super().__getattribute__(name)
+
+
+class KLRWUpstairsDotsAlgebra_invertible_parameters(
+    KLRWDotsAlgebra, LaurentPolynomialRing
+):
+    Element = DotAlgebraElement_invertible_parameters
+
+    def init_algebra(self, base_ring, nondot_names_list, dot_names_list, order):
+        polynomial_ring = PolynomialRing(
+            base_ring,
+            len(nondot_names_list) + len(dot_names_list),
+            nondot_names_list + dot_names_list,
+            order=order,
+        )
+        super(KLRWDotsAlgebra, self).__init__(polynomial_ring)
+
+    # def __getattribute__(self, name):
+    #    print("Algebra :: Accessing attribute {}".format(name))
+    #    return super().__getattribute__(name)

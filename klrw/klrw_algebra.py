@@ -21,7 +21,7 @@ from .klrw_state import KLRWstate
 from .klrw_braid import KLRWbraid, KLRWbraid_set
 from .framed_dynkin import (
     FramedDynkinDiagram_with_dimensions,
-    KLRWUpstairsDotsAlgebra,
+    KLRWDotsAlgebra,
     QuiverGradingGroupElement,
     QuiverGradingGroup,
 )
@@ -150,7 +150,7 @@ class RightDotAction(Action):
         p = self.codomain().base()(p)
         return self.codomain().linear_combination(
             (self._act_on_bases_(exp_tuple, braid), coeff * left_poly)
-            for exp_tuple, coeff in p.iterator_exp_coeff(as_ETuples=True)
+            for exp_tuple, coeff in p.iterator_exp_coeff()
             for braid, left_poly in x
         )
 
@@ -184,9 +184,7 @@ class RightDotAction(Action):
                 coeff_of_crossing = self._coeff_of_crossing_(
                     p_exp_tuple, index_of_dots_on_left_strand
                 )
-                for exp_tuple, coeff in coeff_of_crossing.iterator_exp_coeff(
-                    as_ETuples=True
-                ):
+                for exp_tuple, coeff in coeff_of_crossing.iterator_exp_coeff():
                     for term in self._act_on_bases_iter_(exp_tuple, braid[:-1]):
                         for br, poly in term:
                             # we use :meth:right_multiply_by_s, to bring to lexmin form
@@ -199,7 +197,7 @@ class RightDotAction(Action):
                     index_of_dots_on_left_strand,
                     index_of_special_coefficient,
                 ):
-                    for exp_tuple, coeff in poly.iterator_exp_coeff(as_ETuples=True):
+                    for exp_tuple, coeff in poly.iterator_exp_coeff():
                         yield coeff * self._act_on_bases_(exp_tuple, braid[:-1])
 
             else:
@@ -267,6 +265,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         vertex_scaling=False,
         edge_scaling=False,
         dot_scaling=False,
+        invertible_parameters=False,
         dot_algebra_order="degrevlex",
         warnings=False,
         **kwrds,
@@ -278,6 +277,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             vertex_scaling=vertex_scaling,
             edge_scaling=edge_scaling,
             dot_scaling=dot_scaling,
+            invertible_parameters=invertible_parameters,
             dot_algebra_order=dot_algebra_order,
             warnings=warnings,
             **kwrds,
@@ -290,6 +290,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         vertex_scaling=False,
         edge_scaling=False,
         dot_scaling=False,
+        invertible_parameters=False,
         dot_algebra_order="degrevlex",
         warnings=False,
         **kwrds,
@@ -313,8 +314,12 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             dot_scaling=dot_scaling,
         )
 
-        dots_algebra = KLRWUpstairsDotsAlgebra(
-            base_R, quiver_data, order=dot_algebra_order, **kwrds
+        dots_algebra = KLRWDotsAlgebra(
+            base_R,
+            quiver_data,
+            invertible_parameters=invertible_parameters,
+            order=dot_algebra_order,
+            **kwrds
         )
         category = FiniteDimensionalAlgebrasWithBasis(dots_algebra)
         super().__init__(R=dots_algebra, element_class=KLRWElement, category=category)
@@ -793,7 +798,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         for braid, poly in element:
             assert braid.left_state() == self.left_state
             assert braid.right_state() == self.right_state
-            for exp, coeff in poly.iterator_exp_coeff(as_ETuples=True):
+            for exp, coeff in poly.iterator_exp_coeff():
                 index = self._word_exp_to_index_[braid.word(), exp]
                 vec[index] += coeff
         return vec

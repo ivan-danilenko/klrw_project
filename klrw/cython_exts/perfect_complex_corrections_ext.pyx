@@ -327,7 +327,7 @@ def system_d_squared_piece(
             if entry_can_be_non_zero:
                 if not dot_product.is_zero():
                     for braid, poly in dot_product:
-                        for exp, scalar in poly.iterator_exp_coeff(as_ETuples=True):
+                        for exp, scalar in poly.iterator_exp_coeff():
                             if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
                                 key = (i, j, braid.word(), exp)
                                 result_index: cython.int
