@@ -36,6 +36,11 @@ extensions = [
         sources=["{}/combinatorial_ebranes_ext.pyx".format(PACKAGE_PATH)],
         include_dirs=[numpy.get_include()],
     ),
+    Extension(
+        "{}.sparse_multiplication".format(PACKAGE_NAME),
+        sources=["{}/sparse_multiplication.pyx".format(PACKAGE_PATH)],
+        include_dirs=[numpy.get_include()],
+    ),
 ]
 
 if __name__ == "__main__":

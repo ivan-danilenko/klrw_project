@@ -1,14 +1,18 @@
 from typing import NamedTuple
 from typing import Iterable
 from collections import defaultdict
-from dataclasses import dataclass, InitVar, replace
+from dataclasses import dataclass, InitVar, replace, field
 from types import MappingProxyType
 from copy import copy
+import operator
 
 from sage.structure.parent import Parent
-from sage.groups.abelian_gps.abelian_group_element import AbelianGroupElement
+from sage.groups.additive_abelian.additive_abelian_group import AdditiveAbelianGroup
+from sage.groups.additive_abelian.additive_abelian_group import (
+    AdditiveAbelianGroupElement,
+)
+from sage.categories.morphism import Morphism
 from sage.combinat.free_module import CombinatorialFreeModule
-
 from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
 from sage.matrix.matrix0 import Matrix
 from sage.matrix.constructor import matrix
@@ -20,6 +24,7 @@ from sage.rings.integer_ring import ZZ
 from sage.rings.finite_rings.integer_mod_ring import IntegerModRing
 from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
+from sage.categories.action import Action
 
 from .klrw_state import KLRWstate
 from .klrw_algebra import KLRWAlgebra
@@ -53,49 +58,79 @@ class KLRWProjectiveModule:
         )
 
 
+@dataclass(frozen=True, eq=True, repr=False)
 class KLRWPerfectComplex(Parent):
-    def __init__(
-        self,
-        KLRW_algebra: KLRWAlgebra,
-        differentials: dict[AbelianGroupElement, Matrix],
-        projectives: (
-            dict[AbelianGroupElement, Iterable[KLRWProjectiveModule]] | None
-        ) = None,
-        degree=-1,
-        grading_group=ZZ,
-        mod2grading=IntegerModRing(2).coerce_map_from(ZZ),
-        check=True,
-    ):
-        """
-        Differentials are matrices that act **on the left**.
-        Since matrix elements multiply left-to-right,
-        we have to use the convention that
-        d_i: C_i -> C_{i+degree}
-        d_{i-degree}: C_{i-degree} -> C_i
-        then the composite map is the matrix multiplication
-        d_{i-degree}*d_i.
-        This leads to a counterintuitive convention that
-        d_i is represented by a matrix of KLRW elements
-        that has dim(C_{i+degree}) columns and dim(C_i) rows.
-        """
-        self.KLRW_algebra = KLRW_algebra
-        self.degree = degree
+    """
+    Differentials are matrices that act **on the left**.
+    Since matrix elements multiply left-to-right,
+    we have to use the convention that
+    d_i: C_i -> C_{i+degree}
+    d_{i-degree}: C_{i-degree} -> C_i
+    then the composite map is the matrix multiplication
+    d_{i-degree}*d_i.
+    This leads to a counterintuitive convention that
+    d_i is represented by a matrix of KLRW elements
+    that has dim(C_{i+degree}) columns and dim(C_i) rows.
+    """
 
-        self.differentials = differentials
-        if isinstance(projectives, defaultdict):
-            assert projectives.default_factory is list
-            self.projectives = projectives
-        else:
-            self.projectives: defaultdict[
-                AbelianGroupElement, Iterable[KLRWProjectiveModule]
-            ] = defaultdict(list)
-            self.projectives |= projectives
+    KLRW_algebra: KLRWAlgebra
+    differentials: dict[AdditiveAbelianGroupElement, Matrix] = field(hash=False)
+    projectives: (
+        dict[AdditiveAbelianGroupElement, Iterable[KLRWProjectiveModule]] | None
+    ) = field(hash=False, default=None)
+    degree: AdditiveAbelianGroupElement = -1
+    grading_group: AdditiveAbelianGroup = ZZ
+    mod2grading: Morphism = IntegerModRing(2).coerce_map_from(ZZ)
+    check: bool = True
+    differentials_hash: int = field(init=False)
+    projectives_hash: int = field(init=False)
 
-        self.grading_group = grading_group
-        self.mod2grading = mod2grading
-        self.check = check
+    def __post_init__(self):
+        # normalize projectives and differentials, make immutable
+        normalized_projectives = {
+            hom_deg: copy(proj) for hom_deg, proj in self.projectives.items() if proj
+        }
+        normalized_differentials = {
+            hom_deg: copy(mat)
+            for hom_deg, mat in self.differentials.items()
+            if not mat.is_zero()
+        }
 
-        if check:
+        for mat in normalized_differentials.values():
+            mat.set_immutable()
+
+        normalized_projectives = MappingProxyType(normalized_projectives)
+        normalized_differentials
+
+        hashable_differentials = tuple(
+            (hom_deg, normalized_differentials[hom_deg])
+            for hom_deg in sorted(normalized_differentials.keys())
+        )
+
+        hashable_projectives = tuple(
+            (key, tuple(normalized_projectives[key]))
+            for key in sorted(normalized_projectives.keys())
+        )
+
+        # bypass protection in frozen=True to change the entry
+        super().__setattr__(
+            "differentials_hash",
+            hash(hashable_differentials),
+        )
+        super().__setattr__(
+            "projectives_hash",
+            hash(hashable_projectives),
+        )
+        super().__setattr__(
+            "differentials",
+            MappingProxyType(normalized_differentials),
+        )
+        super().__setattr__(
+            "projectives",
+            MappingProxyType(normalized_projectives),
+        )
+
+        if self.check:
             for n in self.differentials:
                 if n + self.degree in self.differentials:
                     assert (
@@ -109,17 +144,17 @@ class KLRWPerfectComplex(Parent):
                     )
 
                 for (i, j), elem in self.differentials[n].dict(copy=False).items():
-                    assert self.projectives[n + degree][j].state == elem.right_state(
-                        check_if_all_have_same_right_state=True
-                    )
+                    assert self.projectives[n + self.degree][
+                        j
+                    ].state == elem.right_state(check_if_all_have_same_right_state=True)
                     assert self.projectives[n][i].state == elem.left_state(
                         check_if_all_have_same_left_state=True
                     )
                     assert (
-                        self.projectives[n + degree][j].equivariant_degree
+                        self.projectives[n + self.degree][j].equivariant_degree
                         - self.projectives[n][i].equivariant_degree
                     ) == elem.degree(check_if_homogeneous=True), (
-                        repr(self.projectives[n + degree][j].equivariant_degree)
+                        repr(self.projectives[n + self.degree][j].equivariant_degree)
                         + " "
                         + repr(self.projectives[n][i].equivariant_degree)
                         + " "
@@ -414,6 +449,86 @@ class KLRWHomOfGradedProjectivesElement(IndexedFreeModuleElement):
 
         return cone
 
+    def to_dict_of_CSR(self, transpose=True):
+        """
+        Transforms into a dictionary of CSR matrices.
+
+        Beware of the transposition in the convention!
+        [see the comment in KLRWPerfectComplex]
+        By default, transpose=True, it follows this convention
+        """
+        from klrw.cython_exts.sparse_csr import CSR_Mat
+
+        self_dict = defaultdict(dict)
+        for stype, coeff in self:
+            hom_deg, i, j = stype
+            if transpose:
+                self_dict[hom_deg][i, j] = coeff
+            else:
+                self_dict[hom_deg][j, i] = coeff
+
+        number_of_columns = {
+            hom_deg: len(
+                self.parent().codomain.projectives[hom_deg + self.parent().shift]
+            )
+            for hom_deg in self_dict
+        }
+        number_of_rows = {
+            hom_deg: len(self.parent().domain.projectives[hom_deg])
+            for hom_deg in self_dict
+        }
+        if not transpose:
+            number_of_columns, number_of_rows = number_of_rows, number_of_columns
+
+        return {
+            hom_deg: CSR_Mat.from_dict(
+                self_dict[hom_deg],
+                number_of_rows[hom_deg],
+                number_of_columns[hom_deg],
+            )
+            for hom_deg in self_dict
+        }
+
+    def to_dict_of_CSC(self, transpose=True):
+        """
+        Transforms into a dictionary of CSC matrices.
+
+        Beware of the transposition in the convention!
+        [see the comment in KLRWPerfectComplex]
+        By default, transpose=True, it follows this convention
+        """
+        from klrw.cython_exts.sparse_csc import CSC_Mat
+
+        self_dict = defaultdict(dict)
+        for stype, coeff in self:
+            hom_deg, i, j = stype
+            if transpose:
+                self_dict[hom_deg][i, j] = coeff
+            else:
+                self_dict[hom_deg][j, i] = coeff
+
+        number_of_columns = {
+            hom_deg: len(
+                self.parent().codomain.projectives[hom_deg + self.parent().shift]
+            )
+            for hom_deg in self_dict
+        }
+        number_of_rows = {
+            hom_deg: len(self.parent().domain.projectives[hom_deg])
+            for hom_deg in self_dict
+        }
+        if not transpose:
+            number_of_columns, number_of_rows = number_of_rows, number_of_columns
+
+        return {
+            hom_deg: CSC_Mat.from_dict(
+                self_dict[hom_deg],
+                number_of_rows[hom_deg],
+                number_of_columns[hom_deg],
+            )
+            for hom_deg in self_dict
+        }
+
     def _repr_(self):
         dict_of_matrices = self.dict_of_matrices().items()
         if dict_of_matrices:
@@ -431,16 +546,151 @@ class KLRWHomOfGradedProjectivesElement(IndexedFreeModuleElement):
             return "0"
 
 
-class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
-    def __init__(
+class HomHomMultiplication(Action):
+    """
+    Gives multiplication of two homs of graded projectives.
+
+    The solution is similar to matrix multiplication is Sage.
+    [see MatrixMatrixAction in MatrixSpace]
+    Coercion model in Sage requires both elements in
+    the usual product to have the same parent, but in
+    actions this is no longer the case. So we use the class Action.
+    """
+
+    def __init__(self, left_parent, right_parent):
+        Action.__init__(
+            self, G=left_parent, S=right_parent, is_left=True, op=operator.mul
+        )
+        self._left_domain = self.actor()
+        self._right_domain = self.domain()
+        self._codomain = self._create_codomain()
+
+    def _create_codomain(self):
+        if (
+            self._left_domain.domain.projectives
+            != self._right_domain.codomain.projectives
+        ):
+            from pprint import pprint
+
+            pprint(self._left_domain.domain.projectives)
+            pprint(self._right_domain.codomain.projectives)
+            raise TypeError("Incomposable homs")
+        return KLRWHomOfGradedProjectives(
+            domain=self._right_domain.domain,
+            codomain=self._left_domain.codomain,
+            shift=self._left_domain.shift + self._right_domain.shift,
+        )
+
+    def _act_(
         self,
+        g: KLRWHomOfGradedProjectivesElement,
+        s: KLRWHomOfGradedProjectivesElement,
+    ) -> KLRWHomOfGradedProjectivesElement:
+        from klrw.cython_exts.sparse_multiplication import multiplication
+
+        left_dict = g.to_dict_of_CSC()
+        right_dict = s.to_dict_of_CSR()
+        result_dict = {}
+        for hom_deg in left_dict:
+            shifted_hom_deg = hom_deg + self._right_domain.shift
+            if shifted_hom_deg in right_dict:
+                # because of the transposition convention
+                # the first map has to go on the left in the matrix
+                # multiplication but in the composition it goes on
+                # the right
+                result_dict[hom_deg] = multiplication(
+                    left=right_dict[hom_deg],
+                    right=left_dict[shifted_hom_deg],
+                    as_dict=True,
+                )
+
+        return self._codomain._element_from_dict_of_dicts_(result_dict, transpose=True)
+
+
+class ParameterHomMultiplication(Action):
+    """
+    Multiplication of a hom of graded projectives
+    by a symmetric homogeneous element in the dot algebra.
+
+    Default coercion uses the unit in KLRW which is not the best
+    way to do multiplication by parameters.
+    """
+
+    def __init__(self, other, hom_parent):
+        self.dot_algebra = hom_parent.KLRW_algebra().base()
+        self.coerce_map = self.dot_algebra.coerce_map_from(other)
+        Action.__init__(self, G=other, S=hom_parent, is_left=True, op=operator.mul)
+
+    def codomain(self):
+        raise AttributeError("Codomain depend on the dot algebra element")
+
+    def _act_(
+        self,
+        g,
+        h: KLRWHomOfGradedProjectivesElement,
+    ) -> KLRWHomOfGradedProjectivesElement:
+        g = self.coerce_map(g)
+        grading_group = self.domain().KLRW_algebra().grading_group
+        element_degree = self.dot_algebra.element_degree(
+            g,
+            grading_group,
+            check_if_homogeneous=True,
+        )
+        assert self.dot_algebra.is_element_symmetric(g), "The element is not symmetric"
+
+        hom_codomain_projectives = {}
+        h_codomain = self.domain().codomain
+        for hom_deg, projs in h_codomain.projectives.items():
+            hom_codomain_projectives[hom_deg] = [
+                replace(pr, equivariant_degree=pr.equivariant_degree + element_degree)
+                for pr in projs
+            ]
+
+        hom_codomain = KLRWPerfectComplex(
+            KLRW_algebra=self.domain().codomain.KLRW_algebra,
+            differentials=self.domain().codomain.differentials,
+            projectives=hom_codomain_projectives,
+            degree=self.domain().codomain.degree,
+            grading_group=self.domain().codomain.grading_group,
+            mod2grading=self.domain().codomain.mod2grading,
+            check=True,
+        )
+
+        product_parent = KLRWHomOfGradedProjectives(
+            self.domain().domain,
+            hom_codomain,
+            shift=self.domain().shift,
+        )
+
+        elem_times_h_dict = {stype: g * elem for stype, elem in h}
+
+        return product_parent._from_dict(elem_times_h_dict)
+
+
+class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
+    @staticmethod
+    def __classcall__(
+        cls,
         domain: KLRWPerfectComplex,
         codomain: KLRWPerfectComplex,
         shift=0,
     ):
+        return super().__classcall__(
+            cls,
+            domain=domain,
+            codomain=codomain,
+            shift=shift,
+        )
+
+    def __init__(
+        self,
+        domain: KLRWPerfectComplex,
+        codomain: KLRWPerfectComplex,
+        shift,
+    ):
         assert domain.KLRW_algebra is codomain.KLRW_algebra
-        self.domain = copy(domain)
-        self.codomain = copy(codomain)
+        self.domain = domain
+        self.codomain = codomain
         self.shift = shift
         super().__init__(
             R=self.domain.KLRW_algebra,
@@ -524,7 +774,7 @@ class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
     def _element_from_vector_(self, vect):
         assert len(vect) == self.subdivisions(-1)
 
-        dict_of_matrices = {}
+        result_dict = {}
         for ind in range(len(self.subdivisions()) - 1):
             type = self.types()[ind]
 
@@ -534,9 +784,9 @@ class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
             entry = graded_component._element_from_vector_(vect[begin:end])
 
             if not entry.is_zero():
-                dict_of_matrices[type] = entry
+                result_dict[type] = entry
 
-        return self._from_dict(dict_of_matrices)
+        return self._from_dict(result_dict)
 
     def _vector_from_element_(self, elem):
         assert elem.parent() is self
@@ -550,8 +800,49 @@ class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
 
         return vect
 
-    #def _repr_(self):
-    #    return "Graded morphims between graded modules"
+    def _element_from_dict_of_dicts_(self, dic: dict, transpose=True):
+        """
+        Transforms a dictionary of dictionaries into a hom element.
+
+        Beware of the transposition in the convention!
+        [see the comment in KLRWPerfectComplex]
+        By default, transpose=True, it follows this convention
+        """
+        if transpose:
+            result_dict = {
+                SummandType(
+                    domain_grading=hom_deg,
+                    domain_index=i,
+                    codomain_index=j,
+                ): entry
+                for hom_deg, mat in dic.items()
+                for (i, j), entry in mat.items()
+            }
+        else:
+            result_dict = {
+                SummandType(
+                    domain_grading=hom_deg,
+                    domain_index=j,
+                    codomain_index=i,
+                ): entry
+                for hom_deg, mat in dic.items()
+                for (i, j), entry in mat.items()
+            }
+        return self._from_dict(result_dict)
+
+    def _get_action_(self, other, op, self_on_left):
+        if op == operator.mul:
+            if isinstance(other, KLRWHomOfGradedProjectives):
+                if self_on_left:
+                    return HomHomMultiplication(left_parent=self, right_parent=other)
+                else:
+                    return HomHomMultiplication(left_parent=other, right_parent=self)
+            if self.KLRW_algebra().base().has_coerce_map_from(other):
+                return ParameterHomMultiplication(other, self)
+        return super()._get_action_(other, op, self_on_left)
+
+    def _repr_(self):
+        return "Graded morphims between graded modules"
 
     def one(self, as_vector=False):
         assert self.shift == 0
@@ -779,8 +1070,9 @@ class KLRWHomOfPerfectComplexes(Parent):
 
     def ext(self, shift):
         """
-        Returns Ext^degree
+        Returns Ext^shift
         """
+        # ???? MAKE SHIFTS
         ext = KLRWExtOfGradedProjectives(ambient=self, shift=shift)
 
         return ext

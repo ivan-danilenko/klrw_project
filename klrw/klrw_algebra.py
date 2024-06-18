@@ -319,7 +319,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             quiver_data,
             invertible_parameters=invertible_parameters,
             order=dot_algebra_order,
-            **kwrds
+            **kwrds,
         )
         category = FiniteDimensionalAlgebrasWithBasis(dots_algebra)
         super().__init__(R=dots_algebra, element_class=KLRWElement, category=category)
@@ -796,8 +796,12 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
         assert element.parent() is self.KLRW_algebra
         vec = vector(self.KLRW_algebra.scalars(), len(self.basis()))
         for braid, poly in element:
-            assert braid.left_state() == self.left_state
-            assert braid.right_state() == self.right_state
+            assert braid.left_state() == self.left_state, (
+                repr(braid) + " " + repr(self.left_state) + " " + repr(self.right_state)
+            )
+            assert braid.right_state() == self.right_state, (
+                repr(braid) + " " + repr(self.left_state) + " " + repr(self.right_state)
+            )
             for exp, coeff in poly.iterator_exp_coeff():
                 index = self._word_exp_to_index_[braid.word(), exp]
                 vec[index] += coeff

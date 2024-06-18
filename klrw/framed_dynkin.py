@@ -1175,6 +1175,21 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
         return degree
 
+    def is_element_symmetric(self, element):
+        for v in self.quiver_data.non_framing_nodes():
+            dim_v = self.quiver_data[v]
+            for i in range(1, dim_v):
+                x_i = self.dot_variable(v, i)
+                x_i_1 = self.dot_variable(v, i + 1)
+                swap = {
+                    x_i.name: x_i_1.monomial,
+                    x_i_1.name: x_i.monomial,
+                }
+                swapped_element = element.subs(**swap)
+                if swapped_element != element:
+                    return False
+        return True
+
     def etuple_ignoring_dots(self, et: ETuple):
         # we assume that the non-zero dots have first positions
         return et[: self.number_of_non_dot_params]
