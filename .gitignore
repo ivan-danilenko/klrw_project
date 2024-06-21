@@ -28,6 +28,9 @@ build/
 *.mtx
 *.ilp
 
+# IntelliJ Suite files
+.idea/
+
 # Visual Studio Code files
 .vscode
 
