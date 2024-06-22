@@ -27,6 +27,7 @@ build/
 *.csv
 *.mtx
 *.ilp
+*.lp
 
 # IntelliJ Suite files
 .idea/
@@ -42,3 +43,6 @@ KnotInfoDatabase
 
 # Sage files
 *.sage
+
+# Setuptools files
+*.egg*

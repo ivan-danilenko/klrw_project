@@ -5,6 +5,7 @@ import numpy
 
 import os
 from pathlib import Path
+
 # directory of setup.py
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -46,14 +47,23 @@ extensions = [
     ),
 ]
 
+requirements = [
+    "cython>=3.0",
+    "scipy>=1.11",
+    "numpy>=1.23",
+    "gurobipy>=10.0",
+]
+
 if __name__ == "__main__":
     setup(
         name=PACKAGE_NAME,
         #    package_dir={'cython_ext': '/cython'},
         #    include_dirs=["."],
-        ext_modules=cythonize([e for e in extensions]),
+        ext_modules=cythonize(extensions),
         packages=[PACKAGE_NAME],
         package_dir={PACKAGE_NAME: PACKAGE_PATH},
+        install_requires=requirements,
+        setup_requires=requirements,
     )
     
     # Additionally make the pickles directory if it doesn't exist
