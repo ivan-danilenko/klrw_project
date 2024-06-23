@@ -941,7 +941,7 @@ class KLRWExtOfGradedProjectives(Parent):
 
     def dimension(self):
         return len(self._basis_vectors_)
-    
+
     def relations(self, as_vectors=False):
         if as_vectors:
             return self._relations_vectors_
