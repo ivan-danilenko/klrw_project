@@ -16,7 +16,7 @@ from sage.rings.polynomial.laurent_polynomial_ring import (
     LaurentPolynomialRing_mpair as LaurentPolynomialRing,
 )
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
-from sage.rings.polynomial.laurent_polynomial import LaurentPolynomial_mpair
+# from sage.rings.polynomial.laurent_polynomial import LaurentPolynomial_mpair
 from sage.rings.polynomial.polydict import ETuple
 from sage.rings.ring import CommutativeRing, Ring
 from sage.rings.integer_ring import ZZ
@@ -1298,10 +1298,10 @@ class KLRWUpstairsDotsAlgebra(KLRWDotsAlgebra, PolynomialRing_sing):
         )
 
 
-class DotAlgebraElement_invertible_parameters(LaurentPolynomial_mpair):
+#class DotAlgebraElement_invertible_parameters(LaurentPolynomial_mpair):
     # TODO: can speed up __init__ by using reduce=False
     # need Cython
-    pass
+#    pass
     # def __getattribute__(self, name):
     #     print("Element :: Accessing attribute {}".format(name))
     #     return super().__getattribute__(name)
@@ -1310,7 +1310,7 @@ class DotAlgebraElement_invertible_parameters(LaurentPolynomial_mpair):
 class KLRWUpstairsDotsAlgebra_invertible_parameters(
     KLRWDotsAlgebra, LaurentPolynomialRing
 ):
-    Element = DotAlgebraElement_invertible_parameters
+#    Element = DotAlgebraElement_invertible_parameters
 
     def init_algebra(self, base_ring, nondot_names_list, dot_names_list, order):
         polynomial_ring = PolynomialRing(
