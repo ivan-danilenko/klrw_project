@@ -80,11 +80,11 @@ class KLRWPerfectComplex(Parent):
     degree: AdditiveAbelianGroupElement = -1
     grading_group: AdditiveAbelianGroup = ZZ
     mod2grading: Morphism = IntegerModRing(2).coerce_map_from(ZZ)
-    check: bool = True
+    check: InitVar[bool] = True
     differentials_hash: int = field(init=False)
     projectives_hash: int = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self, check):
         # normalize projectives and differentials, make immutable
         normalized_projectives = {
             hom_deg: copy(proj) for hom_deg, proj in self.projectives.items() if proj
@@ -129,7 +129,7 @@ class KLRWPerfectComplex(Parent):
             MappingProxyType(normalized_projectives),
         )
 
-        if self.check:
+        if check:
             for n in self.differentials:
                 if n + self.degree in self.differentials:
                     assert (
@@ -343,9 +343,9 @@ class KLRWPerfectComplex(Parent):
     def _repr_(self):
         result = "A complex of projectives of a KLRW algebra\n"
         result += "with differentials given by the following matrices\n"
-        for grading, diff in self.differentials.items():
+        for grading in sorted(self.differentials.keys()):
             result += "d_{} = \n".format(grading)
-            result += repr(diff) + "\n"
+            result += repr(self.differentials[grading]) + "\n"
         return result
 
 
@@ -965,22 +965,31 @@ class KLRWExtOfGradedProjectives(Parent):
         else:
             raise NotImplementedError
 
-    def if_homotopic_to_scalar(self, element):
+    def if_homotopic_to_scalar(self, element, return_scalar=False):
         if isinstance(element, KLRWHomOfGradedProjectivesElement):
             hom = self.hom_of_graded
             vect = hom._vector_from_element_(element)
             vect = self.reduce(vect)
-            return self.if_homotopic_to_scalar(vect)
+            return self.if_homotopic_to_scalar(vect, return_scalar=return_scalar)
         elif isinstance(element, Vector):
             hom = self.hom_of_graded
             one_reduced = self.reduce(hom.one(as_vector=True))
             elem_reduced = self.reduce(element)
-            return (
-                span(
-                    [one_reduced, elem_reduced], self.KLRW_algebra().scalars()
-                ).dimension()
-                <= 1
+            relations = one_reduced.parent().linear_dependence(
+                [one_reduced, elem_reduced]
             )
+            if not relations:
+                return False
+            if return_scalar:
+                if len(relations) > 1:
+                    # this can happen only if we have domain=codomain homotopic to zero
+                    # a more elegant way?
+                    from sage.symbolic.constants import NotANumber
+
+                    return NotANumber
+                relation = relations[0]
+                return -relation[0] / relation[1]
+            return True
         else:
             raise NotImplementedError
 
@@ -991,6 +1000,9 @@ class KLRWHomOfPerfectComplexes(Parent):
         domain: KLRWPerfectComplex,
         codomain: KLRWPerfectComplex,
     ):
+        assert (
+            domain.KLRW_algebra.scalars().is_field()
+        ), "Only fields are supported so for complexes."
         assert domain.KLRW_algebra == codomain.KLRW_algebra
         assert domain.degree == codomain.degree
         assert domain.grading_group is codomain.grading_group
