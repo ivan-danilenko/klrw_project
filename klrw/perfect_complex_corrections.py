@@ -33,6 +33,7 @@ def PerfectComplex(
     degree=-1,
     parallel_processes=8,
     max_iterations_for_corrections=10,
+    verbose=True,
 ):
     if max_iterations_for_corrections == 0:
         return KLRWPerfectComplex(
@@ -49,6 +50,7 @@ def PerfectComplex(
         degree=degree,
         parallel_processes=parallel_processes,
         max_iterations_for_corrections=max_iterations_for_corrections,
+        verbose=verbose,
     )
 
     diff = {
@@ -77,6 +79,7 @@ def corrected_diffirential_csc(
     degree=-1,
     parallel_processes=1,
     max_iterations_for_corrections=10,
+    verbose=True,
 ):
     d_csc = {}
     d_csr = {}
@@ -122,7 +125,8 @@ def corrected_diffirential_csc(
 
     exp = min_exp_in_square(d_csr, d_csc, degree=degree)
     if exp is None:
-        print("Differential closes!")
+        if verbose:
+            print("Differential closes!")
         return d_csc
 
     assert exp != ETuple(
@@ -132,7 +136,8 @@ def corrected_diffirential_csc(
     relevant_coeff_degree = dot_algebra.exp_degree(exp, grading_group)
 
     for k in range(max_iterations_for_corrections):
-        print("Correcting degree {}".format(relevant_coeff_degree))
+        if verbose:
+            print("Correcting degree {}".format(relevant_coeff_degree))
 
         corrections = possible_corrections(
             klrw_algebra,
@@ -141,6 +146,7 @@ def corrected_diffirential_csc(
             relevant_coeff_degree=relevant_coeff_degree,
             parallel_processes=parallel_processes,
             ignore=ignore,
+            verbose=verbose,
         )
 
         basis_in_product = {}
@@ -153,6 +159,7 @@ def corrected_diffirential_csc(
             basis_appearing_in_product=basis_in_product,
             degree=degree,
             relevant_coeff_degree=relevant_coeff_degree,
+            verbose=verbose,
         )
 
         rhs = system_on_corrections_rhs(
@@ -164,9 +171,10 @@ def corrected_diffirential_csc(
             basis_appearing_in_product=basis_in_product,
             degree=degree,
             relevant_coeff_degree=relevant_coeff_degree,
+            verbose=verbose,
         )
 
-        x = solve_system(lhs, rhs)
+        x = solve_system(lhs, rhs, verbose=verbose)
 
         d_csc = update_differential(
             klrw_algebra,
@@ -179,7 +187,8 @@ def corrected_diffirential_csc(
 
         exp = min_exp_in_square(d_csr, d_csc, degree=degree)
         if exp is None:
-            print("Differential closes!")
+            if verbose:
+                print("Differential closes!")
             break
         relevant_coeff_degree = dot_algebra.exp_degree(exp, grading_group)
     else:
@@ -199,6 +208,7 @@ def possible_corrections(
     relevant_coeff_degree,
     parallel_processes=1,
     ignore: dict[frozenset] | None = None,
+    verbose=True,
 ):
     if ignore is None:
         ignore = {hom_deg: frozenset() for hom_deg in projectives}
@@ -216,6 +226,7 @@ def possible_corrections(
             hom_deg,
             degree,
             ignore[hom_deg],
+            verbose,
         )
         for hom_deg in possible_corrections_hom_degrees
     ]
@@ -242,12 +253,14 @@ def possible_corrections_in_hom_degree_and_print(
     hom_deg,
     degree,
     ignore: frozenset = frozenset(),
+    verbose=True,
 ):
-    print(
-        "Start: Finding possible corrections for C_{} -> C_{}".format(
-            hom_deg, hom_deg + degree
+    if verbose:
+        print(
+            "Start: Finding possible corrections for C_{} -> C_{}".format(
+                hom_deg, hom_deg + degree
+            )
         )
-    )
 
     corrections_in_hom_deg = possible_corrections_in_hom_degree(
         klrw_algebra=klrw_algebra,
@@ -257,11 +270,12 @@ def possible_corrections_in_hom_degree_and_print(
         ignore=ignore,
     )
 
-    print(
-        "End: Finding possible corrections for C_{} -> C_{}".format(
-            hom_deg, hom_deg + degree
+    if verbose:
+        print(
+            "End: Finding possible corrections for C_{} -> C_{}".format(
+                hom_deg, hom_deg + degree
+            )
         )
-    )
 
     return hom_deg, corrections_in_hom_deg
 
@@ -358,6 +372,7 @@ def system_on_corrections_lhs(
     basis_appearing_in_product: dict,
     degree,
     relevant_coeff_degree,
+    verbose=True,
 ):
     matrix_blocks = [[None] * len(projectives) for _ in range(len(projectives))]
     # To have a good block-band matrix
@@ -372,11 +387,12 @@ def system_on_corrections_lhs(
         if hom_deg + degree not in hom_deg_to_index:
             continue
 
-        print(
-            "Making the left hand side for the corrections C_{} -> C_{}".format(
-                hom_deg, hom_deg + 2 * degree
+        if verbose:
+            print(
+                "Making the left hand side for the corrections C_{} -> C_{}".format(
+                    hom_deg, hom_deg + 2 * degree
+                )
             )
-        )
         hom_deg_index = hom_deg_to_index[hom_deg]
         hom_deg_next_index = hom_deg_to_index[hom_deg + degree]
         basis_appearing_in_product[hom_deg] = {}
@@ -416,6 +432,7 @@ def system_on_corrections_rhs(
     basis_appearing_in_product: dict,
     degree,
     relevant_coeff_degree,
+    verbose=True,
 ):
     augment_blocks = [[None] for _ in range(len(projectives))]
     # To have a good block-band matrix
@@ -430,11 +447,12 @@ def system_on_corrections_rhs(
         if hom_deg + degree not in hom_deg_to_index:
             continue
 
-        print(
-            "Making the right hand side for the corrections C_{} -> C_{}".format(
-                hom_deg, hom_deg + 2 * degree
+        if verbose:
+            print(
+                "Making the right hand side for the corrections C_{} -> C_{}".format(
+                    hom_deg, hom_deg + 2 * degree
+                )
             )
-        )
         hom_deg_index = hom_deg_to_index[hom_deg]
         basis_dict = basis_appearing_in_product[hom_deg]
         if hom_deg + degree in d_csr and hom_deg in d_csc:
@@ -455,22 +473,26 @@ def system_on_corrections_rhs(
     return b
 
 
-def solve_system(A, b):
+def solve_system(A, b, verbose=True):
     import gurobipy as gp
 
     y = b.transpose()
 
-    m = gp.Model()
-    x = m.addMVar(A.shape[1], lb=-float("inf"))
-    m.addConstr(A @ x == y)
-    # set method to primal simplex method
-    m.Params.Method = 0
-    m.optimize()
-    # if model is infeasible
-    if m.Status == 3:
-        m.computeIIS()
-        m.write("model.ilp")
-    x = x.X
+    with gp.Env(empty=True) as env:
+        if not verbose:
+            env.setParam("OutputFlag", 0)
+        env.start()
+        with gp.Model(env=env) as m:
+            x = m.addMVar(A.shape[1], lb=-float("inf"))
+            m.addConstr(A @ x == y)
+            # set method to primal simplex method
+            m.Params.Method = 0
+            m.optimize()
+            # if model is infeasible
+            if m.Status == 3:
+                m.computeIIS()
+                m.write("model.ilp")
+            x = x.X
 
     from scipy.sparse import csr_matrix
 
