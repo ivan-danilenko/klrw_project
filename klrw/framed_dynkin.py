@@ -437,6 +437,13 @@ class FramedDynkinDiagram_with_dimensions_immutable(
             ),
         )
 
+    def mutable_copy(self):
+        return FramedDynkinDiagram_with_dimensions(
+            ct=self.quiver.cartan_type(),
+            quiver=self.quiver,
+            dimensions_dict=dict(self.dimensions_dict),
+        )
+
 
 class QuiverGradingLabel:
     pass
