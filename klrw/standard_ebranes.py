@@ -83,9 +83,9 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
         return all(x.inner_product(y) >= 0 for y in ys)
 
     pos = Poset(data=(Orb, leq))
-    pos.plot(
-        label_elements=False, title="Poset of the Weight Orbit", fontsize=10
-    ).show()
+    # pos.plot(
+    #     label_elements=False, title="Poset of the Weight Orbit", fontsize=10
+    # ).show()
     pos_dual = pos.dual()
 
     sequences_by_weight = {}
@@ -144,8 +144,10 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
     KLRW = KLRWAlgebra(
         ZZ,
         DD,
+        dot_scaling=True,
         edge_scaling=True,
         vertex_scaling=True,
+        invertible_parameters=True,
         warnings=True,
     )
 
@@ -161,16 +163,23 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
         for mu, (left_seq, right_seq) in sequences_by_weight.items()
     }
 
-    R = QQ
-    KLRW_one_grading = KLRWAlgebra(
-        R,
-        DD,
-        default_vertex_parameter=R.one(),
-        default_edge_parameter=R.one(),
-        warnings=True,
-    )
+    # making the algebra that is similar to KLWR, but without extra gradings
+    # cls, args, kwrds = KLRW._reduction
+    # R = QQ
+    # kwrds["base_R"] = R
+    # kwrds["default_vertex_parameter"] = R.one()
+    # kwrds["default_edge_parameter"] = R.one()
+    # kwrds["dot_scaling"] = False
+    # kwrds["edge_scaling"] = False
+    # kwrds["vertex_scaling"] = False
+    # KLRW_one_grading = cls(*args, **kwrds)
 
-    stab = {mu: st.base_change(KLRW_one_grading) for mu, st in stab.items()}
+    cls, args, kwrds = KLRW._reduction
+    R = QQ
+    kwrds["base_R"] = R
+    KLRW_QQ = cls(*args, **kwrds)
+
+    stab = {mu: st.base_change(KLRW_QQ) for mu, st in stab.items()}
 
     print("Finding the e-brane")
 
@@ -183,12 +192,14 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
         left_seq, right_seq = sequences_by_weight[mu]
         stab_mu = stab[mu]
         degree = sum(
-            KLRW_one_grading.grading_group.crossing_grading(left_seq[i], left_seq[j])
+            KLRW_QQ.grading_group.crossing_grading(left_seq[i], left_seq[j])
+            # KLRW_one_grading.grading_group.crossing_grading(left_seq[i], left_seq[j])
             for j in range(len(left_seq))
             for i in range(j)
         )
         degree += sum(
-            KLRW_one_grading.grading_group.crossing_grading(left_seq[i], left_framing)
+            KLRW_QQ.grading_group.crossing_grading(left_seq[i], left_framing)
+            # KLRW_one_grading.grading_group.crossing_grading(left_seq[i], left_framing)
             for i in range(len(left_seq))
         )
         rhom = KLRWHomOfPerfectComplexes(stab_mu[-len(left_seq) + 1, -degree], e_brane)
@@ -200,7 +211,7 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
     return e_brane
 
     left_seq, right_seq = next(iter(sequences_by_weight.values()))
-    relevant_state = KLRW_one_grading.state(
+    relevant_state = KLRW_QQ.state(
         (left_framing,) + left_seq + right_seq + (right_framing,)
     )
 
