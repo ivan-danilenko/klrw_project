@@ -492,8 +492,8 @@ class CombinatorialEBrane:
                     .braid_set()
                     .braid_for_one_strand(
                         right_state=current_state,
-                        right_moving_strand_position=current_segment + 1,
-                        left_moving_strand_position=next_segment + 1,
+                        right_moving_strand_position=current_segment,
+                        left_moving_strand_position=next_segment,
                         check=False,
                     )
                 )
@@ -524,8 +524,8 @@ class CombinatorialEBrane:
                     .braid_set()
                     .braid_for_one_strand(
                         right_state=next_state,
-                        right_moving_strand_position=next_segment + 1,
-                        left_moving_strand_position=current_segment + 1,
+                        right_moving_strand_position=next_segment,
+                        left_moving_strand_position=current_segment,
                         check=False,
                     )
                 )

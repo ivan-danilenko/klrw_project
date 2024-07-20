@@ -446,6 +446,7 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
         the position prescribed in
         left_moving_strand_position on the lest to
         right_moving_strand_position on the right.
+        Counting of strand positions starts with 0.
 
         Works faster than the function for more general number of strands
         """
@@ -458,13 +459,13 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
 
         if right_moving_strand_position >= left_moving_strand_position:
             word = tuple(
-                range(left_moving_strand_position, right_moving_strand_position)
+                range(left_moving_strand_position + 1, right_moving_strand_position + 1)
             )
         else:
             word = tuple(
                 range(
-                    left_moving_strand_position - 1,
-                    right_moving_strand_position - 1,
+                    left_moving_strand_position,
+                    right_moving_strand_position,
                     -1,
                 )
             )
