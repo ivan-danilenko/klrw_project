@@ -529,6 +529,15 @@ class KLRWHomOfGradedProjectivesElement(IndexedFreeModuleElement):
             for hom_deg in self_dict
         }
 
+    def _mul_(self, other):
+        """
+        Used *only* in the special case when both self and other
+        have the same parent.
+        Because of a technical details in the coercion model
+        this method is called instead of action.
+        """
+        return self.parent().self_action.act(self, other)
+
     def _repr_(self):
         dict_of_matrices = self.dict_of_matrices().items()
         if dict_of_matrices:
@@ -840,6 +849,10 @@ class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
             if self.KLRW_algebra().base().has_coerce_map_from(other):
                 return ParameterHomMultiplication(other, self)
         return super()._get_action_(other, op, self_on_left)
+
+    @lazy_attribute
+    def self_action(self):
+        return HomHomMultiplication(left_parent=self, right_parent=self)
 
     def _repr_(self):
         return "Graded morphims between graded modules"
