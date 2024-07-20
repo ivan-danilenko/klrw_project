@@ -16,8 +16,7 @@ from sage.combinat.free_module import CombinatorialFreeModule
 from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
 from sage.matrix.matrix0 import Matrix
 from sage.matrix.constructor import matrix
-from sage.modules.free_module_element import vector
-from sage.modules.free_module import span
+from sage.modules.free_module import VectorSpace
 from sage.structure.element import Vector
 from sage.homology.chain_complex import ChainComplex, ChainComplex_class
 from sage.rings.integer_ring import ZZ
@@ -761,6 +760,9 @@ class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
     def dimension(self):
         return self.subdivisions(-1)
 
+    def vector_space(self):
+        return VectorSpace(self.KLRW_algebra().scalars(), self.dimension(), sparse=True)
+
     def graded_component_of_type(self, type):
         left = self.domain.projectives[type.domain_grading][type.domain_index]
         codomain_grading = type.domain_grading + self.shift
@@ -799,7 +801,8 @@ class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
 
     def _vector_from_element_(self, elem):
         assert elem.parent() is self
-        vect = vector(self.KLRW_algebra().scalars(), self.dimension(), sparse=True)
+        # create a mutable zero vector
+        vect = self.vector_space()()
         for type, coeff in elem:
             graded_component = self.graded_component_of_type(type)
             begin = self._type_to_subdivision_index_[type]
@@ -881,21 +884,50 @@ class KLRWExtOfGradedProjectives(Parent):
     def __init__(self, ambient, shift):
         self._shift = shift
         self._ambient = ambient
-        previous_differential_matrix = ambient._differential_matrix_(
-            shift - ambient.degree()
+
+    @lazy_attribute
+    def _cycle_module_(self):
+        current_differential_matrix = self._ambient._differential_matrix_(self._shift)
+
+        return current_differential_matrix.right_kernel()
+
+    @lazy_attribute
+    def _boundary_module_(self):
+        previous_differential_matrix = self._ambient._differential_matrix_(
+            self._shift - self._ambient.degree()
         )
-        current_differential_matrix = ambient._differential_matrix_(shift)
 
-        assert (current_differential_matrix * previous_differential_matrix).is_zero()
+        return previous_differential_matrix.column_module()
 
-        kernel = current_differential_matrix.right_kernel()
-        image = previous_differential_matrix.column_module()
-        self._homology_ = kernel.quotient(image)
-        self._basis_vectors_ = tuple(
-            self._homology_.lift(b) for b in self._homology_.basis()
-        )
-        self._relations_vectors_ = tuple(b for b in image.basis())
+    @lazy_attribute
+    def _homology_(self):
+        cyc = self._cycle_module_
+        bon = self._boundary_module_
+        quo = cyc.quotient(bon)
+        return quo
 
+    @lazy_attribute
+    def _basis_vectors_(self):
+        return tuple(self._homology_.lift(b) for b in self._homology_.basis())
+
+    @lazy_attribute
+    def _relations_vectors_(self):
+        return tuple(b for b in self._boundary_module_.basis())
+
+    @lazy_attribute
+    def _vector_space_mod_boundaries_(self):
+        hom = self.hom_of_graded
+        return hom.vector_space() / self._boundary_module_
+
+    @lazy_attribute
+    def _vector_quotient_map_(self):
+        return self._vector_space_mod_boundaries_.quotient_map()
+
+    @lazy_attribute
+    def _vector_lift_map_(self):
+        return self._vector_space_mod_boundaries_.lift_map()
+
+    @lazy_attribute
     def hom_of_graded(self):
         return self._ambient[self._shift]
 
@@ -904,7 +936,7 @@ class KLRWExtOfGradedProjectives(Parent):
         if as_vectors:
             return self._basis_vectors_
         else:
-            hom = self.hom_of_graded()
+            hom = self.hom_of_graded
             return tuple(hom._element_from_vector_(b) for b in self._basis_vectors_)
 
     def dimension(self):
@@ -914,7 +946,7 @@ class KLRWExtOfGradedProjectives(Parent):
         if as_vectors:
             return self._relations_vectors_
         else:
-            hom = self.hom_of_graded()
+            hom = self.hom_of_graded
             return tuple(hom._element_from_vector_(b) for b in self._relations_vectors_)
 
     def KLRW_algebra(self):
@@ -922,25 +954,25 @@ class KLRWExtOfGradedProjectives(Parent):
 
     def reduce(self, element):
         if isinstance(element, KLRWHomOfGradedProjectivesElement):
-            hom = self.hom_of_graded()
+            hom = self.hom_of_graded
             vect = hom._vector_from_element_(element)
             vect = self.reduce(vect)
             return hom._element_from_vector_(vect)
         elif isinstance(element, Vector):
-            quotient_map = self._homology_.quotient_map()
-            lift_map = self._homology_.lift_map()
+            quotient_map = self._vector_quotient_map_
+            lift_map = self._vector_lift_map_
             return lift_map(quotient_map(element))
         else:
             raise NotImplementedError
 
     def if_homotopic_to_scalar(self, element):
         if isinstance(element, KLRWHomOfGradedProjectivesElement):
-            hom = self.hom_of_graded()
+            hom = self.hom_of_graded
             vect = hom._vector_from_element_(element)
             vect = self.reduce(vect)
             return self.if_homotopic_to_scalar(vect)
         elif isinstance(element, Vector):
-            hom = self.hom_of_graded()
+            hom = self.hom_of_graded
             one_reduced = self.reduce(hom.one(as_vector=True))
             elem_reduced = self.reduce(element)
             return (
