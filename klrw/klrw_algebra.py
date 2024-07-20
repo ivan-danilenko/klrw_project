@@ -13,6 +13,7 @@ from sage.categories.action import Action
 from sage.rings.polynomial.polydict import ETuple
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import weak_cached_function
 from sage.structure.unique_representation import UniqueRepresentation
 from sage.matrix.constructor import matrix
 from sage.modules.free_module_element import vector
@@ -257,7 +258,7 @@ class RightDotAction(Action):
 
 
 class KLRWAlgebra(LeftFreeBimoduleMonoid):
-    @staticmethod
+    @weak_cached_function(cache=128)  # automatically a staticmethod
     def __classcall__(
         cls,
         base_R,

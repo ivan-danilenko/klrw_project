@@ -21,7 +21,7 @@ from sage.structure.element import Vector
 from sage.homology.chain_complex import ChainComplex, ChainComplex_class
 from sage.rings.integer_ring import ZZ
 from sage.rings.finite_rings.integer_mod_ring import IntegerModRing
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_method, weak_cached_function
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.categories.action import Action
 
@@ -676,7 +676,7 @@ class ParameterHomMultiplication(Action):
 
 
 class KLRWHomOfGradedProjectives(CombinatorialFreeModule):
-    @staticmethod
+    @weak_cached_function(cache=128)  # automatically a staticmethod
     def __classcall__(
         cls,
         domain: KLRWPerfectComplex,

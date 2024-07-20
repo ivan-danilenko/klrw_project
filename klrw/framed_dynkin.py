@@ -24,7 +24,7 @@ from sage.combinat.free_module import CombinatorialFreeModule
 from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
 from sage.structure.sage_object import SageObject
 
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_method, weak_cached_function
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.misc_c import prod
 
@@ -706,7 +706,7 @@ def exps_for_dots_of_degree(etuples_degrees: MappingProxyType | tuple, degree):
 # TODO: add an abstract class KLRWDotsAlgebra(CoomutativeRing, UniqueRep),
 # inherit upstairs and downstairs versions
 class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
-    @staticmethod
+    @weak_cached_function(cache=128)  # automatically a staticmethod
     def __classcall_private__(cls, *args, invertible_parameters=False, **kwargs):
         if not invertible_parameters:
             # TODO: add the case when the list of invertible parameters is empty
