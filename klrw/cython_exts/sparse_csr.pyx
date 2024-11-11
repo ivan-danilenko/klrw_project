@@ -147,3 +147,65 @@ class CSR_Mat:
             indptrs=d_csr_indptrs,
             number_of_columns=number_of_columns,
         )
+
+    def eliminate_zeros(self, inplace=True):
+        if inplace:
+            output_indptrs = self.indptrs
+            output_indices = self.indices
+            output_data = self.data
+        else:
+            output_indptrs = np.zeros_like(self.indptrs)
+            output_indices = np.zeros_like(self.indices)
+            output_data = np.empty_like(self.data)
+
+        j: cython.int
+        indptr: cython.int = 0
+        entries_so_far: cython.int = 0
+        for j in range(len(self.indptrs) - 1):
+            while indptr < self.indptrs[j + 1]:
+                entry = self.data[indptr]
+
+                if entry:
+                    output_data[entries_so_far] = entry
+                    output_indices[entries_so_far] = self.indices[indptr]
+                    entries_so_far += 1
+
+                indptr += 1
+
+            output_indptrs[j + 1] = entries_so_far
+
+        output_data = output_data[:entries_so_far]
+        output_indices = output_indices[:entries_so_far]
+
+        if inplace:
+            return self
+        else:
+            return CSR_Mat(
+                output_data,
+                output_indices,
+                output_indptrs,
+                self.number_of_columns,
+            )
+
+    def apply_entrywise(self, function, inplace=True):
+        if inplace:
+            output = self.data
+        else:
+            output = np.empty_like(self.data)
+        j: cython.int
+        for j in range(len(self.data)):
+            output[j] = function(self.data[j])
+
+        if inplace:
+            return self
+        else:
+            return CSR_Mat(
+                output,
+                self.indices,
+                self.indptrs,
+                self.number_of_columns,
+            )
+
+    def change_ring(self, ring):
+        self.apply_entrywise(ring)
+        return self
