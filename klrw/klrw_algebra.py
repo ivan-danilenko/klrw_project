@@ -14,7 +14,6 @@ from sage.rings.polynomial.polydict import ETuple
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.cachefunc import cached_method
 from sage.misc.cachefunc import weak_cached_function
-from sage.structure.unique_representation import UniqueRepresentation
 from sage.matrix.constructor import matrix
 from sage.modules.free_module_element import vector
 
@@ -94,8 +93,6 @@ class KLRWElement(IndexedFreeModuleElement):
         """
         Gives a matrix of how multiplication by this element
         acts on a graded component of a Hom between projectives.
-        Return None if the element is zero, since we don't know
-        the codomain.
         """
         assert graded_component.KLRW_algebra is self.parent()
         # use to assert that the element is homogenuous in degree
@@ -332,9 +329,19 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         the graded finite-dimensional component
         """
         if isinstance(key, slice):
-            return KLRWAlgebraGradedComponent(
-                self, key.start, key.stop, self.grading_group(key.step)
+            return self.graded_component(
+                key.start, key.stop, self.grading_group(key.step)
             )
+
+    # cache to keep hard references for graded components
+    @cached_method
+    def graded_component(
+        self,
+        left_state: KLRWstate,
+        right_state: KLRWstate,
+        degree: QuiverGradingGroupElement,
+    ):
+        return KLRWAlgebraGradedComponent(self, left_state, right_state, degree)
 
     @lazy_attribute
     def ideal_of_symmetric_dots(self):
@@ -721,12 +728,66 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         """
         return "KLRW algebra"
 
+    def element_from_braid(
+        self,
+        word: Iterable,
+        left_state=None,
+        right_state=None,
+        coeff=None,
+    ):
+        """
+        Creates an element form any braid data.
+
+        I.e. the braid does not have to be of special form
+        [minimal, lexmin]
+        Works slowlier than KLRWmonomial
+        that requires the braid to be minimal lexmin.
+        """
+        assert (
+            left_state is not None or right_state is not None
+        ), "Left or right state must be given"
+
+        if right_state is not None:
+            state = right_state
+            result = self.idempotent(state)
+            for i in reversed(word):
+                crossing_element = self.KLRWmonomial(
+                    state=state,
+                    word=(i,),
+                )
+                result = crossing_element * result
+                state = state.act_by_s(i)
+
+            if left_state is not None:
+                assert state == left_state, "Left and right states are incompatible."
+
+        else:
+            # the case where only the left side was given
+            state = left_state
+            result = self.idempotent(state)
+            for i in word:
+                state = state.act_by_s(i)
+                crossing_element = self.KLRWmonomial(
+                    state=state,
+                    word=(i,),
+                )
+                result = result * crossing_element
+
+        if coeff is not None:
+            result = coeff * result
+        return result
+
 
 ###############################################################################
 
 
+# Instead of inheritance from `UniqueRepresentation`
+# We cache in corresponding KLRW_Algebra.
+# This is because `UniqueRepresentation` uses weak cache
+# and we have many cases when we don't keep
+# a strong reference to graded components.
 @dataclass(slots=True)
-class KLRWAlgebraGradedComponent(UniqueRepresentation):
+class KLRWAlgebraGradedComponent:
     KLRW_algebra: KLRWAlgebra
     left_state: KLRWstate
     right_state: KLRWstate
@@ -757,7 +818,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
                 result.append(self.KLRW_algebra.term(braid, coeff))
             return tuple(result)
 
-    @lazy_attribute
+    @cached_method
     def _word_exp_to_index_(self) -> MappingProxyType:
         """
         Makes a dictionary where for each word and tuple of dot exponents
@@ -804,7 +865,7 @@ class KLRWAlgebraGradedComponent(UniqueRepresentation):
                 repr(braid) + " " + repr(self.left_state) + " " + repr(self.right_state)
             )
             for exp, coeff in poly.iterator_exp_coeff():
-                index = self._word_exp_to_index_[braid.word(), exp]
+                index = self._word_exp_to_index_()[braid.word(), exp]
                 vec[index] += coeff
         return vec
 

@@ -433,6 +433,32 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
     def total_number_of_strands(self):
         return self.KLRWstate_set.total_number_of_strands()
 
+    @staticmethod
+    def word_for_one_strand(
+        right_moving_strand_position: int,
+        left_moving_strand_position: int,
+    ) -> tuple[int]:
+        """
+        Returns a word for KLRW braid
+        where the only one strand moves from
+        the position prescribed in
+        left_moving_strand_position on the lest to
+        right_moving_strand_position on the right.
+        Counting of strand positions starts with 0.
+        """
+        if right_moving_strand_position >= left_moving_strand_position:
+            return tuple(
+                range(left_moving_strand_position + 1, right_moving_strand_position + 1)
+            )
+        else:
+            return tuple(
+                range(
+                    left_moving_strand_position,
+                    right_moving_strand_position,
+                    -1,
+                )
+            )
+
     def braid_for_one_strand(
         self,
         right_state: KLRWstate,
@@ -457,18 +483,10 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
                 right_moving_strand_position
             ].is_framing(), "Framing nodes can't move"
 
-        if right_moving_strand_position >= left_moving_strand_position:
-            word = tuple(
-                range(left_moving_strand_position + 1, right_moving_strand_position + 1)
-            )
-        else:
-            word = tuple(
-                range(
-                    left_moving_strand_position,
-                    right_moving_strand_position,
-                    -1,
-                )
-            )
+        word = self.word_for_one_strand(
+            right_moving_strand_position,
+            left_moving_strand_position,
+        )
 
         return self._element_constructor_(state=right_state, word=word)
 
