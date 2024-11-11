@@ -20,9 +20,9 @@ from sage.modules.free_module_element import vector
 
 from .klrw_state import KLRWstate
 from .klrw_braid import KLRWbraid, KLRWbraid_set
-from .framed_dynkin import (
-    FramedDynkinDiagram_with_dimensions,
-    KLRWDotsAlgebra,
+from .framed_dynkin import FramedDynkinDiagram_with_dimensions
+from .dot_algebra import KLRWDotsAlgebra
+from .gradings import (
     QuiverGradingGroupElement,
     QuiverGradingGroup,
 )

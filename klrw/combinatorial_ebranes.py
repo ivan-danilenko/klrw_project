@@ -8,9 +8,10 @@ from sage.matrix.constructor import matrix
 from sage.combinat.root_system.cartan_type import CartanType
 
 from .klrw_algebra import KLRWAlgebra
-from .framed_dynkin import FramedDynkinDiagram_with_dimensions, DotVariableIndex
+from .framed_dynkin import FramedDynkinDiagram_with_dimensions
+from .dot_algeabra import DotVariableIndex
 from .klrw_state import KLRWstate
-from .perfect_complex import KLRWProjectiveModule, KLRWPerfectComplex
+from .perfect_complex import KLRWIrreducibleProjectiveModule, KLRWPerfectComplex
 from .perfect_complex_corrections import corrected_diffirential_csc
 from klrw.cython_exts.combinatorial_ebranes_ext import (
     d_times_one_piece,
