@@ -20,7 +20,7 @@ from klrw.gradings import (
     QuiverGradingGroup,
 )
 from klrw.dot_algebra import KLRWUpstairsDotsAlgebra
-from klrw.perfect_complex import FreeRankOneModule_Endset
+from klrw.opposite_algebra import FreeRankOneModule_Endset
 from cython.cimports.klrw.cython_exts.sparse_csc import CSC_Mat
 from cython.cimports.klrw.cython_exts.sparse_csr import CSR_Mat
 from klrw.cython_exts.sparse_addition import add

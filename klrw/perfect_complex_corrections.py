@@ -15,7 +15,11 @@ from .klrw_algebra import KLRWAlgebra
 from klrw.cython_exts.sparse_csc import CSC_Mat
 from klrw.cython_exts.sparse_csr import CSR_Mat
 
-from .perfect_complex import KLRWPerfectComplex, KLRWProjectiveModule
+from .perfect_complex import (
+    KLRWPerfectComplex,
+    KLRWIrreducibleProjectiveModule,
+)
+from .opposite_algebra import FreeRankOneModule_Endset
 from klrw.cython_exts.perfect_complex_corrections_ext import (
     CorrectionsMatrix,
     system_d_geom_d1_piece,
