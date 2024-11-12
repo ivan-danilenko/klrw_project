@@ -475,7 +475,7 @@ class CombinatorialEBrane:
                 )
             )
             projectives[current_hom_deg].append(
-                KLRWProjectiveModule(
+                KLRWIrreducibleProjectiveModule(
                     state=current_state,
                     equivariant_degree=current_equ_deg * vw_crossing_degree,
                 )
@@ -642,7 +642,7 @@ class CombinatorialEBrane:
                                     * vv_crossing_degree
                                 )
 
-                        new_proj = KLRWProjectiveModule(state, equ_deg)
+                        new_proj = KLRWIrreducibleProjectiveModule(state, equ_deg)
 
                         projs_in_hom_deg[hom_deg_curr, hom_deg_next].append(new_proj)
 

@@ -9,7 +9,6 @@ from klrw.framed_dynkin import (
     NodeInFramedQuiver,
 )
 from klrw.klrw_algebra import KLRWAlgebra
-from klrw.perfect_complex import KLRWHomOfPerfectComplexes
 from klrw.stable_envelopes import stable_envelope
 
 
@@ -202,10 +201,12 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
             # KLRW_one_grading.grading_group.crossing_grading(left_seq[i], left_framing)
             for i in range(len(left_seq))
         )
-        rhom = KLRWHomOfPerfectComplexes(stab_mu[-len(left_seq) + 1, -degree], e_brane)
-        ext = rhom.ext(0)
-        v = ext.basis()[0]
-        e_brane = v.cone()
+        hom_set = stab_mu[-len(left_seq) + 1, -degree].hom_set(e_brane)
+        ext_set = hom_set.homology()
+        ext_basis = ext_set.basis
+        assert len(ext_basis) == 1
+        ext = ext_basis(0)
+        e_brane = ext.cone()
 
     print(e_brane)
     return e_brane

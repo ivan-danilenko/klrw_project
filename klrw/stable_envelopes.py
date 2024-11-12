@@ -4,9 +4,10 @@ from functools import cache
 
 from sage.matrix.constructor import matrix
 from sage.functions.other import Function_factorial
+from sage.rings.integer_ring import ZZ
 
 from .framed_dynkin import NodeInFramedQuiverWithMarks
-from .perfect_complex import KLRWProjectiveModule
+from .perfect_complex import KLRWIrreducibleProjectiveModule
 from .perfect_complex_corrections import PerfectComplex
 
 
@@ -99,7 +100,7 @@ def stable_envelope(
     Braid = KLRW.KLRWBraid
     State = Braid.KLRWstate_set
     State.enable_checks()
-    differentials = {}
+    differential = {}
     projectives = defaultdict(list)
 
     if dots_on_left is not None:
@@ -144,21 +145,21 @@ def stable_envelope(
     state = State._element_constructor_(unmark(marked_state))
     index_in_chain_by_multi_index[multiindex] = 0
     equivariant_degree_by_multi_index[multiindex] = KLRW.grading_group.zero()
-    projectives[0] = [KLRWProjectiveModule(state, KLRW.grading_group.zero())]
+    projectives[0] = [KLRWIrreducibleProjectiveModule(state, KLRW.grading_group.zero())]
 
     for multiindex in multi_index_iterator:
         homological_degree = sum(multiindex)
         index_in_chain = len(projectives[homological_degree])
         index_in_chain_by_multi_index[multiindex] = index_in_chain
         if index_in_chain == 0:
-            differentials[homological_degree] = matrix(
+            differential[homological_degree] = matrix(
                 KLRW,
-                terms_in_homology_degree(sequence_len, homological_degree),
                 terms_in_homology_degree(sequence_len, homological_degree - 1),
+                terms_in_homology_degree(sequence_len, homological_degree),
                 sparse=True,
             )
 
-        diff = differentials[homological_degree]
+        diff = differential[homological_degree]
 
         marked_state = state_by_index(
             multiindex, left_framing, left_sequence, right_sequence, right_framing
@@ -186,17 +187,22 @@ def stable_envelope(
                     check_if_homogeneous=True
                 )
             codomain_index_in_chain = index_in_chain_by_multi_index[new_index]
-            diff[index_in_chain, codomain_index_in_chain] = entry
+            diff[codomain_index_in_chain, index_in_chain] = entry
 
         projectives[homological_degree].append(
-            KLRWProjectiveModule(state, equivariant_degree_by_multi_index[multiindex])
+            KLRWIrreducibleProjectiveModule(
+                state,
+                equivariant_degree_by_multi_index[multiindex],
+            )
         )
 
     stab = PerfectComplex(
-        KLRW,
-        differentials=differentials,
+        ring=KLRW,
+        differential=differential,
         projectives=projectives,
-        degree=-1,
+        differential_degree=ZZ(-1),
+        # parallel_processes=1,
+        verbose=False,
     )
 
     return stab

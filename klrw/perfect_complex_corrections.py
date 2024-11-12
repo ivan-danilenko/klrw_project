@@ -10,6 +10,7 @@ from sage.structure.element import Element
 from sage.matrix.matrix0 import Matrix
 from sage.matrix.constructor import matrix
 from sage.rings.polynomial.polydict import ETuple
+from sage.rings.integer_ring import ZZ
 
 from .klrw_algebra import KLRWAlgebra
 from klrw.cython_exts.sparse_csc import CSC_Mat
@@ -31,37 +32,39 @@ from klrw.cython_exts.perfect_complex_corrections_ext import (
 
 
 def PerfectComplex(
-    klrw_algebra: KLRWAlgebra,
-    differentials: dict[Element, object],
-    projectives: dict[Element, Iterable[KLRWProjectiveModule]] | None = None,
-    degree=-1,
+    ring: KLRWAlgebra,
+    differential: dict[Element, object],
+    projectives: dict[Element, Iterable[KLRWIrreducibleProjectiveModule]] | None = None,
+    differential_degree=ZZ(-1),
     parallel_processes=8,
     max_iterations_for_corrections=10,
     verbose=True,
 ):
     if max_iterations_for_corrections == 0:
         return KLRWPerfectComplex(
-            klrw_algebra,
-            differentials,
-            projectives,
-            check=True,
+            ring=ring,
+            projectives=projectives,
+            differential=differential,
+            differential_degree=differential_degree,
         )
 
     d_csc = corrected_diffirential_csc(
-        klrw_algebra=klrw_algebra,
-        differentials=differentials,
+        klrw_algebra=ring,
+        differential=differential,
         projectives=projectives,
-        degree=degree,
+        degree=differential_degree,
         parallel_processes=parallel_processes,
         max_iterations_for_corrections=max_iterations_for_corrections,
         verbose=verbose,
     )
 
+    # ???frozenset
     diff = {
         hom_deg: matrix(
-            klrw_algebra,
+            FreeRankOneModule_Endset(ring),
+            # !!!
+            len(projectives[hom_deg + differential_degree]),
             len(projectives[hom_deg]),
-            len(projectives[hom_deg + degree]),
             mat.dict(),
             sparse=True,
         )
@@ -69,17 +72,17 @@ def PerfectComplex(
     }
 
     return KLRWPerfectComplex(
-        klrw_algebra,
-        diff,
-        projectives,
-        check=True,
+        ring=ring,
+        projectives=projectives,
+        differential=diff,
+        differential_degree=differential_degree,
     )
 
 
 def corrected_diffirential_csc(
     klrw_algebra: KLRWAlgebra,
-    differentials: dict[Element, object] | MappingProxyType[Element, object],
-    projectives: dict[Element, Iterable[KLRWProjectiveModule]] | None = None,
+    differential: dict[Element, object] | MappingProxyType[Element, object],
+    projectives: dict[Element, Iterable[KLRWIrreducibleProjectiveModule]] | None = None,
     degree=-1,
     parallel_processes=1,
     max_iterations_for_corrections=10,
@@ -87,7 +90,8 @@ def corrected_diffirential_csc(
 ):
     d_csc = {}
     d_csr = {}
-    for hom_deg, mat in differentials.items():
+    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
+    for hom_deg, mat in differential.items():
         if isinstance(mat, CSC_Mat):
             d_csc[hom_deg] = mat
         elif isinstance(mat, CSR_Mat):
@@ -95,30 +99,39 @@ def corrected_diffirential_csc(
         elif isinstance(mat, dict):
             d_csc[hom_deg] = CSC_Mat.from_dict(
                 mat,
-                number_of_rows=len(projectives[hom_deg]),
-                number_of_columns=len(projectives[hom_deg + degree]),
+                # !!!
+                number_of_rows=len(projectives[hom_deg + degree]),
+                number_of_columns=len(projectives[hom_deg]),
             )
         elif isinstance(mat, Matrix):
             d_csc[hom_deg] = CSC_Mat.from_dict(
                 mat.dict(),
-                number_of_rows=len(projectives[hom_deg]),
-                number_of_columns=len(projectives[hom_deg + degree]),
+                # !!!
+                number_of_rows=len(projectives[hom_deg + degree]),
+                number_of_columns=len(projectives[hom_deg]),
             )
         else:
             raise ValueError("Unknown type of differential matrices")
 
+        d_csc[hom_deg].change_ring(end_algebra)
+
         if isinstance(mat, CSR_Mat):
-            d_csr[hom_deg] = mat
+            d_csr[hom_deg] = mat.change_ring(end_algebra)
         else:
             d_csr[hom_deg] = d_csc[hom_deg].to_csr()
 
+    def geometric_part(entry):
+        return end_algebra(entry.value.geometric_part())
+
+    d_geom_csc = {
+        hom_deg: mat.apply_entrywise(geometric_part, inplace=False).eliminate_zeros()
+        for hom_deg, mat in d_csc.items()
+    }
+    d_geom_csr = {hom_deg: mat.to_csr() for hom_deg, mat in d_geom_csc.items()}
+
     # MappingProxyType to prevent accident modification
-    d_geom_csc = MappingProxyType(
-        {hom_deg: mat.geometric_part() for hom_deg, mat in d_csc.items()}
-    )
-    d_geom_csr = MappingProxyType(
-        {hom_deg: mat.to_csr() for hom_deg, mat in d_geom_csc.items()}
-    )
+    d_geom_csc = MappingProxyType(d_geom_csc)
+    d_geom_csr = MappingProxyType(d_geom_csr)
 
     dot_algebra = klrw_algebra.base()
     grading_group = klrw_algebra.grading_group
@@ -132,6 +145,8 @@ def corrected_diffirential_csc(
         if verbose:
             print("Differential closes!")
         return d_csc
+
+    print(">>>Correcting the differential!<<<")
 
     assert exp != ETuple(
         (0,) * len(exp)
@@ -186,6 +201,7 @@ def corrected_diffirential_csc(
             corrections,
             x,
             projectives,
+            degree,
         )
         d_csr = {key: mat.to_csr() for key, mat in d_csc.items()}
 
@@ -219,11 +235,12 @@ def possible_corrections(
 
     # terms of differential exist only between adjacent coh degrees
     possible_corrections_hom_degrees = frozenset(
-        hom_deg for hom_deg in projectives.keys() if hom_deg + degree in projectives
+        hom_deg for hom_deg in projectives if hom_deg + degree in projectives
     )
     tasks = [
         (
             klrw_algebra,
+            # !!!
             projectives[hom_deg],
             projectives[hom_deg + degree],
             relevant_coeff_degree,
@@ -306,12 +323,16 @@ def possible_corrections_in_hom_degree(
     d1_csc_corrections_exp_list = []
     d1_csc_entry_ptrs_list = [0]
     d1_csc_indices_list = []
-    d1_csc_indptrs = np.zeros(len(projectives_codomain) + 1, dtype=np.dtype("intc"))
+    # !!!
+    d1_csc_indptrs = np.zeros(len(projectives_domain) + 1, dtype=np.dtype("intc"))
     entry_index = 0
     variable_index = 0
-    for right_index, right_projective in enumerate(projectives_codomain):
-        for left_index, left_projective in enumerate(projectives_domain):
-            if (left_index, right_index) in ignore:
+    # !!!
+    # left_index is column index
+    # right_index is row index
+    for left_index, left_projective in enumerate(projectives_domain):
+        for right_index, right_projective in enumerate(projectives_codomain):
+            if (right_index, left_index) in ignore:
                 continue
 
             equ_degree = (
@@ -332,7 +353,7 @@ def possible_corrections_in_hom_degree(
                 # d1_csc_corrections[variable_index] = elem
                 d1_csc_corrections_braid_list.append(braid)
                 # exp_dots_scaled = exp.eadd_scaled(
-                #     dot_multiplier_exp, klrw_algebra.base().exp_number_of_dots(exp)
+                #     dot_multiplier_exp, ring.base().exp_number_of_dots(exp)
                 # )
                 # d1_csc_corrections_exp_list.append(exp_dots_scaled)
                 d1_csc_corrections_exp_list.append(exp)
@@ -340,10 +361,12 @@ def possible_corrections_in_hom_degree(
             # d1_csc_entry_ptrs[entry_index + 1] = variable_index
             d1_csc_entry_ptrs_list.append(variable_index)
             # d1_csc_indices[entry_index + 1] = left_index
-            d1_csc_indices_list.append(left_index)
+            # !!!
+            d1_csc_indices_list.append(right_index)
             entry_index += 1
 
-        d1_csc_indptrs[right_index + 1] = entry_index
+        # !!!
+        d1_csc_indptrs[left_index + 1] = entry_index
 
     d1_csc_corrections_braid = np.array(
         d1_csc_corrections_braid_list, dtype=np.dtype("O")
@@ -363,7 +386,8 @@ def possible_corrections_in_hom_degree(
         d1_csc_entry_ptrs,
         d1_csc_indices,
         d1_csc_indptrs,
-        len(projectives_domain),
+        # !!!
+        len(projectives_codomain),
     )
 
 
@@ -397,29 +421,32 @@ def system_on_corrections_lhs(
                     hom_deg, hom_deg + 2 * degree
                 )
             )
+        # !!!
         hom_deg_index = hom_deg_to_index[hom_deg]
         hom_deg_next_index = hom_deg_to_index[hom_deg + degree]
         basis_appearing_in_product[hom_deg] = {}
         basis_dict = basis_appearing_in_product[hom_deg]
+        # !!!
         if hom_deg + degree in corrections and hom_deg in d_geom_csc:
-            matrix_blocks[hom_deg_index][hom_deg_next_index] = system_d_geom_d1_piece(
+            matrix_blocks[hom_deg_index][hom_deg_index] = system_d_geom_d1_piece(
                 klrw_algebra=klrw_algebra,
-                d_geom_csc=d_geom_csc[hom_deg],
-                d1_csc=corrections[hom_deg + degree],
-                relevant_coeff_degree=relevant_coeff_degree,
-                basis_appearing_in_product=basis_dict,
-            )
-        if hom_deg in corrections and hom_deg + degree in d_geom_csc:
-            matrix_blocks[hom_deg_index][hom_deg_index] = system_d1_d_geom_piece(
-                klrw_algebra=klrw_algebra,
-                d_geom_csr=d_geom_csr[hom_deg + degree],
+                # !!!
+                d_geom_csc=d_geom_csc[hom_deg + degree],
                 d1_csc=corrections[hom_deg],
                 relevant_coeff_degree=relevant_coeff_degree,
                 basis_appearing_in_product=basis_dict,
             )
-            if matrix_blocks[hom_deg_index][hom_deg_next_index] is not None:
-                A = matrix_blocks[hom_deg_index][hom_deg_next_index]
-                B = matrix_blocks[hom_deg_index][hom_deg_index]
+        if hom_deg in corrections and hom_deg + degree in d_geom_csc:
+            matrix_blocks[hom_deg_index][hom_deg_next_index] = system_d1_d_geom_piece(
+                klrw_algebra=klrw_algebra,
+                d_geom_csr=d_geom_csr[hom_deg],
+                d1_csc=corrections[hom_deg + degree],
+                relevant_coeff_degree=relevant_coeff_degree,
+                basis_appearing_in_product=basis_dict,
+            )
+            if matrix_blocks[hom_deg_index][hom_deg_index] is not None:
+                A = matrix_blocks[hom_deg_index][hom_deg_index]
+                B = matrix_blocks[hom_deg_index][hom_deg_next_index]
                 A.resize(B.shape[0], A.shape[1])
 
     A = block_array(matrix_blocks, format="csr")
@@ -459,13 +486,15 @@ def system_on_corrections_rhs(
             )
         hom_deg_index = hom_deg_to_index[hom_deg]
         basis_dict = basis_appearing_in_product[hom_deg]
+        # !!!
         if hom_deg + degree in d_csr and hom_deg in d_csc:
             augment_blocks[hom_deg_index] = [
                 system_d_squared_piece(
                     dot_algebra,
                     grading_group,
-                    d_csr=d_csr[hom_deg],
-                    d_csc=d_csc[hom_deg + degree],
+                    # !!!
+                    d_csr=d_csr[hom_deg + degree],
+                    d_csc=d_csc[hom_deg],
                     relevant_coeff_degree=relevant_coeff_degree,
                     basis_appearing_in_product=basis_dict,
                 )
@@ -516,13 +545,14 @@ def min_exp_in_square(
     degree,
 ) -> ETuple | None:
     min_exp: ETuple | None = None
-    for hom_deg in sorted(d_csr.keys()):
-        if hom_deg + degree in d_csc:
-            exp = min_exp_in_product(d_csr[hom_deg], d_csc[hom_deg + degree])
-            if exp is not None:
-                if min_exp is None:
-                    min_exp = exp
-                elif exp < min_exp:
-                    min_exp = exp
+    square_support = (hom_deg for hom_deg in d_csr.keys() if hom_deg + degree in d_csc)
+    for hom_deg in square_support:
+        # !!!
+        exp = min_exp_in_product(d_csr[hom_deg + degree], d_csc[hom_deg])
+        if exp is not None:
+            if min_exp is None:
+                min_exp = exp
+            elif exp < min_exp:
+                min_exp = exp
 
     return min_exp

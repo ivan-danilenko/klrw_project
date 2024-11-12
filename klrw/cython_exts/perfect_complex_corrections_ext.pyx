@@ -143,6 +143,7 @@ def system_d_geom_d1_piece(
     relevant_coeff_degree: QuiverGradingGroupElement,
     basis_appearing_in_product: dict,
 ):
+    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
     dot_algebra = klrw_algebra.base()
     grading_group = klrw_algebra.grading_group
     system_piece = dok_matrix(
@@ -155,6 +156,7 @@ def system_d_geom_d1_piece(
     k: cython.int
     indptr0: cython.int
     indptr1: cython.int
+    variable_number: cython.int
 
     # basis in product is given by a quadruple
     # (i, j, braid, exp), where
@@ -180,12 +182,12 @@ def system_d_geom_d1_piece(
                 correction = klrw_algebra.term(
                     correction_braid, dot_algebra.monomial(*correction_exp)
                 )
+                correction = end_algebra(correction)
                 for indptr0 in range(d_geom_csc.indptrs[k], d_geom_csc.indptrs[k + 1]):
                     i = d_geom_csc.indices[indptr0]
                     d_geom_entry = d_geom_csc.data[indptr0]
-                    # caution: order of multiplication!
-                    # this is in accordance with conventions in perfect_complex
-                    for braid, poly in d_geom_entry * correction:
+                    product = d_geom_entry * correction
+                    for braid, poly in product.value:
                         for exp, scalar in poly.iterator_exp_coeff():
                             if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
                                 key = (i, j, braid.word(), exp)
@@ -214,6 +216,7 @@ def system_d1_d_geom_piece(
     basis_appearing_in_product: dict,
 ):
     dot_algebra = klrw_algebra.base()
+    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
     grading_group = klrw_algebra.grading_group
     system_piece = dok_matrix(
         (len(basis_appearing_in_product), d1_csc.number_of_corrections()),
@@ -225,6 +228,8 @@ def system_d1_d_geom_piece(
     k: cython.int
     indptr0: cython.int
     indptr1: cython.int
+    variable_number: cython.int
+
 
     # basis in product is given by a quadruple
     # (i, j, braid, exp), where
@@ -250,12 +255,12 @@ def system_d1_d_geom_piece(
                 correction = klrw_algebra.term(
                     correction_braid, dot_algebra.monomial(*correction_exp)
                 )
+                correction = end_algebra(correction)
                 for indptr0 in range(d_geom_csr.indptrs[k], d_geom_csr.indptrs[k + 1]):
                     j = d_geom_csr.indices[indptr0]
                     d_geom_entry = d_geom_csr.data[indptr0]
-                    # caution: order of multiplication!
-                    # this is in accordance with conventions in perfect_complex
-                    for braid, poly in correction * d_geom_entry:
+                    product = correction * d_geom_entry
+                    for braid, poly in product.value:
                         for exp, scalar in poly.iterator_exp_coeff():
                             if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
                                 key = (i, j, braid.word(), exp)
@@ -326,8 +331,8 @@ def system_d_squared_piece(
                     indptr2 += 1
 
             if entry_can_be_non_zero:
-                if not dot_product.is_zero():
-                    for braid, poly in dot_product:
+                if dot_product:
+                    for braid, poly in dot_product.value:
                         for exp, scalar in poly.iterator_exp_coeff():
                             if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
                                 key = (i, j, braid.word(), exp)
@@ -353,6 +358,7 @@ def correction_piece_csc(
 ):
     assert x_piece_csc.shape[1] == 1, "x must be a column"
 
+    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
     dot_algebra = klrw_algebra.base()
 
     corretion_csc_indptrs: cython.int[::1] = np.zeros(
@@ -386,7 +392,7 @@ def correction_piece_csc(
             first_var_number_in_next_entry = entry_ptrs_in_this_column[next_entry_index]
             # the zero index in the slice corresponds
             # to d1_piece_csc.indptrs[j] in the original array
-            entry_index = next_entry_index + d1_piece_csc.indptrs[j] - 1
+            entry_index: cython.int = next_entry_index + d1_piece_csc.indptrs[j] - 1
             # sum over all variables in the same matrix element
             entry_element = klrw_algebra.zero()
             while var_number < first_var_number_in_next_entry:
@@ -406,15 +412,16 @@ def correction_piece_csc(
                 entry_index
             ]
             elem = entry_element
-            corretion_csc_data[non_zero_entries_so_far] = elem
             assert (
                 elem.right_state(check_if_all_have_same_right_state=True)
-                == projectives_right[j].state
+                == projectives_right[d1_piece_csc.indices[entry_index]].state
             )
             assert (
                 elem.left_state(check_if_all_have_same_left_state=True)
-                == projectives_left[d1_piece_csc.indices[entry_index]].state
+                == projectives_left[j].state
             )
+
+            corretion_csc_data[non_zero_entries_so_far] = end_algebra(elem)
 
             non_zero_entries_so_far += 1
 
@@ -439,6 +446,7 @@ def update_differential(
     ),
     x_csc: csc_matrix,
     projectives,
+    degree,
 ):
     corrected_differential = {}
     index_begin_in_hom_deg = 0
@@ -456,7 +464,7 @@ def update_differential(
                 d1_csc[hom_deg],
                 x_csc_piece,
                 projectives[hom_deg],
-                projectives[hom_deg - 1],
+                projectives[hom_deg + degree],
             )
             corrected_differential[hom_deg] = add(d_geom_csc[hom_deg], corr_piece_csc)
 
@@ -505,7 +513,7 @@ def min_exp_in_product(left: CSR_Mat, right: CSC_Mat) -> ETuple | None:
                     indptr2 += 1
 
             if entry_can_be_non_zero:
-                for _, poly in dot_product:
+                for _, poly in dot_product.value:
                     for exp in poly.exponents():
                         if min_exp is None:
                             min_exp = exp
