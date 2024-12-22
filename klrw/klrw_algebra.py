@@ -26,6 +26,7 @@ from .gradings import (
     QuiverGradingGroup,
 )
 from .bimodule_monoid import LeftFreeBimoduleMonoid
+from .opposite_algebra import OppositeAlgebra
 
 
 class KLRWElement(IndexedFreeModuleElement):
@@ -459,6 +460,10 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
                     return RightDotAction(
                         other, self, is_left=not self_on_left, op=operator.mul
                     )
+        #if op == operator.matmul:
+        #    if self_on_left:
+        #        if isinstance(other, KLRWDotsAlgebra):
+        #            return TensorMultiplication(left_parent=self, right_parent=other)
         return super()._get_action_(other, op, self_on_left)
 
     def braid_set(self):
@@ -776,6 +781,34 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         if coeff is not None:
             result = coeff * result
         return result
+
+    @lazy_attribute
+    def opposite(self):
+        return OppositeAlgebra(self)
+    
+    def _replace_(self, **replacements):
+        """
+        Make a similar parent with several adjustments.
+
+        Compare to _replace of named tuples.
+        """
+        from sage.structure.unique_representation import unreduce
+
+        cls, args, kwrds = self._reduction
+        new_kwrds = kwrds | replacements
+        return unreduce(cls, args, new_kwrds)
+
+    #@cached_method
+    #@staticmethod
+    #def tensor_product(terms: Iterable):
+    #    return TensorProductOfKLRWAlgebras(terms)
+    #
+    #def __matmul__(self, other):
+    #    return self.tensor_product((self, other))
+    #
+    #@lazy_attribute
+    #def _self_action(self):
+    #    return TensorMultiplication(left_parent=self, right_parent=self)
 
 
 ###############################################################################
