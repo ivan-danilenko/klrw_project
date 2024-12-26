@@ -28,7 +28,6 @@ from .gradings import (
     HomologicalGradingGroupElement,
     ExtendedQuiverGradingGroupElement,
 )
-from .opposite_algebra import FreeRankOneModule_Endset
 
 
 class GradedFreeModule(UniqueRepresentation):
@@ -656,7 +655,7 @@ class GradedFreeModule_Homset(UniqueRepresentation, Module):
 
     @lazy_attribute
     def end_algebra(self):
-        return FreeRankOneModule_Endset(self.ring)
+        return self.ring.opposite
 
     def _element_constructor_(
         self,

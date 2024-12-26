@@ -20,7 +20,6 @@ from klrw.gradings import (
     QuiverGradingGroup,
 )
 from klrw.dot_algebra import KLRWUpstairsDotsAlgebra
-from klrw.opposite_algebra import FreeRankOneModule_Endset
 from cython.cimports.klrw.cython_exts.sparse_csc import CSC_Mat
 from cython.cimports.klrw.cython_exts.sparse_csr import CSR_Mat
 from klrw.cython_exts.sparse_addition import add
@@ -143,7 +142,7 @@ def system_d_geom_d1_piece(
     relevant_coeff_degree: QuiverGradingGroupElement,
     basis_appearing_in_product: dict,
 ):
-    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
+    end_algebra = klrw_algebra.opposite
     dot_algebra = klrw_algebra.base()
     grading_group = klrw_algebra.grading_group
     system_piece = dok_matrix(
@@ -216,7 +215,7 @@ def system_d1_d_geom_piece(
     basis_appearing_in_product: dict,
 ):
     dot_algebra = klrw_algebra.base()
-    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
+    end_algebra = klrw_algebra.opposite
     grading_group = klrw_algebra.grading_group
     system_piece = dok_matrix(
         (len(basis_appearing_in_product), d1_csc.number_of_corrections()),
@@ -358,7 +357,7 @@ def correction_piece_csc(
 ):
     assert x_piece_csc.shape[1] == 1, "x must be a column"
 
-    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
+    end_algebra = klrw_algebra.opposite
     dot_algebra = klrw_algebra.base()
 
     corretion_csc_indptrs: cython.int[::1] = np.zeros(

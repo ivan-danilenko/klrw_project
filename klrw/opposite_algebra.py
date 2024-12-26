@@ -2,8 +2,6 @@ from sage.structure.element import ModuleElement, Element
 from sage.modules.module import Module
 from sage.structure.unique_representation import UniqueRepresentation
 from sage.misc.lazy_attribute import lazy_attribute
-from sage.categories.algebras import Algebras
-from sage.categories.homset import Hom
 
 
 class OppositeAlgebraElement(ModuleElement):
@@ -76,9 +74,9 @@ class OppositeAlgebraElement(ModuleElement):
         return hash(self.value)
 
 
-class FreeRankOneModule_Endset(UniqueRepresentation, Module):
+class OppositeAlgebra(UniqueRepresentation, Module):
     """
-    Endomorphim algebra of a free rank one module.
+    Endomorphism algebra of a free rank one module.
 
     The algebra is assumed to be unital, but not
     necessary commutative.
@@ -115,7 +113,11 @@ class FreeRankOneModule_Endset(UniqueRepresentation, Module):
     def __init__(self, algebra):
         self.algebra = algebra
         base = algebra.base()
+
+        from sage.categories.algebras import Algebras
+
         category = Algebras(base) & algebra.category()
+
         Module.__init__(self, base=base, category=category)
 
     def _element_constructor_(self, *args, **kwargs):
@@ -123,9 +125,10 @@ class FreeRankOneModule_Endset(UniqueRepresentation, Module):
         return self.isomorphism_from_algebra(x)
 
     def _coerce_map_from_(self, other):
-        if isinstance(other, FreeRankOneModule_Endset):
+        if isinstance(other, OppositeAlgebra):
             if self.algebra.has_coerce_map_from(other.algebra):
                 from sage.categories.morphism import SetMorphism
+                from sage.categories.homset import Hom
 
                 morphism = SetMorphism(
                     Hom(self.algebra, self),
@@ -139,6 +142,7 @@ class FreeRankOneModule_Endset(UniqueRepresentation, Module):
     def _convert_map_from_(self, algebra):
         if self.algebra.has_coerce_map_from(algebra):
             from sage.categories.morphism import SetMorphism
+            from sage.categories.homset import Hom
 
             morphism = SetMorphism(
                 Hom(self.algebra, self),
@@ -156,6 +160,7 @@ class FreeRankOneModule_Endset(UniqueRepresentation, Module):
         This is an isomorphism of modules over the center.
         """
         from sage.categories.morphism import SetMorphism
+        from sage.categories.homset import Hom
 
         isomorphism = SetMorphism(
             Hom(self, self.algebra),
@@ -181,7 +186,7 @@ class FreeRankOneModule_Endset(UniqueRepresentation, Module):
         return self(self.algebra.zero())
 
     def _repr_(self):
-        result = "Endomorphim algebra of a free rank one module over "
+        result = "Endomorphism algebra of a free rank one module over "
         result += repr(self.algebra)
 
         return result

@@ -20,7 +20,6 @@ from .perfect_complex import (
     KLRWPerfectComplex,
     KLRWIrreducibleProjectiveModule,
 )
-from .opposite_algebra import FreeRankOneModule_Endset
 from klrw.cython_exts.perfect_complex_corrections_ext import (
     CorrectionsMatrix,
     system_d_geom_d1_piece,
@@ -58,11 +57,9 @@ def PerfectComplex(
         verbose=verbose,
     )
 
-    # ???frozenset
     diff = {
         hom_deg: matrix(
-            FreeRankOneModule_Endset(ring),
-            # !!!
+            ring.opposite,
             len(projectives[hom_deg + differential_degree]),
             len(projectives[hom_deg]),
             mat.dict(),
@@ -90,7 +87,7 @@ def corrected_diffirential_csc(
 ):
     d_csc = {}
     d_csr = {}
-    end_algebra = FreeRankOneModule_Endset(klrw_algebra)
+    end_algebra = klrw_algebra.opposite
     for hom_deg, mat in differential.items():
         if isinstance(mat, CSC_Mat):
             d_csc[hom_deg] = mat
