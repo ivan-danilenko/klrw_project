@@ -1,5 +1,4 @@
-from typing import Iterable, Any
-from collections import defaultdict
+from typing import Iterable, Any, Callable
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
@@ -20,9 +19,10 @@ from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute, lazy_class_attribute
 from sage.categories.action import Action
 from sage.modules.module import Module
-from sage.data_structures.blas_dict import add, negate, axpy
+from sage.data_structures.blas_dict import add, negate
 from sage.structure.unique_representation import UniqueRepresentation
 from sage.structure.element import get_coercion_model
+
 
 from .gradings import (
     HomologicalGradingGroupElement,
@@ -42,6 +42,12 @@ class GradedFreeModule(UniqueRepresentation):
     @lazy_class_attribute
     def HomsetClass(cls):
         return GradedFreeModule_Homset
+
+    @lazy_class_attribute
+    def TensorClass(cls):
+        from klrw.tensor_product_of_complexes import TensorProductOfGradedFreeModules
+
+        return TensorProductOfGradedFreeModules
 
     @staticmethod
     def __classcall__(
@@ -88,7 +94,7 @@ class GradedFreeModule(UniqueRepresentation):
         return self._component_ranks.keys()
 
     def component_rank(self, grading):
-        grading = self._grading_group(grading)
+        grading = self.hom_grading_group()(grading)
         if grading in self._component_ranks:
             return self._component_ranks[grading]
         else:
@@ -121,23 +127,46 @@ class GradedFreeModule(UniqueRepresentation):
         from pprint import pformat
 
         result = "A graded free module with dimensions\n"
-        result += pformat(dict(self._component_ranks))
+        result += pformat(dict(self.component_rank_iter()))
 
         return result
 
-    def is_instance_of_sameclass_or_shiftedclass(self, other):
-        return isinstance(other, self.__class__ | self.ShiftedClass)
+    # def is_instance_of_sameclass_or_shiftedclass(self, other):
+    #     return isinstance(other, self.__class__ | self.ShiftedClass)
 
     def hom_set(self, other, **kwargs):
-        if self.is_instance_of_sameclass_or_shiftedclass(other):
-            return self.HomsetClass(domain=self, codomain=other, **kwargs)
+        if issubclass(self.HomsetClass, other.HomsetClass):
+            HomsetClass = other.HomsetClass
+        elif issubclass(other.HomsetClass, self.HomsetClass):
+            HomsetClass = self.HomsetClass
         else:
             raise TypeError(
                 "Can't define homomorphisms from\n{}\nto\n{}\n".format(self, other)
             )
+        return HomsetClass(domain=self, codomain=other, **kwargs)
 
     def hom(self, other, morphism_data, **kwargs):
         return self.hom_set(other)._element_constructor_(morphism_data, **kwargs)
+
+    def subdivisions(self, grading, position=None):
+        """
+        Subdivisions in hom matrices.
+
+        Normally we don't have any subdivisions.
+        """
+        grading = self.hom_grading_group()(grading)
+        if grading in self.gradings():
+            component_rank = self.component_rank(grading)
+        else:
+            component_rank = 0
+        if position is None:
+            return [0, component_rank]
+        elif position == 0:
+            return 0
+        elif position == 1:
+            return component_rank
+        else:
+            raise ValueError()
 
     def _replace_(self, **replacements):
         """
@@ -155,6 +184,22 @@ class GradedFreeModule(UniqueRepresentation):
         return self._replace_(
             ring=other,
         )
+
+    @classmethod
+    def tensor_product(cls, *modules: Iterable, totalize=True):
+        originals, shifts = zip(
+            *(ShiftedObject.original_and_shift(module) for module in modules)
+        )
+        tensor_product = cls.TensorClass(*originals)
+        prod_shift_group = tensor_product.shift_group()
+        total_shift = prod_shift_group.cartesian_product_of_elements(*shifts)
+        if totalize:
+            tensor_product = tensor_product.totalization()
+            total_shift = prod_shift_group.totalization_morphism(total_shift)
+        return tensor_product[total_shift]
+
+    def __matmul__(self, other):
+        return self.tensor_product(self, other, totalize=True)
 
 
 # Do we need UniqueRepresentation?
@@ -212,25 +257,26 @@ class ShiftedObject:
 
         Return `None` objects are not immediately shifts of each other.
         """
-        one_is_shifted = isinstance(one, ShiftedObject)
-        other_is_shifted = isinstance(other, ShiftedObject)
-        if one_is_shifted:
-            one_object = one.original
-            one_shift = one.shift
-        else:
-            one_object = one
-            one_shift = 0
-        if other_is_shifted:
-            other_object = other.original
-            other_shift = other.shift
-        else:
-            other_object = other
-            other_shift = 0
+        one_original, one_shift = ShiftedObject.original_and_shift(one)
+        other_original, other_shift = ShiftedObject.original_and_shift(other)
 
-        if one_object == other_object:
+        if one_original == other_original:
             return other_shift - one_shift
 
         return None
+
+    @staticmethod
+    def original_and_shift(obj):
+        """
+        Return a pair `(original, shift)` for `obj` object.
+        If the object is not shifted (i.e. not an instance
+        of `ShiftedObject`), then `original=obj` and
+        `shift=0` (zero in of `obj.shift_group()`).
+        """
+        if isinstance(obj, ShiftedObject):
+            return obj.original, obj.shift
+        else:
+            return obj, obj.shift_group().zero()
 
 
 class ShiftedGradedFreeModule(ShiftedObject):
@@ -242,18 +288,27 @@ class ShiftedGradedFreeModule(ShiftedObject):
     def OriginalClass(cls):
         return GradedFreeModule
 
+    @lazy_class_attribute
+    def HomsetClass(cls):
+        return cls.OriginalClass.HomsetClass
+
     def __post_init__(self):
-        assert isinstance(self.original, GradedFreeModule)
+        assert isinstance(self.original, self.OriginalClass)
 
     def gradings(self):
-        return frozenset(grading - self.shift for grading in self.original.gradings())
+        return frozenset(
+            grading - self.hom_shift() for grading in self.original.gradings()
+        )
 
     def component_rank(self, grading):
         return self.original.component_rank(grading + self.hom_shift())
 
     def component_rank_iter(self):
         for grading, dim in self.original.component_rank_iter():
-            yield (grading - self.shift, dim)
+            yield (grading - self.hom_shift(), dim)
+
+    def subdivisions(self, grading, position=None):
+        return self.original.subdivisions(grading + self.hom_shift(), position)
 
     def hom_grading_group(self):
         return self.original.hom_grading_group()
@@ -271,8 +326,8 @@ class ShiftedGradedFreeModule(ShiftedObject):
         extra_shift = self.shift_group()(key)
         return self.shift_object(extra_shift)
 
-    def is_instance_of_sameclass_or_shiftedclass(self, other):
-        return self.original.is_instance_of_sameclass_or_shiftedclass(other)
+    # def is_instance_of_sameclass_or_shiftedclass(self, other):
+    #     return self.original.is_instance_of_sameclass_or_shiftedclass(other)
 
     def hom_set(self, other, use_shift_isomorphism=False):
         if use_shift_isomorphism:
@@ -280,8 +335,9 @@ class ShiftedGradedFreeModule(ShiftedObject):
         else:
             return self.original.HomsetClass(self, other)
 
-    def hom(self, other, morphism_data):
-        raise NotImplementedError()
+    def hom(self, other, morphism_data, use_shift_isomorphism=False, **kwargs):
+        hom_set = self.hom_set(other, use_shift_isomorphism=use_shift_isomorphism)
+        return hom_set._element_constructor_(morphism_data, **kwargs)
 
     def base_change(self, other: Ring):
         new_original = self.original.base_change(other)
@@ -291,6 +347,10 @@ class ShiftedGradedFreeModule(ShiftedObject):
             new_original,
             new_shift,
         )
+
+    @classmethod
+    def tensor_product(cls, *modules: Iterable, totalize=True):
+        return cls.OriginalClass.tensor_product(*modules, totalize=totalize)
 
 
 class Graded_Homomorphism(ModuleElement):
@@ -347,15 +407,12 @@ class Graded_Homomorphism(ModuleElement):
         )
 
     def _sub_(self, other):
-        return self.parent()._element_constructor_(
-            axpy(
-                -1,
-                other._map_components,
-                self._map_components,
-            ),
-            check=False,
-            copy=False,
-        )
+        return self + other._neg_()
+
+    def _pow_int(self, other):
+        from sage.misc.misc_c import prod
+
+        return prod([self] * other)
 
     def __iter__(self):
         yield from self._map_components.items()
@@ -370,7 +427,14 @@ class Graded_Homomorphism(ModuleElement):
                 return self._map_components[grading]
             else:
                 return self._negate_component_(self._map_components[grading])
-        return None
+        # otherwise return a zero matrix
+        return matrix(
+            self.parent().end_algebra,
+            ncols=self.parent().domain.component_rank(grading),
+            nrows=self.parent().codomain.component_rank(grading),
+            sparse=True,
+            immutable=True,
+        )
 
     def __getitem__(self, shift):
         hom_shift = self.parent().hom_grading_group()(shift)
@@ -422,6 +486,20 @@ class Graded_Homomorphism(ModuleElement):
         for mat in self._map_components.values():
             mat.set_immutable()
 
+    def _richcmp_(self, other, op: int):
+        from sage.structure.richcmp import rich_to_bool
+
+        if self._map_components == other._map_components:
+            return rich_to_bool(op, 0)
+
+        from sage.structure.richcmp import op_NE, op_EQ
+
+        # Not equal
+        if op == op_EQ:
+            return False
+        if op == op_NE:
+            return True
+
     @staticmethod
     def _negate_component_(mat):
         """
@@ -430,6 +508,12 @@ class Graded_Homomorphism(ModuleElement):
         In subclasses there is a faster way to do it.
         """
         return -mat
+
+    def __reduce__(self):
+        """
+        For pickling.
+        """
+        return (self.__class__, (self.parent(), self._map_components))
 
 
 class GradedFreeModule_Homomorphism(Graded_Homomorphism):
@@ -441,6 +525,15 @@ class GradedFreeModule_Homomorphism(Graded_Homomorphism):
         this method is called instead of action.
         """
         return self.parent()._self_action.act(self, other)
+
+    def _matmul_(self, other):
+        """
+        Used *only* in the special case when both self and other
+        have the same parent.
+        Because of a technical details in the coercion model
+        this method is called instead of action.
+        """
+        return self.parent()._self_tensor_action.act(self, other)
 
     def _rmul_(self, left: Element):
         """
@@ -593,6 +686,31 @@ class HomHomMultiplication(Action):
         )
 
 
+class HomHomTensorMultiplication(Action):
+    """
+    Gives tensor multiplication of two homs of graded projectives.
+
+    The solution is similar to matrix multiplication is Sage.
+    [see MatrixMatrixAction in MatrixSpace]
+    Coercion model in Sage requires both elements in
+    the usual product to have the same parent, but in
+    actions this is no longer the case. So we use the class Action.
+    """
+
+    def __init__(
+        self,
+        left_parent: GradedFreeModule,
+        right_parent: GradedFreeModule,
+    ):
+        Action.__init__(
+            self, G=left_parent, S=right_parent, is_left=True, op=operator.matmul
+        )
+
+    def _act_(self, left, right):
+        from klrw.tensor_product_of_complexes import HomomorphismTensorProduct
+        return HomomorphismTensorProduct(left, right, totalize=True)
+
+
 class GradedFreeModule_Homset(UniqueRepresentation, Module):
     """
     Homset for graded free modules over algebras.
@@ -632,7 +750,7 @@ class GradedFreeModule_Homset(UniqueRepresentation, Module):
         self,
         domain: GradedFreeModule | ShiftedGradedFreeModule,
         codomain: GradedFreeModule | ShiftedGradedFreeModule,
-        base,
+        base=None,
     ):
         ring = get_coercion_model().common_parent(domain.ring(), codomain.ring())
         assert domain.hom_grading_group() is codomain.hom_grading_group()
@@ -761,11 +879,21 @@ class GradedFreeModule_Homset(UniqueRepresentation, Module):
             if self_on_left:
                 if isinstance(other, GradedFreeModule_Homset):
                     return HomHomMultiplication(left_parent=self, right_parent=other)
+        if op == operator.matmul:
+            if self_on_left:
+                if isinstance(other, GradedFreeModule_Homset):
+                    return HomHomTensorMultiplication(
+                        left_parent=self, right_parent=other
+                    )
         return super()._get_action_(other, op, self_on_left)
 
     @lazy_attribute
     def _self_action(self):
         return HomHomMultiplication(left_parent=self, right_parent=self)
+
+    @lazy_attribute
+    def _self_tensor_action(self):
+        return HomHomTensorMultiplication(left_parent=self, right_parent=self)
 
     @classmethod
     def _class_without_category_(cls):
@@ -832,8 +960,8 @@ class GradedFreeModule_Homset(UniqueRepresentation, Module):
         Return the image of the morphism under the differential.
 
         One can define it as
-        `self.codomain.differential * morphism
-        - morphism * self.domain.differential`;
+        `- self.codomain.differential * morphism
+        + morphism * self.domain.differential`;
         In our applications the image is often zero.
         Then it's faster to get the zero doing the computation
         grading-by grading, without storing intermediate result
@@ -875,13 +1003,16 @@ class GradedFreeModule_Homset(UniqueRepresentation, Module):
         for grading in first_term_supp | second_term_supp:
             if grading in first_term_supp:
                 if grading in second_term_supp:
-                    value = codomain_diff(grading) * morphism(
-                        grading
-                    ) - shifted_morphism(grading) * domain_diff(grading)
+                    value = codomain_diff(grading) * morphism(grading)
+                    # take negative, avoiding using 1 in algebras like KLRW algebra.
+                    value = morphism._negate_component_(value)
+                    value += shifted_morphism(grading) * domain_diff(grading)
                 else:
                     value = codomain_diff(grading) * morphism(grading)
+                    # take negative, avoiding using 1 in algebras like KLRW algebra.
+                    value = morphism._negate_component_(value)
             else:
-                value = -shifted_morphism(grading) * domain_diff(grading)
+                value = shifted_morphism(grading) * domain_diff(grading)
             if value:
                 result_dict[grading] = value
 
@@ -949,15 +1080,21 @@ class Differential(GradedFreeModule_Homomorphism):
         ),
         degree,
         grading_group=None,
+        sign=None,
         coerce_coefficients=True,
         check=True,
     ):
         if grading_group is None:
             self._shift_grading_group = underlying_module.shift_group()
+        else:
+            self._shift_grading_group = grading_group
         if isinstance(degree, int) or isinstance(degree, Integer):
             degree = underlying_module.hom_grading_group()(degree)
         self._degree = self._shift_grading_group(degree)
-        assert self._degree.sign() == -1
+        if sign is None:
+            sign = self._shift_grading_group.default_sign_morphism
+        self._sign = sign
+        assert self._sign(self._degree) == -1
 
         # We want to make differential into a morphism.
         # The correct homset is the one that does all the checks
@@ -966,7 +1103,7 @@ class Differential(GradedFreeModule_Homomorphism):
         # squares to zero, we can't check it before we
         # define self.parent().differential that uses this __init__]
         codomain = underlying_module[self._degree]
-        graded_hom_set = underlying_module.hom_set(codomain, check=False)
+        graded_hom_set = underlying_module.hom_set(codomain)
         graded_map = graded_hom_set._element_constructor_(
             differential_data,
             check=check,
@@ -980,10 +1117,27 @@ class Differential(GradedFreeModule_Homomorphism):
 
         # now we check the square
         if check:
-            diff_square = self * self
+            # to avoid signs from shifts in the computation of d*d, we consider
+            # d as a graded morphism: those shift without signs.
+            diff_square = graded_map * graded_map
             assert diff_square.is_zero(), "Differential has non-zero square,\n" + repr(
                 diff_square
             )
+
+    def __reduce__(self):
+        """
+        For pickling.
+        """
+        return (
+            self.__class__,
+            (
+                self.domain(),
+                self._map_components,
+                self.degree(),
+                self.degree().parent(),
+                self._sign,
+            ),
+        )
 
     def degree(self):
         return self._degree
@@ -1008,6 +1162,28 @@ class Differential(GradedFreeModule_Homomorphism):
         else:
             return self
 
+    @lazy_attribute
+    def sign(self):
+        """
+        Sign appearing is shifts, bicomplexes, etc.
+
+        More concretely, we think that we have a representation
+        of an algebra spanned by
+        `s` and `d`,
+        with relations
+        `s*s = 1`, `d*d = 0`, `s*d=-d*s`.
+        In a representation `d` is given by the differential,
+        and `s` is the sign function `(-1)^{f(degree)}`
+        coming from a projection `f` of gradings.
+        If there is only one homological grading and
+        no special `sign` was given in constructor,
+        then `s` is `(-1)^{homological_degree}`.
+
+        This appeares in shifts of differentials,
+        for bicomplexes, etc.
+        """
+        return self._sign
+
 
 @dataclass(frozen=True, eq=True, repr=False, slots=True)
 class ShiftedDifferential(GradedFreeModule_Homomorphism):
@@ -1021,10 +1197,19 @@ class ShiftedDifferential(GradedFreeModule_Homomorphism):
 
     original: Any
     shift: Element
+    sign: Callable = field(init=False)
 
     @lazy_class_attribute
     def ShiftedClass(cls):
         return cls
+
+    def __post_init__(self):
+        # bypassing protection `frozen=True`
+        object.__setattr__(
+            self,
+            "sign",
+            self.original.sign,
+        )
 
     def shift_object(self, shift):
         """
@@ -1050,7 +1235,7 @@ class ShiftedDifferential(GradedFreeModule_Homomorphism):
         return result
 
     def __call__(self, grading=None, sign=False):
-        sign = self.shift.sign()
+        sign = self.sign(self.shift)
         hom_shift = self.hom_shift()
         diff_component = self.original(
             grading + hom_shift,
@@ -1064,12 +1249,12 @@ class ShiftedDifferential(GradedFreeModule_Homomorphism):
 
     def __iter__(self):
         hom_shift = self.hom_shift()
-        sign = self.shift.sign()
-        for grading in self.original.support:
+        sign = self.sign(self.shift)
+        for grading in self.original.support():
             yield (
                 grading - hom_shift,
                 self.original(
-                    grading + hom_shift,
+                    grading,
                     sign != 1,
                 ),
             )
@@ -1109,6 +1294,18 @@ class ShiftedDifferential(GradedFreeModule_Homomorphism):
     def set_immutable(self):
         self.original.set_immutable()
 
+    def __reduce__(self):
+        """
+        For pickling.
+        """
+        return (
+            self.__class__,
+            (
+                self.original,
+                self.shift,
+            ),
+        )
+
 
 class ComplexOfFreeModules(GradedFreeModule):
     """
@@ -1122,6 +1319,14 @@ class ComplexOfFreeModules(GradedFreeModule):
     @lazy_class_attribute
     def HomsetClass(cls):
         return ComplexOfFreeModules_Homset
+
+    @lazy_class_attribute
+    def TensorClass(cls):
+        from klrw.tensor_product_of_complexes import (
+            TensorProductOfComplexesOfFreeModules,
+        )
+
+        return TensorProductOfComplexesOfFreeModules
 
     @lazy_class_attribute
     def HomsetClassWithoutDifferential(cls):
@@ -1144,7 +1349,7 @@ class ComplexOfFreeModules(GradedFreeModule):
             | GradedFreeModule_Homomorphism
         ),
         differential_degree,
-        coerce_coefficients=True,
+        sign=None,
         **kwargs,
     ):
         # to make hashable
@@ -1160,6 +1365,7 @@ class ComplexOfFreeModules(GradedFreeModule):
             ring=ring,
             differential=differential,
             differential_degree=differential_degree,
+            sign=sign,
             **kwargs,
         )
 
@@ -1167,6 +1373,7 @@ class ComplexOfFreeModules(GradedFreeModule):
         self,
         differential,
         differential_degree,
+        sign=None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -1174,18 +1381,34 @@ class ComplexOfFreeModules(GradedFreeModule):
             underlying_module=self,
             differential_data=differential,
             degree=differential_degree,
+            sign=sign,
         )
+
+    @staticmethod
+    def sum(*complexes, keep_subdivisions=True):
+        if len(complexes) == 1:
+            return complexes[0]
+        from klrw.sum_of_complexes import SumOfComplexesOfFreeModules
+
+        return SumOfComplexesOfFreeModules(
+            *complexes,
+            keep_subdivisions=keep_subdivisions,
+        )
+
+    def __add__(self, other):
+        return self.sum(self, other)
 
     def __repr__(self):
         from pprint import pformat
 
         result = "A complex of free modules with graded dimension\n"
-        result += pformat(dict(self._component_ranks))
-        result += "\nand a differential\n"
-        for grading in sorted(self._differential.support()):
-            result += repr(grading) + " -> " + repr(grading + self._differential_degree)
+        result += pformat(dict(self.component_rank_iter()))
+        result += "\nwith differential\n"
+        for grading in sorted(self.differential.support()):
+            result += repr(grading) + " -> "
+            result += repr(grading + self.differential.hom_degree())
             result += ":\n"
-            result += repr(self._differential(grading)) + "\n"
+            result += repr(self.differential(grading)) + "\n"
 
         return result
 
@@ -1193,7 +1416,7 @@ class ComplexOfFreeModules(GradedFreeModule):
 @dataclass(frozen=True, eq=True, repr=False, slots=True)
 class ShiftedComplexOfFreeModules(ShiftedGradedFreeModule):
     """
-    A graded module with shifted gradings.
+    A complex of graded modules with shifted gradings.
     """
 
     differential: ShiftedDifferential = field(init=False, compare=False)
@@ -1201,9 +1424,6 @@ class ShiftedComplexOfFreeModules(ShiftedGradedFreeModule):
     @lazy_class_attribute
     def OriginalClass(cls):
         return ComplexOfFreeModules
-
-    def __post_init__(self):
-        assert isinstance(self.original, ComplexOfFreeModules)
 
     @lazy_class_attribute
     def HomsetClassWithoutDifferential(cls):
@@ -1215,6 +1435,9 @@ class ShiftedComplexOfFreeModules(ShiftedGradedFreeModule):
 
         Since we use `frozen=True` we need to bypass the protection,
         we can't just use `@lazy_attribute`
+        Caching does not have significant impact, because we
+        don't copy any data; the shifted differential
+        does not store a shifted dictionary.
         """
         if name == "differential":
             diff = self._differential()
@@ -1232,81 +1455,84 @@ class ShiftedComplexOfFreeModules(ShiftedGradedFreeModule):
 
 
 class ComplexOfFreeModules_Homomorphism(GradedFreeModule_Homomorphism):
-    def _cone_component_ranks(self):
-        parent = self.parent()
-        diff_degree = parent.domain.differential.degree()
-        domain_shifted = parent.domain[diff_degree]
-        codomain = parent.codomain
-
-        ranks = defaultdict(int)
-        for grading, rk in domain_shifted.component_rank_iter():
-            ranks[grading] += rk
-        for grading, rk in codomain.component_rank_iter():
-            ranks[grading] += rk
-
-        return MappingProxyType(ranks)
-
-    def _cone_differential(self, keep_subdivisions=True):
-        parent = self.parent()
-        diff_degree = parent.domain.differential.degree()
-        morphism_shifted = self[diff_degree]
-        domain_shifted = parent.domain[diff_degree]
-        codomain = parent.codomain
-
-        gradings = frozenset(domain_shifted.differential.support())
-        gradings |= frozenset(codomain.differential.support())
-        gradings |= frozenset(morphism_shifted.support())
-
-        diff_hom_degree = parent.domain.differential.hom_degree()
-        differential = {}
-        for grading in gradings:
-            next_grading = grading + diff_hom_degree
-            # the matrix has block structure
-            # columns are splitted into two categories by left_block_size
-            left_block_size = domain_shifted.component_rank(grading)
-            # the total number of columns
-            new_domain_rk = left_block_size + codomain.component_rank(grading)
-            # rows are splitted into two categories by top_block_size
-            top_block_size = domain_shifted.component_rank(next_grading)
-            # the total number of rows
-            new_codomain_rk = top_block_size + codomain.component_rank(next_grading)
-
-            differential_component = matrix(
-                parent.end_algebra,
-                ncols=new_domain_rk,
-                nrows=new_codomain_rk,
-                sparse=True,
-            )
-
-            top_left_block = domain_shifted.differential(grading)
-            if top_left_block is not None:
-                differential_component.set_block(0, 0, top_left_block)
-            bottom_left_block = morphism_shifted(grading)
-            if bottom_left_block is not None:
-                differential_component.set_block(top_block_size, 0, bottom_left_block)
-            bottom_right_block = codomain.differential(grading)
-            if bottom_right_block is not None:
-                differential_component.set_block(
-                    top_block_size, left_block_size, bottom_right_block
-                )
-            if keep_subdivisions:
-                differential_component._subdivisions = (
-                    [0, top_block_size, new_codomain_rk],
-                    [0, left_block_size, new_domain_rk],
-                )
-
-            differential_component.set_immutable()
-            differential[grading] = differential_component
-
-        return differential
+    # def _cone_component_ranks(self):
+    #    parent = self.parent()
+    #    diff_degree = parent.domain.differential.degree()
+    #    domain_shifted = parent.domain[diff_degree]
+    #    codomain = parent.codomain
+    #
+    #    ranks = defaultdict(int)
+    #    for grading, rk in domain_shifted.component_rank_iter():
+    #        ranks[grading] += rk
+    #    for grading, rk in codomain.component_rank_iter():
+    #        ranks[grading] += rk
+    #
+    #    return MappingProxyType(ranks)
+    #
+    # def _cone_differential(self, keep_subdivisions=True):
+    #    parent = self.parent()
+    #    diff_degree = parent.domain.differential.degree()
+    #    morphism_shifted = self[diff_degree]
+    #    domain_shifted = parent.domain[diff_degree]
+    #    codomain = parent.codomain
+    #
+    #    gradings = frozenset(domain_shifted.differential.support())
+    #    gradings |= frozenset(codomain.differential.support())
+    #    gradings |= frozenset(morphism_shifted.support())
+    #
+    #    diff_hom_degree = parent.domain.differential.hom_degree()
+    #    differential = {}
+    #    for grading in gradings:
+    #        next_grading = grading + diff_hom_degree
+    #        # the matrix has block structure
+    #        # columns are splitted into two categories by left_block_size
+    #        left_block_size = domain_shifted.component_rank(grading)
+    #        # the total number of columns
+    #        new_domain_rk = left_block_size + codomain.component_rank(grading)
+    #        # rows are splitted into two categories by top_block_size
+    #        top_block_size = domain_shifted.component_rank(next_grading)
+    #        # the total number of rows
+    #        new_codomain_rk = top_block_size + codomain.component_rank(next_grading)
+    #
+    #        differential_component = matrix(
+    #            parent.end_algebra,
+    #            ncols=new_domain_rk,
+    #            nrows=new_codomain_rk,
+    #            sparse=True,
+    #        )
+    #
+    #        top_left_block = domain_shifted.differential(grading)
+    #        if top_left_block is not None:
+    #            differential_component.set_block(0, 0, top_left_block)
+    #        bottom_left_block = morphism_shifted(grading)
+    #        if bottom_left_block is not None:
+    #            differential_component.set_block(top_block_size, 0, bottom_left_block)
+    #        bottom_right_block = codomain.differential(grading)
+    #        if bottom_right_block is not None:
+    #            differential_component.set_block(
+    #                top_block_size, left_block_size, bottom_right_block
+    #            )
+    #        if keep_subdivisions:
+    #            differential_component._subdivisions = (
+    #                [0, top_block_size, new_codomain_rk],
+    #                [0, left_block_size, new_domain_rk],
+    #            )
+    #
+    #        differential_component.set_immutable()
+    #        differential[grading] = differential_component
+    #
+    #    return differential
 
     def cone(self, keep_subdivisions=True):
-        return ComplexOfFreeModules(
-            component_ranks=self._cone_component_ranks(),
-            ring=self.parent().ring,
-            differential_degree=self.parent().domain.differential.degree(),
-            differential=self._cone_differential(),
-        )
+        from klrw.cones import Cone
+
+        return Cone(self, keep_subdivisions)
+        # return ComplexOfFreeModules(
+        #    component_ranks=self._cone_component_ranks(),
+        #    ring=self.parent().ring,
+        #    differential_degree=self.parent().domain.differential.degree(),
+        #    differential=self._cone_differential(),
+        # )
 
 
 class ComplexOfFreeModules_Homset(GradedFreeModule_Homset):
@@ -1339,7 +1565,9 @@ class ComplexOfFreeModules_Homset(GradedFreeModule_Homset):
         if "chain" not in ignore_checks:
             # print("<2")
             image = self.apply_differential(element)
-            assert image.is_zero(), "Morphism does not commute with differential."
+            assert (
+                image.is_zero()
+            ), "Morphism does not commute with differential:\n{}".format(image)
 
         super()._element_check_(element, ignore_checks)
 

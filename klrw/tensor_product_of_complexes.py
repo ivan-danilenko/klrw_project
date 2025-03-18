@@ -1,17 +1,18 @@
 from typing import Iterable
-from collections import defaultdict
 from types import MappingProxyType
+from itertools import product
 
 from sage.structure.unique_representation import UniqueRepresentation
+from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.matrix.constructor import matrix
+from sage.misc.misc_c import prod
 
 from klrw.free_complex import (
     GradedFreeModule,
+    ShiftedGradedFreeModule,
+    GradedFreeModule_Homomorphism,
     GradedFreeModule_Homset,
-    ComplexOfFreeModules,
-    ShiftedComplexOfFreeModules,
-    ComplexOfFreeModules_Homomorphism,
 )
 from klrw.multicomplex import (
     MulticomplexOfFreeModules,
@@ -20,202 +21,254 @@ from klrw.multicomplex import (
 from klrw.perfect_complex import KLRWDirectSumOfProjectives
 
 
-class TensorProductOfGradedFreeModules_Homset(GradedFreeModule_Homset):
+class HomomorphismTensorProduct(UniqueRepresentation):
     """
-    Tensor product over the default base.
+    Tensor product of homomorphisms over the default base.
 
-    If bases implement static method `tensor_product`,
-    that returns an object implementing a method
-    `tensor_product_of_elements`,
-    then uses this object as a base. Otherwise, makes sure
-    bases are the same, and takes the tensor product over
-    the base ring.
+    This is a singleton.
+    Classcall to several homomomorphisms gives their tensor product.
+
+    Domain and codomain have to implement
+    a class method `tensor_product`.
+    If the `ring()` of the tensor product domain/codomain
+    has a method `tensor_product_of_elements`,
+    then uses this method to multiply matrix entries.
+    Otherwise, multiplies matrix entres.
+
+    The tensor product object is graded by one-dimensional grading.
+    Use `totalize=False` to get grading by `direct_sum`
+    of the grading groups.
     """
 
-    def __init__(self, *hom_sets):
-        base_rings = [hom.base().algebra for hom in hom_sets]
-        try:
-            product_ring = base_rings[0].tensor_product(*base_rings)
-            tensor_product_on_matrix_elements = product_ring.tensor_product_of_elements
-        except AttributeError:
-            try:
-                from klrw.misc import get_from_all_and_assert_equality
-                from sage.misc.misc_c import prod
+    @staticmethod
+    def __classcall__(cls, *homs, totalize=True):
+        assert all(isinstance(hom, GradedFreeModule_Homomorphism) for hom in homs)
+        assert homs, "Need at least one homomorphism"
+        instance = cls.instance()
+        return instance(*homs, totalize=totalize)
 
-                product_ring = get_from_all_and_assert_equality(
-                    lambda x: x, base_rings
-                )
-                tensor_product_on_matrix_elements = prod
-            except AssertionError:
-                raise AssertionError(
-                    "Don't know what base assign to the tensor product"
-                )
+    def __init__(self):
+        pass
 
-        self._product_ring = product_ring
-        self._tensor_product_on_matrix_elements = tensor_product_on_matrix_elements
+    def __call__(self, *homs, totalize=True):
+        domain = self._make_domain(*(hom.parent().domain for hom in homs))
+        codomain = self._make_codomain(*(hom.parent().codomain for hom in homs))
 
-        domains = [hom.domain.algebra for hom in hom_sets]
-        codomains = [hom.codomain.algebra for hom in hom_sets]
-
-        assert hom_sets, "Need at least one dot algebra"
-        assert all(isinstance(hom, GradedFreeModule_Homset) for hom in hom_sets)
-        self._parts = hom_sets
-        quiver = get_from_all_and_assert_equality(
-            lambda x: x.quiver_data.quiver, dot_algebras
-        )
-        quiver_data = FramedDynkinDiagram_with_dimensions.with_zero_dimensions(quiver)
-        # we make an array where `i`th entry is the quiver with
-        # dimensions that are the sum of dimensions of the first `i`
-        # dot algebras
-        self._partial_quiver_data = [quiver_data.immutable_copy()]
-        for alg in dot_algebras:
-            for vertex, dim in alg.quiver_data.dimensions(copy=False).items():
-                quiver_data[vertex] += dim
-            self._partial_quiver_data.append(quiver_data.immutable_copy())
-
-        # TODO: fix _reduction and get all the data from reduction?
-        base_ring = get_from_all_and_assert_equality(
-            lambda x: x.base_ring(), dot_algebras
-        )
-        order = get_from_all_and_assert_equality(lambda x: x.term_order(), dot_algebras)
-        parameters_names = [
-            "no_deformations",
-            "default_vertex_parameter",
-            "default_edge_parameter",
-            "invertible_parameters",
-        ]
-        parameters = {}
-        for name in parameters_names:
-            parameters[name] = get_from_all_and_assert_equality(
-                lambda x: getattr(x, name), dot_algebras
+        assert domain.ring() == codomain.ring()
+        ring = domain.ring()
+        tensor_product_method = self._define_product_on_matrix_elements(ring)
+        it = product(*(iter(gr_map) for gr_map in homs))
+        map_dict = {}
+        for (*map_items,) in list(it):
+            hom_degrees, map_components = zip(*map_items)
+            hom_deg = domain.hom_grading_group().cartesian_product_of_elements(
+                *hom_degrees
             )
-        prefixes = get_from_all_and_assert_equality(lambda x: x.prefixes, dot_algebras)
-        parameters |= prefixes
+            map_dict[hom_deg] = self._tensor_product_of_sparse_matrices(
+                *map_components,
+                tensor_product_on_matrix_elements=tensor_product_method,
+                tensor_product_entries_parent=ring,
+            )
 
-        super().__init__(
-            domain=domain,
-            codomain=codomain,
-            base=base,
+        tensor_product = domain.hom(codomain, map_dict)
+        if totalize:
+            from klrw.multicomplex import TotalizationOfGradedFreeModule
+
+            tensor_product = TotalizationOfGradedFreeModule.totalize_morphism(
+                tensor_product
+            )
+
+        return tensor_product
+
+    @staticmethod
+    def _instance(cls):
+        """
+        For technical reasons, we need a static version
+        of method `instance()` for pickling/unpickling.
+        """
+        return UniqueRepresentation.__classcall__(cls)
+
+    @classmethod
+    def instance(cls):
+        """
+        Return the instance.
+        """
+        return cls._instance(cls)
+
+    def __reduce__(self):
+        """
+        For pickling.
+        """
+        return self.__class__._instance, (self.__class__,)
+
+    @staticmethod
+    def _make_domain(*domains):
+        return domains[0].tensor_product(*domains, totalize=False)
+
+    @staticmethod
+    def _make_codomain(*codomains):
+        return codomains[0].tensor_product(*codomains, totalize=False)
+
+    @classmethod
+    def _define_product_on_matrix_elements(cls, ring):
+        try:
+            return ring.tensor_product_of_elements
+        except AttributeError:
+
+            def tensor_product_on_matrix_elements(*elements):
+                return prod(elements)
+
+            return cls._default_tensor_product_on_matrix_elements
+
+    @staticmethod
+    def _default_tensor_product_on_matrix_elements(*elements):
+        return prod(elements)
+
+    @staticmethod
+    def _index_in_tensor_product(multiindex, dims):
+        index = 0
+        for i, d in zip(multiindex, dims):
+            index *= d
+            index += i
+        return index
+
+    @classmethod
+    def _tensor_product_of_sparse_matrices(
+        cls,
+        *matrices,
+        tensor_product_on_matrix_elements,
+        tensor_product_entries_parent,
+    ):
+        row_dimensions = tuple(mat.nrows() for mat in matrices)
+        col_dimensions = tuple(mat.ncols() for mat in matrices)
+        it = product(*(mat.dict(copy=False).items() for mat in matrices))
+        matrix_dict = {}
+        for (*elements_data,) in it:
+            indices, entries = zip(*elements_data)
+            row_indices, col_indices = zip(*indices)
+            i = cls._index_in_tensor_product(row_indices, row_dimensions)
+            j = cls._index_in_tensor_product(col_indices, col_dimensions)
+            # entries are in the opposite algebra
+            # make them elements of the original KLRW algebra
+            entries = list(map(lambda x: x.value, entries))
+            entry = tensor_product_on_matrix_elements(*entries)
+            matrix_dict[i, j] = entry
+
+        return matrix(
+            tensor_product_entries_parent.opposite,
+            nrows=prod(row_dimensions),
+            ncols=prod(col_dimensions),
+            entries=matrix_dict,
+            sparse=True,
         )
-
-    @cached_method
-    def embedding(self, i):
-        """
-        Embeds a piece into the tensor product.
-
-        Homsets are unital, so we can send `x` to
-        `1 @ ... @ x @ ... @ 1`
-        where x is on the `i`th position.
-        """
-        i = int(i)
-        assert i >= 0
-        assert i < len(self._parts)
-        part_dot_algebra = self._parts[i]
-        dims_before_part = self._partial_quiver_data[i]
-        variables_images = [None] * part_dot_algebra.ngens()
-        for index, var in part_dot_algebra.variables.items():
-            if var.position is not None:
-                if isinstance(index, DotVariableIndex):
-                    vertex = index.vertex
-                    new_index = DotVariableIndex(
-                        vertex, index.number + dims_before_part[vertex]
-                    )
-                else:
-                    new_index = index
-                image = self.variables[new_index].monomial
-                variables_images[var.position] = image
-
-        return part_dot_algebra.hom(variables_images, codomain=self)
-
-    def tensor_product_of_elements(self, *elements):
-        """
-        Construct an element from parts.
-        """
-        return prod(self.embedding(i)(element) for i, element in enumerate(elements))
 
 
 class TensorProductOfGradedFreeModules(GradedFreeModule):
     """
     Returns tensor product of graded free modules.
 
-    The shift groups have to implement static method
-    `merge`, hom grading groups have to implement
-    static method `direct_sum`. The result is graded
-    by `direct_sum` of hom grading groups, and
-    can be shifted by `merge` of shift groups.
-    If `totalization=True`, then the result is
-    totalized, and hom grading group is one-dimensional.
+    The grading groups have to implement
+    static method `direct_sum`.
+    The result has to implement `cartesian_product_of_elements`.
+    The tensor product object is graded
+    by `direct_sum` of the grading groups.
+    Use `.totalization()` to get a one-dimensional grading.
+    If base rings have a method `tensor_product`, then
+    uses this for the base ring of a product.
+    Otherwise, makes sure the base rings are the same,
+    and takes tensor product over it.
     """
+
     @staticmethod
     def __classcall__(
         cls,
         *modules,
-        totalize=False,
+        totalize=True,
     ):
-        from klrw.free_complex import ShiftedObject
-        originals, shifts = zip(
-            *(
-                ShiftedObject.original_and_shift(module)
-                for module in modules
-            )
-        )
-        tensor_product = UniqueRepresentation.__classcall__(
+        return UniqueRepresentation.__classcall__(
             cls,
-            *originals,
+            *modules,
         )
-        prod_shift_group = tensor_product.shift_group()
-        total_shift = prod_shift_group.cartesian_product_of_elements(*shifts)
-        if totalize:
-            tensor_product = tensor_product.totalize()
-            total_shift = prod_shift_group.totalization_morphism(total_shift)
-        return tensor_product[total_shift]
 
     def __init__(
         self,
-        *originals: Iterable[GradedFreeModule],
+        *modules: Iterable[GradedFreeModule],
     ):
         assert all(
-            isinstance(orig, GradedFreeModule)
-            for orig in originals
+            isinstance(modul, GradedFreeModule | ShiftedGradedFreeModule)
+            for modul in modules
         )
-        assert originals, "Need at least one group"
-        self._parts = originals
-        parent = self._morphism.parent()
-        self._domain = parent.domain
-        self._codomain = parent.codomain
-
-        super().__init__(
-            self,
-            ring: Ring,
-            component_ranks: frozenset[tuple[Element, int]],
-            grading_group,
-        )
-
-    def hom_grading_group(self):
-        raise NotImplementedError()
-
-    def shift_group(self):
-        raise NotImplementedError()
-
-    def ring(self):
-        return self._domain.ring()
-
-    def component_rank(self, grading):
-        return self._domain_shifted.component_rank(
-            grading
-        ) + self._codomain.component_rank(grading)
-
-    def component_rank_iter(self):
-        for grading, dim in self._domain_shifted.component_rank_iter():
-            extra_dim = self._codomain.component_rank(grading)
-            yield (grading, dim + extra_dim)
-        domain_shifted_gradings = self._domain_shifted.gradings()
-        for grading, dim in self._domain_shifted.component_rank_iter():
-            if grading not in domain_shifted_gradings:
-                yield (grading, dim)
+        assert modules, "Need at least one group"
+        self._parts = modules
 
     @lazy_attribute
-    def differential(self):
+    def _grading_group(self):
+        grading_groups = [modul._grading_group for modul in self._parts]
+        return grading_groups[0].direct_sum(*grading_groups)
+
+    @lazy_attribute
+    def _component_ranks(self):
+        it = product(*(modul.component_rank_iter() for modul in self._parts))
+        _component_ranks = {}
+        for (*comp_rank_items,) in it:
+            hom_degrees, comp_ranks = zip(*comp_rank_items)
+            hom_deg = self.hom_grading_group().cartesian_product_of_elements(
+                *hom_degrees
+            )
+            component_rank = sum(comp_ranks)
+            _component_ranks[hom_deg] = component_rank
+        return MappingProxyType(_component_ranks)
+
+    @lazy_attribute
+    def _ring(self):
+        rings = [modul.ring() for modul in self._parts]
+        try:
+            _ring = rings[0].tensor_product(*rings)
+        except AttributeError:
+            try:
+                from klrw.misc import get_from_all_and_assert_equality
+
+                _ring = get_from_all_and_assert_equality(lambda x: x.ring())
+            except AssertionError:
+                raise AssertionError(
+                    "Don't know what base assign to the tensor product"
+                )
+        return _ring
+
+
+class TensorProductOfComplexesOfFreeModules(MulticomplexOfFreeModules):
+    """
+    Tensor product of complexes.
+
+    By default, returns a multicomplex, with several
+    differential coming from each component in the product.
+    To get a complex with one differential, use `.totalization()`.
+    """
+
+    @lazy_attribute
+    def _differentials(self):
+        _differentials = [None for _ in range(len(self._parts))]
+        ones = [part.hom_set(part).one() for part in self._parts]
+        for i in range(len(self._parts)):
+            differential = self._parts[i].differential
+            new_differential = HomomorphismTensorProduct(
+                *(
+                    self._parts[i].differential if j == i
+                    else ones[j]
+                    for j in range(len(self._parts))
+                ),
+                totalize=False,
+            )
+            sign = self.hom_grading_group().sign_from_part(i, differential.sign)
+            degree = self.shift_group().summand_embedding(i)(differential.degree())
+            _differentials[i] = self.DifferentialClass(
+                underlying_module=self,
+                differential_data=new_differential,
+                sign=sign,
+                degree=degree,
+            )
+        self._check_differentials_(_differentials)
+        return _differentials
         diff_degree = self._domain.differential.degree()
         morphism_shifted = self._morphism[diff_degree]
 
@@ -271,7 +324,7 @@ class TensorProductOfGradedFreeModules(GradedFreeModule):
             differential_component.set_immutable()
             differential[grading] = differential_component
 
-        return self.DifferentialClass(
+        self.DifferentialClass(
             underlying_module=self,
             differential_data=differential,
             degree=diff_degree,
@@ -280,34 +333,60 @@ class TensorProductOfGradedFreeModules(GradedFreeModule):
         )
 
 
-class TensorProductOfComplexesOfFreeModules(MulticomplexOfFreeModules):
-    pass
-
-
 class TensorProductOfKLRWDirectSumsOfProjectives(
-    KLRWDirectSumOfProjectives, TensorProductOfGradedFreeModules
+    TensorProductOfGradedFreeModules, KLRWDirectSumOfProjectives
 ):
-    pass
+    """
+    Returns tensor product of direct sums of KLRW projectives.
 
+    The shift groups have to implement static method
+    `merge`, hom grading groups have to implement
+    static method `direct_sum`. The result is graded
+    by `direct_sum` of hom grading groups, and
+    can be shifted by `merge` of shift groups.
+    By default, returns a multicomplex, with several
+    differential coming from each component in the product.
+    Use `.totalization()` to get a one-dimensional hom grading
+    with one differential.
+    """
 
-class TensorProductOfKLRWPerfectComplexes(
-    KLRWPerfectMulticomplex,
-    TensorProductOfKLRWDirectSumsOfProjectives,
-):
     @lazy_attribute
     def _KLRW_algebra(self):
-        return self._morphism.parent().KLRW_algebra()
+        return self._ring
 
     @lazy_attribute
     def _extended_grading_group(self):
-        return self._domain.shift_group()
+        grading_groups = [modul._extended_grading_group for modul in self._parts]
+        return grading_groups[0].merge(*grading_groups)
 
     @lazy_attribute
     def _projectives(self):
-        projectives = defaultdict(list)
-        for grading, projs in self._domain_shifted.projectives_iter():
-            projectives[grading] += projs
-        for grading, projs in self._codomain.projectives_iter():
-            projectives[grading] += projs
+        from klrw.perfect_complex import KLRWIrreducibleProjectiveModule
 
-        return MappingProxyType(projectives)
+        _projectives = {}
+        it = product(*(modul.projectives_iter() for modul in self._parts))
+        for (*proj_items,) in it:
+            hom_degrees, projs_tuples = zip(*proj_items)
+            hom_deg = self.hom_grading_group().cartesian_product_of_elements(
+                *hom_degrees
+            )
+            projectives_in_degree = []
+            for projs in product(*projs_tuples):
+                new_proj_list = []
+                degree = self.KLRW_algebra().grading_group.zero()
+                for pr in projs:
+                    new_proj_list += pr.state.as_tuple()
+                    degree += pr.equivariant_degree
+                new_proj_state = self.KLRW_algebra().state(new_proj_list)
+                new_proj = KLRWIrreducibleProjectiveModule(new_proj_state, degree)
+                projectives_in_degree.append(new_proj)
+            _projectives[hom_deg] = projectives_in_degree
+        return MappingProxyType(_projectives)
+
+
+class TensorProductOfKLRWPerfectComplexes(
+    TensorProductOfKLRWDirectSumsOfProjectives,
+    TensorProductOfComplexesOfFreeModules,
+    KLRWPerfectMulticomplex,
+):
+    pass

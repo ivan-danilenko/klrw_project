@@ -12,6 +12,7 @@ from sage.modules.free_module import FreeModule
 
 from sage.rings.integer_ring import ZZ
 from sage.rings.ring import Ring
+from sage.categories.action import Action
 
 from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute, lazy_class_attribute
@@ -45,7 +46,7 @@ from .free_complex import (
 @dataclass(frozen=True, init=True, eq=True, repr=False)
 class KLRWIrreducibleProjectiveModule:
     state: KLRWstate
-    equivariant_degree: QuiverGradingGroupElement | int
+    equivariant_degree: QuiverGradingGroupElement | int = 0
     grading_group: InitVar[QuiverGradingGroup | None] = None
 
     def __post_init__(self, grading_group: QuiverGradingGroup | None):
@@ -80,8 +81,7 @@ class KLRWIrreducibleProjectiveModule:
             return self
 
 
-'''
-class ParameterHomMultiplication(Action):
+class CenterHomMultiplication(Action):
     """
     Multiplication of a hom of graded projectives
     by a symmetric homogeneous element in the dot algebra.
@@ -90,19 +90,15 @@ class ParameterHomMultiplication(Action):
     way to do multiplication by parameters.
     """
 
-    def __init__(self, other, hom_parent):
-        self.dot_algebra = hom_parent.KLRW_algebra().base()
+    def __init__(self, other, hom_set):
+        self.dot_algebra = hom_set.KLRW_algebra().base()
         self.coerce_map = self.dot_algebra.coerce_map_from(other)
-        Action.__init__(self, G=other, S=hom_parent, is_left=True, op=operator.mul)
+        Action.__init__(self, G=other, S=hom_set, is_left=True, op=operator.mul)
 
     def codomain(self):
         raise AttributeError("Codomain depend on the dot algebra element")
 
-    def _act_(
-        self,
-        g,
-        h: KLRWHomOfGradedProjectivesElement,
-    ) -> KLRWHomOfGradedProjectivesElement:
+    def _act_(self, g, h, check=True):
         g = self.coerce_map(g)
         grading_group = self.domain().KLRW_algebra().grading_group
         element_degree = self.dot_algebra.element_degree(
@@ -110,36 +106,22 @@ class ParameterHomMultiplication(Action):
             grading_group,
             check_if_homogeneous=True,
         )
-        assert self.dot_algebra.is_element_symmetric(g), "The element is not symmetric"
+        if check:
+            assert self.dot_algebra.is_element_symmetric(
+                g
+            ), "The element is not symmetric"
 
-        hom_codomain_projectives = {}
-        h_codomain = self.domain().codomain
-        for hom_deg, projs in h_codomain.projectives.items():
-            hom_codomain_projectives[hom_deg] = [
-                replace(pr, equivariant_degree=pr.equivariant_degree + element_degree)
-                for pr in projs
-            ]
+        chain_map_dict = {}
+        for hom_deg, map in h:
+            chain_map_dict[hom_deg] = {
+                (i, j): g * entry for (i, j), entry in map.dict(copy=False).items()
+            }
 
-        hom_codomain = KLRWPerfectComplex(
-            KLRW_algebra=self.domain().codomain.KLRW_algebra,
-            differentials=self.domain().codomain.differentials,
-            projectives=hom_codomain_projectives,
-            degree=self.domain().codomain.degree,
-            grading_group=self.domain().codomain.grading_group,
-            mod2grading=self.domain().codomain.mod2grading,
-            check=True,
-        )
-
-        product_parent = KLRWHomOfGradedProjectives(
-            self.domain().domain,
-            hom_codomain,
-            shift=self.domain().shift,
-        )
-
-        elem_times_h_dict = {stype: g * elem for stype, elem in h}
-
-        return product_parent._from_dict(elem_times_h_dict)
-'''
+        product_domain = self.domain().domain
+        product_codomain = self.domain().codomain[0, element_degree]
+        product_homset = product_domain.hom_set(product_codomain)
+        chain_map = product_homset(chain_map_dict, check=False)
+        return chain_map
 
 
 class KLRWIrreducibleProjectiveModule_Homset:
@@ -161,6 +143,14 @@ class KLRWDirectSumOfProjectives(GradedFreeModule):
     def HomsetClass(cls):
         return KLRWDirectSumOfProjectives_Homset
 
+    @lazy_class_attribute
+    def TensorClass(cls):
+        from klrw.tensor_product_of_complexes import (
+            TensorProductOfKLRWDirectSumsOfProjectives,
+        )
+
+        return TensorProductOfKLRWDirectSumsOfProjectives
+
     @staticmethod
     def __classcall__(
         cls,
@@ -171,12 +161,16 @@ class KLRWDirectSumOfProjectives(GradedFreeModule):
             | KLRWIrreducibleProjectiveModule
             | KLRWstate,
         ],
-        homological_grading_names: Iterable[Any] = (None,),
+        homological_grading_names: Iterable[Any] | None = None,
+        homological_grading_group: HomologicalGradingGroup | None = None,
+        extended_grading_group: ExtendedQuiverGradingGroup | None = None,
         **kwargs,
     ):
-        homological_grading_names = tuple(homological_grading_names)
-        extended_grading_group = cls._extended_grading_group_(
-            ring, homological_grading_names
+        _extended_grading_group = cls._normalize_extended_grading_group_(
+            ring,
+            homological_grading_names,
+            homological_grading_group,
+            extended_grading_group,
         )
 
         _projectives = defaultdict(list)
@@ -191,14 +185,14 @@ class KLRWDirectSumOfProjectives(GradedFreeModule):
                 value = list(value)
 
             if isinstance(grading, ExtendedQuiverGradingGroupElement):
-                grading = extended_grading_group(grading)
+                grading = _extended_grading_group(grading)
                 grading_hom_part = grading.homological_part()
                 grading_eq_part = grading.equivariant_part()
             else:
                 try:
                     if isinstance(grading, int):
                         grading = ZZ(grading)
-                    grading = extended_grading_group.homological_part(grading)
+                    grading = _extended_grading_group.homological_part(grading)
                 except TypeError:
                     raise ValueError(
                         "Unkown type of grading: {}".format(grading.__class__)
@@ -233,6 +227,8 @@ class KLRWDirectSumOfProjectives(GradedFreeModule):
             ring=ring,
             projectives=projectives,
             homological_grading_names=homological_grading_names,
+            homological_grading_group=homological_grading_group,
+            extended_grading_group=extended_grading_group,
             **kwargs,
         )
 
@@ -242,24 +238,54 @@ class KLRWDirectSumOfProjectives(GradedFreeModule):
         projectives: frozenset[
             tuple[HomologicalGradingGroupElement, KLRWIrreducibleProjectiveModule]
         ],
-        homological_grading_names,
+        homological_grading_names=None,
+        homological_grading_group=None,
+        extended_grading_group=None,
     ):
         self._KLRW_algebra = ring
         self._projectives = MappingProxyType(dict(projectives))
-        self._extended_grading_group = self._extended_grading_group_(
+        self._extended_grading_group = self._normalize_extended_grading_group_(
             ring,
             homological_grading_names,
+            homological_grading_group,
+            extended_grading_group,
         )
 
     @staticmethod
-    def _extended_grading_group_(ring, homological_grading_names):
-        homological_grading_group = HomologicalGradingGroup(
-            homological_grading_names=homological_grading_names
+    def _normalize_extended_grading_group_(
+        ring,
+        homological_grading_names=None,
+        homological_grading_group=None,
+        extended_grading_group=None,
+    ):
+        # count how many pieces of data are given
+        grading_data_pieces = sum(
+            1
+            for x in (
+                homological_grading_names,
+                homological_grading_group,
+                extended_grading_group,
+            )
+            if x is not None
         )
-        return ExtendedQuiverGradingGroup(
-            equivariant_grading_group=ring.grading_group,
-            homological_grading_group=homological_grading_group,
-        )
+        # there has to be exactly one piece of data
+        assert grading_data_pieces <= 1, "Too much data for grading is given"
+        if extended_grading_group is None:
+            if homological_grading_group is None:
+                if homological_grading_names is None:
+                    homological_grading_names = (None,)
+                homological_grading_names = tuple(homological_grading_names)
+                homological_grading_group = HomologicalGradingGroup(
+                    homological_grading_names=homological_grading_names
+                )
+            extended_grading_group = ExtendedQuiverGradingGroup(
+                equivariant_grading_group=ring.grading_group,
+                homological_grading_group=homological_grading_group,
+            )
+        else:
+            assert extended_grading_group.equivariant_part == ring.grading_group
+
+        return extended_grading_group
 
     def KLRW_algebra(self):
         return self._KLRW_algebra
@@ -337,9 +363,6 @@ class ShiftedKLRWDirectSumOfProjectives(ShiftedGradedFreeModule):
     @lazy_class_attribute
     def OriginalClass(cls):
         return KLRWDirectSumOfProjectives
-
-    def __post_init__(self):
-        assert isinstance(self.original, KLRWDirectSumOfProjectives)
 
     def KLRW_algebra(self):
         return self.original.KLRW_algebra()
@@ -482,19 +505,19 @@ class KLRWDirectSumOfProjectives_Homset(GradedFreeModule_Homset):
                     right_state = elem.right_state(
                         check_if_all_have_same_right_state=True
                     )
-                    assert codomain_pr.state == right_state
+                    assert codomain_pr.state == right_state, repr(codomain_pr.state)
                     left_state = elem.left_state(check_if_all_have_same_left_state=True)
-                    assert domain_pr.state == left_state
-                    degree = elem.degree(check_if_homogeneous=True)
+                    assert domain_pr.state == left_state, repr(domain_pr.state)
+                    eq_degree = elem.degree(check_if_homogeneous=True)
                     assert (
                         codomain_pr.equivariant_degree - domain_pr.equivariant_degree
-                        == degree
+                        == eq_degree
                     ), (
                         repr(codomain_pr.equivariant_degree)
                         + " "
                         + repr(domain_pr.equivariant_degree)
                         + " "
-                        + repr(degree)
+                        + repr(eq_degree)
                     )
 
         super()._element_check_(element, ignore_checks)
@@ -517,6 +540,12 @@ class KLRWDirectSumOfProjectives_Homset(GradedFreeModule_Homset):
             for degree, projs in self.domain.projectives_iter()
         }
         return self._element_constructor_(matrix_dict, check=False)
+
+    def _get_action_(self, other, op, self_on_left):
+        if op == operator.mul:
+            if self.KLRW_algebra().base().has_coerce_map_from(other):
+                return CenterHomMultiplication(other=other, hom_set=self)
+        return super()._get_action_(other, op, self_on_left)
 
     @lazy_attribute
     def basis(self):
@@ -778,11 +807,19 @@ class KLRWDirectSumOfProjectives_HomsetBasis(UniqueRepresentation):
                                 graded_component, acting_on_left=False
                             )
 
-                            diff_mat.set_block(
-                                row_subdivision_index,
-                                column_subdivision_index,
-                                submatrix,
-                            )
+                            # set_block doesn't take into account
+                            # that matrices are sparse
+                            for (a, b), entry in submatrix.dict(copy=False).items():
+                                indices = (
+                                    row_subdivision_index + a,
+                                    column_subdivision_index + b,
+                                )
+                                diff_mat[indices] = entry
+                            # diff_mat.set_block(
+                            #     row_subdivision_index,
+                            #     column_subdivision_index,
+                            #     submatrix,
+                            # )
 
         # matrix of right multiplication by d.
         # there is a sign -1
@@ -849,6 +886,12 @@ class KLRWPerfectComplex(ComplexOfFreeModules, KLRWDirectSumOfProjectives):
         return KLRWPerfectComplex_Homset
 
     @lazy_class_attribute
+    def TensorClass(cls):
+        from klrw.tensor_product_of_complexes import TensorProductOfKLRWPerfectComplexes
+
+        return TensorProductOfKLRWPerfectComplexes
+
+    @lazy_class_attribute
     def HomsetClassWithoutDifferential(cls):
         assert issubclass(cls.HomsetClass, KLRWDirectSumOfProjectives_Homset)
         return KLRWDirectSumOfProjectives_Homset
@@ -857,12 +900,32 @@ class KLRWPerfectComplex(ComplexOfFreeModules, KLRWDirectSumOfProjectives):
     def DifferentialClass(cls):
         return KLRWDifferential
 
+    @staticmethod
+    def sum(*complexes, keep_subdivisions=True):
+        if len(complexes) == 1:
+            return complexes[0]
+        else:
+            from klrw.sum_of_complexes import SumOfKLRWPerfectComplexes
+
+            return SumOfKLRWPerfectComplexes(*complexes)
+
+    def base_change(self, other: Ring):
+        assert other.has_coerce_map_from(self.ring())
+        return KLRWPerfectComplex(
+            ring=other,
+            differential=self.differential,
+            sign=self.differential.sign,
+            differential_degree=self.differential.degree(),
+            projectives=self.projectives(),
+            homological_grading_names=self.hom_grading_group().names(),
+        )
+
     def __repr__(self):
         from pprint import pformat
 
-        result = "A complex of projective modules modules\n"
+        result = "A complex of projective modules\n"
         result += pformat(dict(self.projectives()))
-        result += "\nand a differential\n"
+        result += "\nwith differential\n"
         for grading in sorted(self.differential.support()):
             result += repr(grading) + " -> "
             result += repr(grading + self.differential.hom_degree())
@@ -881,18 +944,44 @@ class ShiftedKLRWPerfectComplex(
 
 
 class KLRWPerfectComplex_Homomorphism(
-    ComplexOfFreeModules_Homomorphism, KLRWDirectSumOfProjectives_Homomorphism
+    KLRWDirectSumOfProjectives_Homomorphism, ComplexOfFreeModules_Homomorphism
 ):
-    pass
+    # def _cone_projectives(self):
+    #    parent = self.parent()
+    #    diff_degree = parent.domain.differential.degree()
+    #    domain_shifted = parent.domain[diff_degree]
+    #    codomain = parent.codomain
+    #
+    #    projectives = defaultdict(list)
+    #    for grading, projs in domain_shifted.projectives_iter():
+    #        projectives[grading] += projs
+    #    for grading, projs in codomain.projectives_iter():
+    #        projectives[grading] += projs
+    #
+    #    return MappingProxyType(projectives)
+
+    def cone(self, keep_subdivisions=True):
+        from klrw.cones import KLRWCone
+
+        return KLRWCone(self, keep_subdivisions)
+        # return KLRWPerfectComplex(
+        #    projectives=self._cone_projectives(),
+        #    ring=self.parent().ring,
+        #    differential_degree=self.parent().domain.differential.degree(),
+        #    differential=self._cone_differential(),
+        # )
+
+    def homology_class(self):
+        return self.parent().homology()(self)
 
 
-class KLRWDifferential(Differential, KLRWPerfectComplex_Homomorphism):
+class KLRWDifferential(KLRWPerfectComplex_Homomorphism, Differential):
     @lazy_class_attribute
     def ShiftedClass(cls):
         return ShiftedKLRWDifferential
 
 
-class ShiftedKLRWDifferential(ShiftedDifferential, KLRWPerfectComplex_Homomorphism):
+class ShiftedKLRWDifferential(KLRWPerfectComplex_Homomorphism, ShiftedDifferential):
     @lazy_class_attribute
     def OriginalClass(cls):
         return KLRWDifferential
@@ -986,45 +1075,40 @@ class KLRWPerfectComplex_HomsetBasis(UniqueRepresentation):
         return vec
 
 
-class KLRWPerfectComplex_Ext0(
-    KLRWDirectSumOfProjectives_Homomorphism,
-    ComplexOfFreeModules_Homomorphism,
-):
+class KLRWPerfectComplex_Ext0(KLRWPerfectComplex_Homomorphism):
     def representative(self):
         return self.parent().representative(self)
 
-    def in_coordinates(self):
-        return self.parent().in_coordinates(self)
+    def in_coordinates(self, check=False):
+        return self.parent().in_coordinates(self, check=check)
 
     def _richcmp_(self, right, op):
-        from sage.structure.richcmp import richcmp
+        from sage.structure.richcmp import richcmp, op_EQ, op_NE
 
-        return richcmp(self.in_coordinates(), right.in_coordinates(), op)
+        if op == op_EQ or op == op_NE:
+            op_is_eq = op == op_EQ
+            if self.parent() != right.parent():
+                return not op_is_eq
+            if (self - right).is_zero():
+                return op_is_eq
+            return not op_is_eq
+
+        raise NotImplementedError("Needs more tests.")
+        return richcmp(
+            self.in_coordinates(check=False), right.in_coordinates(check=False), op
+        )
+
+    def is_zero(self):
+        # first check if zero without homotopy
+        if self.representative().is_zero():
+            return True
+        return self.parent().is_nilhomotopic(self)
 
     def __hash__(self):
         return hash(self.in_coordinates())
 
-    def _cone_projectives(self):
-        parent = self.parent()
-        diff_degree = parent.domain.differential.degree()
-        domain_shifted = parent.domain[diff_degree]
-        codomain = parent.codomain
-
-        projectives = defaultdict(list)
-        for grading, projs in domain_shifted.projectives_iter():
-            projectives[grading] += projs
-        for grading, projs in codomain.projectives_iter():
-            projectives[grading] += projs
-
-        return MappingProxyType(projectives)
-
-    def cone(self, keep_subdivisions=True):
-        return KLRWPerfectComplex(
-            projectives=self._cone_projectives(),
-            ring=self.parent().ring,
-            differential_degree=self.parent().domain.differential.degree(),
-            differential=self._cone_differential(),
-        )
+    def cone(self):
+        return self.representative().cone()
 
 
 class KLRWPerfectComplex_Ext0set(KLRWPerfectComplex_Homset):
@@ -1058,11 +1142,19 @@ class KLRWPerfectComplex_Ext0set(KLRWPerfectComplex_Homset):
         )
 
     def one(self):
-        one_as_cycle = self.CycleClass.one()
+        cycle_set = self.CycleClass(
+            domain=self.domain,
+            codomain=self.codomain,
+        )
+        one_as_cycle = cycle_set.one()
         return self.coerce(one_as_cycle)
 
     def zero(self):
-        zero_as_cycle = self.CycleClass.zero()
+        cycle_set = self.CycleClass(
+            domain=self.domain,
+            codomain=self.codomain,
+        )
+        zero_as_cycle = cycle_set.zero()
         return self.coerce(zero_as_cycle)
 
     def _coerce_map_from_(self, other):
@@ -1085,8 +1177,15 @@ class KLRWPerfectComplex_Ext0set(KLRWPerfectComplex_Homset):
     def _self_action(self):
         return HomHomMultiplication(left_parent=self, right_parent=self)
 
-    def in_coordinates(self, element):
-        return self.basis._vector_from_element_(element)
+    def in_coordinates(self, element, check=False):
+        return self.basis._vector_from_element_(element, check=check)
+
+    def is_nilhomotopic(self, element):
+        boundary_module = self.basis._coordinate_boundary_module
+        ambient_homset = self.basis._ambient_homset
+        # in coordinates of the ambient set of cycles
+        elem_in_coord = ambient_homset.basis._vector_from_element_(element)
+        return elem_in_coord in boundary_module
 
     def representative(self, element):
         return self.cycle_module._element_constructor_(
@@ -1132,13 +1231,26 @@ class KLRWPerfectComplex_Ext0setGenerators(UniqueRepresentation):
     def __init__(self, extset: KLRWPerfectComplex_Ext0set):
         assert isinstance(extset, KLRWPerfectComplex_Ext0set)
         self._extset = extset
-        self._cycleset = extset.CycleClass(
-            domain=extset.domain,
-            codomain=extset.codomain,
+
+    @lazy_attribute
+    def _ambient_homset(self):
+        return self._cycleset.basis._ambient_homset
+
+    @lazy_attribute
+    def _cycleset(self):
+        return self._extset.CycleClass(
+            domain=self._extset.domain,
+            codomain=self._extset.codomain,
         )
-        self._coordinate_cycle_module = self._cycleset.basis.coordinate_free_module
+
+    @lazy_attribute
+    def _coordinate_cycle_module(self):
+        return self._cycleset.basis.coordinate_free_module
+
+    @lazy_attribute
+    def _coordinate_boundary_module(self):
         differential = self._cycleset.basis.previous_differential
-        self._coordinate_boundary_module = differential.sparse_matrix().column_module()
+        return differential.sparse_matrix().column_module()
 
     @lazy_attribute
     def _as_tuple_(self):
@@ -1169,9 +1281,9 @@ class KLRWPerfectComplex_Ext0setGenerators(UniqueRepresentation):
         )
         return self._extset.coerce(ambient_element)
 
-    def _vector_from_element_(self, elem, immutable=True):
+    def _vector_from_element_(self, elem, check=False, immutable=True):
         rep = elem.representative()
-        vec = self._cycleset.basis._vector_from_element_(rep)
+        vec = self._cycleset.basis._vector_from_element_(rep, check=check)
         # `vec` is an element of a the space of all homs.
         # We need to make it an element of the cycle submodule.
         vec = self._coordinate_cycle_module(vec)
