@@ -13,7 +13,6 @@ from sage.categories.action import Action
 from sage.rings.polynomial.polydict import ETuple
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.cachefunc import cached_method
-from sage.misc.cachefunc import weak_cached_function
 from sage.matrix.constructor import matrix
 from sage.modules.free_module_element import vector
 
@@ -25,7 +24,7 @@ from .gradings import (
     QuiverGradingGroupElement,
     QuiverGradingGroup,
 )
-from .bimodule_monoid import LeftFreeBimoduleMonoid
+from .bimodule_monoid import LeftFreeBimoduleMonoid, RightActionOnBimodule
 from .opposite_algebra import OppositeAlgebra
 
 
@@ -128,14 +127,23 @@ class KLRWElement(IndexedFreeModuleElement):
 
         The geometric part contains only constant dot coefficients.
         """
-        return self.parent().linear_combination(
+        dot_algebra = self.parent().base()
+        return self.parent().sum_of_terms(
             (
-                self.parent().monomial(braid),
-                self.parent().base()(coeff.constant_coefficient()),
+                braid,
+                dot_algebra.geometric_part(coeff),
             )
             for braid, coeff in self
-            if not coeff.constant_coefficient().is_zero()
         )
+
+    def _matmul_(self, other):
+        """
+        Used *only* in the special case when both self and other
+        have the same parent.
+        Because of a technical details in the coercion model
+        this method is called instead of action.
+        """
+        return self.parent()._self_action.act(self, other)
 
     # TODO:rewrite
     # def check(self):
@@ -143,15 +151,22 @@ class KLRWElement(IndexedFreeModuleElement):
     # TODO: add checks that all braids are correct
 
 
-class RightDotAction(Action):
+class RightDotAction(RightActionOnBimodule):
     # @cached_method
-    def _act_(self, p, x: IndexedFreeModuleElement) -> IndexedFreeModuleElement:
+    # def _act_(self, p, x: IndexedFreeModuleElement) -> IndexedFreeModuleElement:
+    #     p = self.codomain().base()(p)
+    #     return self.codomain().linear_combination(
+    #         (self._act_on_bases_(exp_tuple, braid), coeff * left_poly)
+    #         for exp_tuple, coeff in p.iterator_exp_coeff()
+    #         for braid, left_poly in x
+    #     )
+
+    def _act_on_base_in_bimodule_iter_(self, p, x_index):
+        # `x_index` is a braid in this setting.
         p = self.codomain().base()(p)
-        return self.codomain().linear_combination(
-            (self._act_on_bases_(exp_tuple, braid), coeff * left_poly)
-            for exp_tuple, coeff in p.iterator_exp_coeff()
-            for braid, left_poly in x
-        )
+        for exp_tuple, coeff in p.iterator_exp_coeff():
+            for new_index, new_coeff in self._act_on_bases_(exp_tuple, x_index):
+                yield (new_index, coeff * new_coeff)
 
     @cached_method
     def _act_on_bases_(self, p_exp_tuple: ETuple, braid: KLRWbraid):
@@ -256,8 +271,9 @@ class RightDotAction(Action):
 
 
 class KLRWAlgebra(LeftFreeBimoduleMonoid):
-    @weak_cached_function(cache=128)  # automatically a staticmethod
-    def __classcall__(
+    # @weak_cached_function(cache=128)  # automatically a staticmethod
+    @staticmethod
+    def __classcall_private__(
         cls,
         base_R,
         quiver_data: FramedDynkinDiagram_with_dimensions,
@@ -352,6 +368,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         return element.reduce(self.ideal_of_symmetric_dots)
 
     def one(self):
+        raise ValueError()
         if self.warnings:
             print(
                 r"The identity of KLRW is used' often this is done deep in Sage's code."
@@ -368,6 +385,50 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             (self.KLRWBraid._element_constructor_(state), self.base().one())
             for state in self.KLRWBraid.KLRWstate_set
         )
+
+    def from_base_ring(self, r):
+        """
+        Return the canonical embedding of ``r`` into ``self``.
+        """
+        if r.is_zero():
+            return self.zero()
+        return self.one()._lmul_(r)
+
+    """
+    def linear_combination(self, iter_of_elements_coeff):
+        from sage.data_structures.blas_dict import iaxpy
+        result = {}
+
+        for element, coeff in iter_of_elements_coeff:
+            monomial_coefficients = element._monomial_coefficients
+            if not coeff: # We multiply by 0, so nothing to do
+                continue
+            if not result:
+                if coeff == 1:
+                    result = monomial_coefficients.copy()
+                    continue
+            iaxpy(coeff, monomial_coefficients, result, remove_zeros=False)
+
+        # generator instead of a list & removal
+        if any(val.is_zero() for val in result.values()):
+            # self._counter_()
+            result = dict(
+                item for item in result.items() if not item[1].is_zero()
+            )
+
+        #filtered_result = dict(
+        #    filter(lambda item: not item[0].is_zero(), result.items())
+        #)
+
+        return self._from_dict(
+            result,
+            coerce=True,
+            remove_zeros=False,
+        )
+    """
+
+    # def _counter_(self):
+    #    pass
 
     def scalars(self):
         return self.base().base()
@@ -435,9 +496,9 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
 
     def scale_dots_in_element(self, element, multipliers):
         dots_algebra = self.base()
-        return self.linear_combination(
+        return self.sum_of_terms(
             (
-                self.monomial(braid),
+                braid,
                 dots_algebra.scale_dots_in_element(coeff, multipliers),
             )
             for braid, coeff in element
@@ -453,17 +514,20 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
             )
         )
 
+    def _right_base_action_(self, other):
+        return RightDotAction(other, self, is_left=False, op=operator.mul)
+
     def _get_action_(self, other, op, self_on_left):
-        if op == operator.mul:
-            if self_on_left is True:
-                if self.base().has_coerce_map_from(other):
-                    return RightDotAction(
-                        other, self, is_left=not self_on_left, op=operator.mul
-                    )
-        #if op == operator.matmul:
-        #    if self_on_left:
-        #        if isinstance(other, KLRWDotsAlgebra):
-        #            return TensorMultiplication(left_parent=self, right_parent=other)
+        # if op == operator.mul:
+        #     if self_on_left is True:
+        #         if self.base().has_coerce_map_from(other):
+        #             return RightDotAction(
+        #                 other, self, is_left=not self_on_left, op=operator.mul
+        #             )
+        if op == operator.matmul:
+            if self_on_left:
+                if isinstance(other, KLRWAlgebra):
+                    return TensorMultiplication(left_parent=self, right_parent=other)
         return super()._get_action_(other, op, self_on_left)
 
     def braid_set(self):
@@ -690,6 +754,7 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         """
         if left.right_state() != right.left_state():
             if self.warnings:
+                raise ValueError()
                 print(
                     "states don't match!"
                     + repr(left.right_state())
@@ -785,30 +850,40 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
     @lazy_attribute
     def opposite(self):
         return OppositeAlgebra(self)
-    
+
+    def klrw_options(self):
+        """
+        Return keywords needed for creating this
+        (or isomorphic, if called in subclasses)
+        KLRW algebra.
+        """
+        assert not self._reduction[1]
+        return self._reduction[2].copy()
+
     def _replace_(self, **replacements):
         """
         Make a similar parent with several adjustments.
 
         Compare to _replace of named tuples.
+        Warning: this makes an instance of KLRWAlgebra,
+        not its subclasses (e.g. `TensorProductOfKLRWAlgebras`)
         """
         from sage.structure.unique_representation import unreduce
 
-        cls, args, kwrds = self._reduction
+        kwrds = self.klrw_options()
         new_kwrds = kwrds | replacements
-        return unreduce(cls, args, new_kwrds)
+        return unreduce(KLRWAlgebra, (), new_kwrds)
 
-    #@cached_method
-    #@staticmethod
-    #def tensor_product(terms: Iterable):
-    #    return TensorProductOfKLRWAlgebras(terms)
-    #
-    #def __matmul__(self, other):
-    #    return self.tensor_product((self, other))
-    #
-    #@lazy_attribute
-    #def _self_action(self):
-    #    return TensorMultiplication(left_parent=self, right_parent=self)
+    @staticmethod
+    def tensor_product(*terms):
+        return TensorProductOfKLRWAlgebras(*terms)
+
+    def __matmul__(self, other):
+        return self.tensor_product(self, other)
+
+    @lazy_attribute
+    def _self_action(self):
+        return TensorMultiplication(left_parent=self, right_parent=self)
 
 
 ###############################################################################
@@ -834,19 +909,38 @@ class KLRWAlgebraGradedComponent:
         return len(self.basis(as_tuples=False))
 
     @cached_method
-    def basis(self, relevant_coeff_degree=None, as_tuples=False):
+    def basis(
+        self,
+        relevant_coeff_degree=None,
+        relevant_parameter_part=None,
+        as_tuples=False,
+    ):
         """
-        Generates a basis in a component
-        If as_tuples=True returns tuples (braid, exp)
+        Generates a basis in a component.
+
+        If as_tuples=True returns tuples
+        `(braid, exp)`
         representing monomials.
-        braid is a KLRW braid.
-        exp is a tuple of exponents in the polynomial coefficients.
+        `braid` is a KLRW braid.
+        `exp` is a tuple of exponents in the polynomial coefficients.
+
+        If `relevant_coeff_degree` is given, sorts only the entries
+        where `exp` has the given degree.
+        If `relevant_parameter_part` is given, sorts only the entries
+        where `exp` has the given parameter (i.e. non-dot) part.
         """
         if as_tuples:
-            return tuple(self._basis_iter_as_tuples_(relevant_coeff_degree))
+            return tuple(
+                self._basis_iter_as_tuples_(
+                    relevant_coeff_degree,
+                    relevant_parameter_part,
+                )
+            )
         else:
             result = []
-            for braid, exp in self._basis_iter_as_tuples_(relevant_coeff_degree):
+            for braid, exp in self._basis_iter_as_tuples_(
+                relevant_coeff_degree, relevant_parameter_part
+            ):
                 coeff = self.KLRW_algebra.base().monomial(*exp)
                 result.append(self.KLRW_algebra.term(braid, coeff))
             return tuple(result)
@@ -864,7 +958,24 @@ class KLRWAlgebraGradedComponent:
             result[braid.word(), exp] = i
         return MappingProxyType(result)
 
-    def _basis_iter_as_tuples_(self, relevant_coeff_degree=None):
+    def _basis_iter_as_tuples_(
+        self,
+        relevant_coeff_degree=None,
+        relevant_parameter_part=None,
+    ):
+        """
+        Iterates over basis monomials.
+
+        Yields pairs
+        `(braid, exp)`
+        where `braid` is the braid part, and `exp` is the ETuple
+        representing a monomial in the dots_algebra.
+
+        If `relevant_coeff_degree` is given, sorts only the entries
+        where `exp` has the given degree.
+        If `relevant_parameter_part` is given, sorts only the entries
+        where `exp` has the given parameter (i.e. non-dot) part.
+        """
         dot_algebra = self.KLRW_algebra.base()
         for braid in self.KLRW_algebra.KLRWBraid.braids_by_states(
             self.left_state, self.right_state
@@ -873,10 +984,17 @@ class KLRWAlgebraGradedComponent:
             if relevant_coeff_degree is not None:
                 if dot_degree != relevant_coeff_degree:
                     continue
-            for exp in dot_algebra.exps_by_degree(
-                self.degree - self.KLRW_algebra.braid_degree(braid),
-            ):
-                yield (braid, exp)
+            if relevant_parameter_part is None:
+                for exp in dot_algebra.exps_by_degree(
+                    self.degree - self.KLRW_algebra.braid_degree(braid),
+                ):
+                    yield (braid, exp)
+            else:
+                for exp in dot_algebra.exps_by_degree_and_parameter_part(
+                    self.degree - self.KLRW_algebra.braid_degree(braid),
+                    relevant_parameter_part,
+                ):
+                    yield (braid, exp)
 
     def _element_from_vector_(self, vector):
         assert len(vector) == len(self.basis())
@@ -943,3 +1061,123 @@ class KLRWAlgebraGradedComponent:
             mat_transposed = mat_transposed.stack(new_row_in_transposed)
 
         return mat_transposed.transpose()
+
+
+###############################################################################
+
+
+class TensorProductOfKLRWAlgebras(KLRWAlgebra):
+    """
+    Tensor product over the parameter algebra.
+
+    Warning:
+    So far it's implemented as the ambient KLRW algebra.
+    Can override methods like `_element_constructor_`
+    and `gens` to get correct behaviour.
+    """
+
+    def __init__(self, *klrw_algebras):
+        from klrw.misc import get_from_all_and_assert_equality
+        from klrw.dot_algebra import TensorProductOfDotAlgebras
+
+        assert klrw_algebras, "Need at least one KLRW algebra"
+        assert all(isinstance(alg, KLRWAlgebra) for alg in klrw_algebras)
+        self._parts = klrw_algebras
+
+        self.warnings = get_from_all_and_assert_equality(
+            lambda x: x.warnings,
+            self._parts,
+        )
+
+        dots_algebra = TensorProductOfDotAlgebras(*(alg.base() for alg in self._parts))
+
+        quiver_data = dots_algebra.quiver_data
+        self.quiver = quiver_data.quiver
+        self.KLRWBraid = KLRWbraid_set(quiver_data, state_on_right=True)
+
+        self.grading_group = get_from_all_and_assert_equality(
+            lambda x: x.grading_group,
+            self._parts,
+        )
+
+        category = FiniteDimensionalAlgebrasWithBasis(dots_algebra)
+        LeftFreeBimoduleMonoid.__init__(
+            self, R=dots_algebra, element_class=KLRWElement, category=category
+        )
+
+    def klrw_options(self):
+        """
+        Return keywords needed for creating this
+        (or isomorphic, if called in subclasses)
+        KLRW algebra.
+        """
+        options = {
+            "base_R": self.base().base_ring(),
+            "quiver_data": self.base().quiver_data,
+            "vertex_scaling": self.grading_group.vertex_scaling,
+            "edge_scaling": self.grading_group.edge_scaling,
+            "dot_scaling": self.grading_group.dot_scaling,
+            "invertible_parameters": self.base().invertible_parameters,
+            "dot_algebra_order": self.base().term_order(),
+            "warnings": self.warnings,
+        }
+        options |= self.base().prefixes
+
+        return options
+
+    @cached_method
+    def ambient_algebra(self):
+        """
+        Return ambient algebra.
+        """
+
+        return self._replace_()
+
+    def _tensor_product_of_braids(self, *braids):
+        state = []
+        word = []
+        for br in braids:
+            word += [i + len(state) for i in br.word()]
+            state += br.state().as_tuple()
+        braid = self.braid(state=self.state(state), word=tuple(word))
+        return braid
+
+    def tensor_product_of_elements(self, *elements):
+        result = self.zero()
+        it = product(*(iter(elem) for elem in elements))
+        for (*braid_coeff_pairs,) in it:
+            braids, coeffs = zip(*braid_coeff_pairs)
+            product_coeff = self.base().one()
+            for i, coeff in enumerate(coeffs):
+                product_coeff *= self.base().embedding(i)(coeff)
+            product_braid = self._tensor_product_of_braids(*braids)
+            result += self.term(product_braid, product_coeff)
+
+        return result
+
+
+class TensorMultiplication(Action):
+    """
+    Gives multiplication of two KLRW elements.
+
+    The solution is similar to matrix multiplication is Sage.
+    [see MatrixMatrixAction in MatrixSpace]
+    Coercion model in Sage requires both elements in
+    the usual product to have the same parent, but in
+    actions this is no longer the case. So we use the class Action.
+    """
+
+    def __init__(
+        self,
+        left_parent: KLRWAlgebra,
+        right_parent: KLRWAlgebra,
+    ):
+        Action.__init__(
+            self, G=left_parent, S=right_parent, is_left=True, op=operator.matmul
+        )
+        self._left_domain = self.actor()
+        self._right_domain = self.domain()
+        self._codomain = self._left_domain @ self._right_domain
+
+    def _act_(self, left, right):
+        return self._codomain.tensor_product_of_elements(left, right)
