@@ -2,6 +2,8 @@ from dataclasses import dataclass, replace
 from collections import defaultdict
 from types import MappingProxyType
 from itertools import product
+from typing import Iterable
+import operator
 
 from sage.structure.unique_representation import UniqueRepresentation
 from sage.rings.polynomial.multi_polynomial_libsingular import (
@@ -11,9 +13,11 @@ from sage.rings.polynomial.laurent_polynomial_ring import (
     LaurentPolynomialRing_mpair as LaurentPolynomialRing,
 )
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+
 # from sage.rings.polynomial.laurent_polynomial import LaurentPolynomial_mpair
 from sage.rings.polynomial.polydict import ETuple
 from sage.rings.ring import CommutativeRing
+from sage.categories.action import Action
 
 from sage.misc.cachefunc import cached_method, weak_cached_function
 from sage.misc.lazy_attribute import lazy_attribute
@@ -28,6 +32,7 @@ from klrw.gradings import (
     QuiverGradingSelfCrossingLabel,
     QuiverGradingUnorientedCrossingLabel,
     QuiverGradingDotLabel,
+    QuiverGradingEquvariantLabel,
 )
 
 
@@ -91,10 +96,37 @@ def exps_for_dots_of_degree(etuples_degrees: MappingProxyType | tuple, degree):
                 yield rec_et.eadd_scaled(et, power)
 
 
+def exps_for_dots_by_number(etuples: Iterable, number):
+    """
+    Returns all exponent ETuples with desired number of dots.
+
+    Similar to `exps_for_dots_of_degree`, but weight of every dot is 1.
+    """
+    if int(number) < 0:
+        return
+
+    etuples = tuple(etuples)
+
+    et = etuples[0]
+    if len(etuples) == 1:
+        if int(number) >= 0:
+            yield et.emul(int(number))
+        return
+    else:
+        power_of_first = int(number)
+        for power in range(power_of_first + 1):
+            for rec_et in exps_for_dots_by_number(
+                etuples[1:],
+                power_of_first - power,
+            ):
+                yield rec_et.eadd_scaled(et, power)
+
+
 # TODO: add an abstract class KLRWDotsAlgebra(CoomutativeRing, UniqueRep),
 # inherit upstairs and downstairs versions
-class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
-    @weak_cached_function(cache=128)  # automatically a staticmethod
+class KLRWDotsAlgebra(UniqueRepresentation, CommutativeRing):
+    # @weak_cached_function(cache=128)  # automatically a staticmethod
+    @staticmethod
     def __classcall_private__(cls, *args, invertible_parameters=False, **kwargs):
         if not invertible_parameters:
             # TODO: add the case when the list of invertible parameters is empty
@@ -185,6 +217,23 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
             ),
         )
 
+    @lazy_attribute
+    def without_dots(self):
+        """
+        Return the subalgebra algebra with no dots.
+        """
+        quiver_data = self.quiver_data.with_zero_dimensions(self.quiver_data.quiver)
+        return self.__class__(
+            self.base(),
+            quiver_data,
+            self.no_deformations,
+            self.default_vertex_parameter,
+            self.default_edge_parameter,
+            self.invertible_parameters,
+            self.term_order().name(),
+            **self.prefixes,
+        )
+
     def assign_default_values(
         self,
         quiver_data,
@@ -223,6 +272,16 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
             for key in quiver_data.KLRW_deformations_names():
                 self.variables[key] = QuiverParameter(None, None, self.zero(), False)
 
+    @lazy_attribute
+    def index_by_position(self):
+        result = {
+            var.position: index
+            for index, var in self.variables.items()
+            if var.position is not None
+        }
+        result = MappingProxyType(result)
+        return result
+
     def center_gens(self):
         for index, variable in self.variables.items():
             if isinstance(index, DotVariableIndex):
@@ -246,7 +305,11 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
     @lazy_attribute
     def number_of_non_dot_params(self):
-        return sum(1 for index in self.names if not isinstance(index, DotVariableIndex))
+        return sum(
+            1
+            for index, var in self.variables.items()
+            if (not isinstance(index, DotVariableIndex) and var.position is not None)
+        )
 
     @cached_method
     def dot_exptuples_and_degrees(self, grading_group: QuiverGradingGroup):
@@ -262,12 +325,38 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
                     result[exps[0]] = grading.coefficient(relevant_grading_index)
         return MappingProxyType(result)
 
+    @lazy_attribute
+    def dot_exptuples_by_color(self):
+        result = defaultdict(list)
+        for index, var in self.variables.items():
+            if isinstance(index, DotVariableIndex):
+                if not index.vertex.is_framing():
+                    exps = var.monomial.exponents()
+                    # must be a monomial
+                    assert len(exps) == 1, repr(var)
+                    color = index.vertex
+                    result[color] += [exps[0]]
+        return MappingProxyType(result)
+
     @cached_method
     def degrees_by_position(self, grading_group: QuiverGradingGroup):
         result = [list() for _ in range(self.ngens())]
         for index, var in self.variables.items():
             if var.position is not None:
                 result[var.position] = grading_group.dot_algebra_grading(index)
+
+        return tuple(result)
+
+    @cached_method
+    def degrees_by_position_ignoring_dots(self, grading_group: QuiverGradingGroup):
+        result = [list() for _ in range(self.ngens())]
+        for index, var in self.variables.items():
+            if var.position is not None:
+                if isinstance(index, DotVariableIndex):
+                    # zero if a dot
+                    result[var.position] = grading_group()
+                else:
+                    result[var.position] = grading_group.dot_algebra_grading(index)
 
         return tuple(result)
 
@@ -421,6 +510,58 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
         return tuple(x for x in result.exponents())
 
     @cached_method
+    def exps_by_degree_and_parameter_part(self, degree, parameter_part: ETuple):
+        """
+        Return a tuple of exponents of a given degree and parameter part.
+
+        Monomials differ by the number of dots.
+        """
+
+        # we make a polynomial with monomials representing all
+        # possible monomials of given degree
+        result = self.monomial(*parameter_part)
+        # first we take into account "easy" degrees
+        # where powers of varibles are uniquely reconstructed
+        grading_group = degree.parent()
+        total_degree_of_new_parts = grading_group.zero()
+        excess_degree = degree - self.exp_degree(parameter_part, grading_group)
+        for label, coeff in excess_degree:
+            # only two types of gradings are allowed in for dots
+            if not isinstance(
+                label, QuiverGradingDotLabel | QuiverGradingEquvariantLabel
+            ):
+                return tuple()
+
+            if isinstance(label, QuiverGradingEquvariantLabel):
+                # Purely equivariant gradings do not matter.
+                # We will check that it's correct later.
+                continue
+
+            color = label.vertex
+            new_part = sum(
+                self.monomial(*etuple)
+                for etuple in exps_for_dots_by_number(
+                    self.dot_exptuples_by_color[color],
+                    coeff,
+                )
+            )
+
+            if not new_part:
+                return tuple()
+
+            total_degree_of_new_parts += coeff * grading_group.dot_algebra_grading(
+                DotVariableIndex(color, None)
+            )
+
+            result *= new_part
+
+        # checking if purely equivariant part matches
+        if total_degree_of_new_parts == excess_degree:
+            return tuple(x for x in result.exponents())
+        else:
+            return tuple()
+
+    @cached_method
     def _indices_for_ilp_on_gradings_(self):
         relevant_invertible_indices = set()
         relevant_not_invertible_indices = set()
@@ -493,9 +634,13 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
         A_inv, A_non_inv = self._ilp_on_gradings_(grading_group)
 
-        y_transposed = dok_array((1, grading_group.dimension()), dtype=intc)
+        # a bug in Gurobi since 12.0.1:
+        # subtraction is not supported with scipy's sparse matrices,
+        # but addition is supported.
+        # So, we use addition instead of == that does subtraction.
+        y_transposed_neg = dok_array((1, grading_group.dimension()), dtype=intc)
         for i, v in degree._vector_(sparse=True).dict(copy=False).items():
-            y_transposed[0, i] = v
+            y_transposed_neg[0, i] = -v
 
         with gp.Env(empty=True) as env:
             env.setParam("OutputFlag", 0)
@@ -512,11 +657,13 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
                 )
 
                 if A_inv.shape[1] == 0:
-                    m.addConstr(A_non_inv @ x_non_inv == y_transposed)
+                    m.addConstr(A_non_inv @ x_non_inv + y_transposed_neg == 0)
                 elif A_non_inv.shape[1] == 0:
-                    m.addConstr(A_inv @ x_inv == y_transposed)
+                    m.addConstr(A_inv @ x_inv + y_transposed_neg == 0)
                 else:
-                    m.addConstr(A_inv @ x_inv + A_non_inv @ x_non_inv == y_transposed)
+                    m.addConstr(
+                        A_inv @ x_inv + A_non_inv @ x_non_inv + y_transposed_neg == 0
+                    )
 
                 m.optimize()
                 # if the system is inconsistent
@@ -539,8 +686,16 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
         return solutions
 
-    def exp_degree(self, exp: ETuple, grading_group: QuiverGradingGroup):
-        degrees_by_position = self.degrees_by_position(grading_group)
+    def exp_degree(
+        self,
+        exp: ETuple,
+        grading_group: QuiverGradingGroup,
+        ignoring_dots=False,
+    ):
+        if ignoring_dots:
+            degrees_by_position = self.degrees_by_position_ignoring_dots(grading_group)
+        else:
+            degrees_by_position = self.degrees_by_position(grading_group)
         return grading_group.linear_combination(
             (degrees_by_position[position], power)
             for position, power in exp.sparse_iter()
@@ -549,9 +704,16 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
     # libsingular wrapper in Sage does not allow to change elements for a wrapper,
     # so we define degree in the parent
     def element_degree(
-        self, element, grading_group: QuiverGradingGroup, check_if_homogeneous=False
+        self,
+        element,
+        grading_group: QuiverGradingGroup,
+        check_if_homogeneous=False,
+        ignoring_dots=False,
     ):
-        degrees_by_position = self.degrees_by_position(grading_group)
+        if ignoring_dots:
+            degrees_by_position = self.degrees_by_position_ignoring_dots(grading_group)
+        else:
+            degrees_by_position = self.degrees_by_position(grading_group)
         # zero elements return None as degree
         degree = None
         for exp, scalar in element.iterator_exp_coeff():
@@ -572,10 +734,7 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
     @cached_method
     def no_parameters_of_zero_degree(self, grading_group: QuiverGradingGroup):
-        return all(
-            not deg.is_zero()
-            for deg in self.degrees_by_position(grading_group)
-        )
+        return all(not deg.is_zero() for deg in self.degrees_by_position(grading_group))
 
     def is_element_symmetric(self, element):
         for v in self.quiver_data.non_framing_nodes():
@@ -594,7 +753,24 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
     def etuple_ignoring_dots(self, et: ETuple):
         # we assume that the non-zero dots have first positions
-        return et[: self.number_of_non_dot_params]
+        # This is not fast, similar to slicing of ETuples
+        data = {
+            ind: exp
+            for ind, exp in et.sparse_iter()
+            if ind < self.number_of_non_dot_params
+        }
+        return ETuple(data=data, length=self.ngens())
+
+    def etuple_has_dots(self, et: ETuple):
+        # we assume that the non-zero dots have first positions
+        return any(ind >= self.number_of_non_dot_params for ind, _ in et.sparse_iter())
+
+    def geometric_part(self, element):
+        return sum(
+            coeff * self.monomial(*exp)
+            for exp, coeff in element.iterator_exp_coeff()
+            if self.etuple_ignoring_dots(exp).is_constant()
+        )
 
     def hom_from_dots_map(self, codomain, map: MappingProxyType):
         variables_images = [
@@ -611,7 +787,15 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
     def _coerce_map_from_(self, other):
         if isinstance(other, KLRWDotsAlgebra):
-            if self.quiver_data == other.quiver_data:
+            # we allow coercion if both quivers are equal
+            # and dimensions are equal
+            compatible_quiver_data = self.quiver_data == other.quiver_data
+            # or if we coerce from the ring with no dots
+            compatible_quiver_data |= (
+                self.quiver_data.quiver == other.quiver_data.quiver
+                and not other.quiver_data.dimensions(copy=False)
+            )
+            if compatible_quiver_data:
                 can_coerce = self.base().has_coerce_map_from(other.base())
                 if other.default_vertex_parameter is not None:
                     can_coerce &= (
@@ -632,24 +816,20 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
 
         return super()._coerce_map_from_(other)
 
-    @cached_method
-    def hom_in_simple(self):
+    def hom_to_simple(self, elem):
         """
-        Kill dots, set all multiplicative parameters to 1.
+        Kill dots in `elem`, set all multiplicative parameters to 1.
 
-        Gets scalars in a ring R.
+        Gets scalars in the base ring.
         """
-        variables_images = []
-        for index, var in self.variables.items():
-            if var.name is not None:
-                if isinstance(index, DotVariableIndex):
-                    # setting all dots to zero
-                    variables_images.append(self.base().zero())
-                else:
-                    # setting all other parameters to 1
-                    variables_images.append(self.base().one())
-
-        return self.hom(variables_images, self.base())
+        return sum(
+            (
+                coeff
+                for exp, coeff in elem.iterator_exp_coeff()
+                if not self.etuple_has_dots(exp)
+            ),
+            start=self.base().zero(),
+        )
 
     def variable(self, *index):
         if len(index) == 1:
@@ -689,8 +869,80 @@ class KLRWDotsAlgebra(CommutativeRing, UniqueRepresentation):
         m = h_n.parent().hom(images, self)
         return m(h_n)
 
+    def _dict_of_dots_iterator_(self, element):
+        """
+        Iterates over monomials.
+
+        Yields a pairs
+        `(coeff, dic)`
+        where `coeff` is a polynomial in non-dots
+        and `dic` is a dictionary that keeps the data about
+        dots in form
+        `{dot_index : power}`
+        Each type of `dic` appears at most once.
+        """
+        # by default each entry is zero in `self.without_dots`
+        result = defaultdict(self.without_dots)
+        for exp, scalar in element.iterator_exp_coeff():
+            coeff_dict = {}
+            dots_dict = {}
+
+            # we assume that the non-zero dots have first positions
+            for i, pow in exp.sparse_iter():
+                if i < self.number_of_non_dot_params:
+                    coeff_dict[i] = pow
+                else:
+                    dots_dict[i] = pow
+
+            # could also do
+            # `dots_etuple = exp[self.number_of_non_dot_params:]`
+            # and
+            # `etuple = exp[:self.number_of_non_dot_params]`,
+            # but slices can be slow for many zeroes
+            # (see implementation of ETuple)
+            dots_etuple = ETuple(dots_dict, self.ngens())
+            etuple = ETuple(coeff_dict, self.without_dots.ngens())
+            coeff = scalar * self.without_dots.monomial(*etuple)
+            result[dots_etuple] += coeff
+
+        for dots_etuple, coeff in result.items():
+            dots_dict = {
+                self.index_by_position[i]: pow for i, pow in dots_etuple.sparse_iter()
+            }
+
+            dots_dict = MappingProxyType(dots_dict)
+            yield (coeff, dots_dict)
+
+    @staticmethod
+    def tensor_product(*terms):
+        return TensorProductOfDotAlgebras(*terms)
+
+    def __matmul__(self, other):
+        return self.tensor_product(self, other)
+
+    def _get_action_(self, other, op, self_on_left):
+        if op == operator.matmul:
+            if self_on_left:
+                if isinstance(other, KLRWDotsAlgebra):
+                    return TensorMultiplication(left_parent=self, right_parent=other)
+        return super()._get_action_(other, op, self_on_left)
+
+    @lazy_attribute
+    def _self_action(self):
+        return TensorMultiplication(left_parent=self, right_parent=self)
+
 
 class KLRWUpstairsDotsAlgebra(KLRWDotsAlgebra, PolynomialRing_sing):
+    class Element(PolynomialRing_sing.Element):
+        def _matmul_(self, other):
+            """
+            Used *only* in the special case when both self and other
+            have the same parent.
+            Because of a technical details in the coercion model
+            this method is called instead of action.
+            """
+            return self.parent()._self_action.act(self, other)
+
     def init_algebra(self, base_ring, nondot_names_list, dot_names_list, order):
         super(KLRWDotsAlgebra, self).__init__(
             base_ring,
@@ -700,19 +952,18 @@ class KLRWUpstairsDotsAlgebra(KLRWDotsAlgebra, PolynomialRing_sing):
         )
 
 
-# class DotAlgebraElement_invertible_parameters(LaurentPolynomial_mpair):
-    # TODO: can speed up __init__ by using reduce=False
-    # need Cython
-#    pass
-    # def __getattribute__(self, name):
-    #     print("Element :: Accessing attribute {}".format(name))
-    #     return super().__getattribute__(name)
-
-
 class KLRWUpstairsDotsAlgebra_invertible_parameters(
     KLRWDotsAlgebra, LaurentPolynomialRing
 ):
-    # Element = DotAlgebraElement_invertible_parameters
+    class Element(LaurentPolynomialRing.Element):
+        def _matmul_(self, other):
+            """
+            Used *only* in the special case when both self and other
+            have the same parent.
+            Because of a technical details in the coercion model
+            this method is called instead of action.
+            """
+            return self.parent()._self_action.act(self, other)
 
     def init_algebra(self, base_ring, nondot_names_list, dot_names_list, order):
         polynomial_ring = PolynomialRing(
@@ -723,6 +974,182 @@ class KLRWUpstairsDotsAlgebra_invertible_parameters(
         )
         super(KLRWDotsAlgebra, self).__init__(polynomial_ring)
 
-    # def __getattribute__(self, name):
-    #    print("Algebra :: Accessing attribute {}".format(name))
-    #    return super().__getattribute__(name)
+
+class TensorProductOfDotAlgebras(KLRWDotsAlgebra):
+    """
+    Tensor product over the parameter algebra.
+    """
+
+    @staticmethod
+    def __classcall_private__(
+        cls,
+        *dot_algebras,
+    ):
+        from klrw.misc import get_from_all_and_assert_equality
+
+        invertible_parameters = get_from_all_and_assert_equality(
+            lambda x: x.invertible_parameters, dot_algebras
+        )
+        if not invertible_parameters:
+            return TensorProductOfKLRWUpstairsDotsAlgebras(dot_algebras)
+        else:
+            return TensorProductOfKLRWUpstairsDotsAlgebras_invertible_parameters(
+                dot_algebras
+            )
+
+    def __init__(self, dot_algebras: tuple[KLRWDotsAlgebra]):
+        from klrw.misc import get_from_all_and_assert_equality
+
+        assert dot_algebras, "Need at least one dot algebra"
+        assert all(isinstance(alg, KLRWDotsAlgebra) for alg in dot_algebras)
+        self._parts = dot_algebras
+        quiver = get_from_all_and_assert_equality(
+            lambda x: x.quiver_data.quiver, dot_algebras
+        )
+        quiver_data = FramedDynkinDiagram_with_dimensions.with_zero_dimensions(quiver)
+        # we make an array where `i`th entry is the quiver with
+        # dimensions that are the sum of dimensions of the first `i`
+        # dot algebras
+        self._partial_quiver_data = [quiver_data.immutable_copy()]
+        for alg in dot_algebras:
+            for vertex, dim in alg.quiver_data.dimensions(copy=False).items():
+                quiver_data[vertex] += dim
+            self._partial_quiver_data.append(quiver_data.immutable_copy())
+
+        # TODO: fix _reduction and get all the data from reduction?
+        base_ring = get_from_all_and_assert_equality(
+            lambda x: x.base_ring(), dot_algebras
+        )
+        order = get_from_all_and_assert_equality(lambda x: x.term_order(), dot_algebras)
+        parameters_names = [
+            "no_deformations",
+            "default_vertex_parameter",
+            "default_edge_parameter",
+            "invertible_parameters",
+        ]
+        parameters = {}
+        for name in parameters_names:
+            parameters[name] = get_from_all_and_assert_equality(
+                lambda x: getattr(x, name), dot_algebras
+            )
+        prefixes = get_from_all_and_assert_equality(lambda x: x.prefixes, dot_algebras)
+        parameters |= prefixes
+
+        super().__init__(
+            base_ring=base_ring,
+            quiver_data=self._partial_quiver_data[-1],
+            order=order,
+            **parameters,
+        )
+
+    @cached_method
+    def embedding(self, i):
+        """
+        Embeds a piece into the tensor product.
+
+        Dot algebras are unital, so we can send `x` to
+        `1 @ ... @ x @ ... @ 1`
+        where x is on the `i`th position.
+        """
+        i = int(i)
+        assert i >= 0
+        assert i < len(self._parts)
+        part_dot_algebra = self._parts[i]
+        dims_before_part = self._partial_quiver_data[i]
+        variables_images = [None] * part_dot_algebra.ngens()
+        for index, var in part_dot_algebra.variables.items():
+            if var.position is not None:
+                if isinstance(index, DotVariableIndex):
+                    vertex = index.vertex
+                    new_index = DotVariableIndex(
+                        vertex, index.number + dims_before_part[vertex]
+                    )
+                else:
+                    new_index = index
+                image = self.variables[new_index].monomial
+                variables_images[var.position] = image
+
+        return part_dot_algebra.hom(variables_images, codomain=self)
+
+    @cached_method
+    def projection(self, i):
+        """
+        Projects the tensor product onto a piece.
+
+        Kills all dots that don't belong to the piece.
+
+        Warning: so far does not work for invertible parameters,
+        because Sage checks if the images of dots are invertible.
+        """
+        i = int(i)
+        assert i >= 0
+        assert i < len(self._parts)
+        part_dot_algebra = self._parts[i]
+        dims_before_part = self._partial_quiver_data[i]
+        dims_after_part = self._partial_quiver_data[i + 1]
+        variables_images = [None] * self.ngens()
+        for index, var in self.variables.items():
+            if var.position is not None:
+                if isinstance(index, DotVariableIndex):
+                    vertex = index.vertex
+                    upper_bound = dims_after_part[vertex]
+                    lower_bound = dims_before_part[vertex]
+                    if index.number <= upper_bound and index.number > lower_bound:
+                        new_index = DotVariableIndex(vertex, index.number - lower_bound)
+                    else:
+                        new_index = None
+                else:
+                    new_index = index
+                if new_index is not None:
+                    image = self.variables[new_index].monomial
+                    variables_images[var.position] = image
+                else:
+                    variables_images[var.position] = part_dot_algebra.zero()
+
+        return self.hom(variables_images, codomain=part_dot_algebra)
+
+    def tensor_product_of_elements(self, *elements):
+        """
+        Construct an element from parts.
+        """
+        return prod(self.embedding(i)(element) for i, element in enumerate(elements))
+
+
+class TensorProductOfKLRWUpstairsDotsAlgebras(
+    TensorProductOfDotAlgebras, KLRWUpstairsDotsAlgebra
+):
+    pass
+
+
+class TensorProductOfKLRWUpstairsDotsAlgebras_invertible_parameters(
+    TensorProductOfDotAlgebras, KLRWUpstairsDotsAlgebra_invertible_parameters
+):
+    pass
+
+
+class TensorMultiplication(Action):
+    """
+    Gives tensor product of two dot algebra elements.
+
+    The solution is similar to matrix multiplication is Sage.
+    [see MatrixMatrixAction in MatrixSpace]
+    Coercion model in Sage requires both elements in
+    the usual product to have the same parent, but in
+    actions this is no longer the case. So we use the class Action.
+    """
+
+    def __init__(
+        self,
+        left_parent: KLRWDotsAlgebra,
+        right_parent: KLRWDotsAlgebra,
+    ):
+        Action.__init__(
+            self, G=left_parent, S=right_parent, is_left=True, op=operator.matmul
+        )
+        self._left_domain = self.actor()
+        self._right_domain = self.domain()
+        self._codomain = self._left_domain @ self._right_domain
+
+    def _act_(self, left, right):
+        # return self._codomain.embedding(0)(left) * self._codomain.embedding(1)(right)
+        return self._codomain.tensor_product_of_elements(left, right)
