@@ -233,8 +233,6 @@ class TotalizationOfGradedFreeModule(GradedFreeModule):
             subdiv_in_grading = self._subdivisions[total_grading]
             subdiv_in_grading.append(subdiv_in_grading[-1] + rank)
 
-        self.original_signs = [diff.sign for diff in graded_module.differentials()]
-
     def indices_within_total_grading(self, grading):
         return self._indices_within_total_grading[grading]
 
@@ -261,17 +259,21 @@ class TotalizationOfGradedFreeModule(GradedFreeModule):
         for grading, subdiv in self._subdivisions.items():
             yield (grading, subdiv[-1])
 
-    def base_change(self, other):
-        graded_module = self._reduction[1][0]
-        return self._replace_(
-            multicomplex=graded_module.base_change(other),
-        )
+    # def base_change(self, other):
+    #     graded_module = self._reduction[1][0]
+    #     return self._replace_(
+    #         multicomplex=graded_module.base_change(other),
+    #     )
 
     @staticmethod
-    def totalize_morphism(morphism):
-        from klrw.free_complex import ShiftedObject
+    def totalize_morphism(morphism, sign=None):
+        """
+        Totalize a morphism between two graded modules with several hom gradings.
 
-        print("*****************************")
+        `sign` is a function of of hom degrees with values +1/-1.
+        By default, it's constantly 1.
+        """
+        from klrw.free_complex import ShiftedObject
 
         original_domain, domain_shift = ShiftedObject.original_and_shift(
             morphism.domain()
@@ -292,6 +294,9 @@ class TotalizationOfGradedFreeModule(GradedFreeModule):
 
         totalized_morphism_dict = defaultdict(dict)
         for hom_degree, map in morphism:
+            # we need to use the original gradings, not totalized ones.
+            # this is why we do shifts by hands, instead of working
+            # with shifted objects.
             total_degree = hom_totalization_morphism(hom_degree)
             domain_index = domain.indices_within_total_grading(
                 hom_degree + domain_hom_shift
@@ -305,29 +310,19 @@ class TotalizationOfGradedFreeModule(GradedFreeModule):
             row_subdivision = codomain.subdivisions(
                 total_degree + total_codomain_hom_shift, codomain_index
             )
-            print(map)
-            print(
-                domain_index, domain.subdivisions(total_degree + total_domain_hom_shift)
-            )
-            print(
-                codomain_index,
-                codomain.subdivisions(total_degree + total_codomain_hom_shift),
-            )
+            if sign is not None:
+                _sign = sign(hom_degree)
+            else:
+                _sign = 1
 
             # new_diff_dict_of_dicts[domain_total_degree] = {}
             totalized_morphism_component = totalized_morphism_dict[total_degree]
             for (a, b), entry in map.dict(copy=False).items():
                 indices = (a + row_subdivision, b + column_subdivision)
-                totalized_morphism_component[indices] = entry
+                totalized_morphism_component[indices] = _sign * entry
 
-        print("1:", domain.__class__)
-        print("2:", codomain.__class__)
-        print("2::", domain.totalization_morphism(domain_shift))
         domain = domain[domain.totalization_morphism(domain_shift)]
-        print("3:", domain.__class__)
-        print("3::", codomain.totalization_morphism(codomain_shift))
         codomain = codomain[codomain.totalization_morphism(codomain_shift)]
-        print("4:", codomain.__class__)
 
         return domain.hom(
             codomain, totalized_morphism_dict, ignore_checks=frozenset(["chain"])
@@ -363,10 +358,18 @@ class TotalizationOfMulticomplexOfFreeModules(
         from klrw.misc import get_from_all_and_assert_equality
         from klrw.free_complex import ShiftedObject
 
+        self.original_signs = [
+            diff.sign for diff in self._before_totalization.differentials()
+        ]
+
         multicomplex = self._before_totalization
+        # we totalize morphisms and multuply blocks by appropriate signs.
         totalized_differentials = [
-            self.totalize_morphism(differential)
-            for differential in multicomplex.differentials()
+            self.totalize_morphism(
+                differential,
+                sign=lambda hom_degree: self.grading_sign(i, hom_degree),
+            )
+            for i, differential in enumerate(multicomplex.differentials())
         ]
         # Checking that codomains are the same.
         # Mostly, that the shifts are correct.
@@ -377,68 +380,13 @@ class TotalizationOfMulticomplexOfFreeModules(
             )
         except AssertionError:
             raise ValueError("Differential degrees differ after totalization.")
-        differential_degree = ShiftedObject.find_shift(codomain, self)
+        differential_degree = ShiftedObject.find_shift(self, codomain)
 
-        new_differential_dict = {}
-        for i, diff in enumerate(totalized_differentials):
-            for hom_degree in diff.support():
-                sign = self.grading_sign(i, hom_degree)
-                # need signed here!!!
-                if hom_degree in new_differential_dict:
-                    new_differential_dict[hom_degree] += diff(
-                        hom_degree, sign=(sign != 1)
-                    )
-                else:
-                    new_differential_dict[hom_degree] = diff(
-                        hom_degree, sign=(sign != 1)
-                    )
-
-        """
-        total_differential_degree = get_from_all_and_assert_equality(
-            lambda x: self.totalization_morphism(x.degree()),
-            multicomplex.differentials(),
-        )
-        total_hom_differential_degree = total_differential_degree.homological_part()
-
-        new_diff_dict_of_dicts = defaultdict(dict)
-        for i, differential in enumerate(multicomplex.differentials()):
-            hom_differential_degree = differential.hom_degree()
-            for hom_degree, map in differential:
-                domain_total_degree = self.hom_totalization_morphism(hom_degree)
-                domain_index = self.indices_within_total_grading[hom_degree]
-                codomain_degree = hom_degree + hom_differential_degree
-                codomain_total_degree = self.hom_totalization_morphism(codomain_degree)
-                codomain_index = self.indices_within_total_grading[codomain_degree]
-                column_subdivision = self.subdivisions(
-                    domain_total_degree, domain_index
-                )
-                row_subdivision = self.subdivisions(
-                    codomain_total_degree, codomain_index
-                )
-
-                # new_diff_dict_of_dicts[domain_total_degree] = {}
-                new_differential_component = new_diff_dict_of_dicts[domain_total_degree]
-                sign = self.grading_sign(i, hom_degree)
-                for (a, b), entry in map.dict(copy=False).items():
-                    indices = (a + row_subdivision, b + column_subdivision)
-                    new_differential_component[indices] = sign * entry
-
-        new_differential_dict = {
-            tot_deg: matrix(
-                multicomplex.ring().opposite,
-                ncols=self.component_rank(tot_deg),
-                nrows=self.component_rank(tot_deg + total_hom_differential_degree),
-                entries=component_dict,
-                sparse=True,
-                immutable=True,
-            )
-            for tot_deg, component_dict in new_diff_dict_of_dicts.items()
-        }
-        """
+        new_differential = sum(totalized_differentials)
 
         return self.DifferentialClass(
             underlying_module=self,
-            differential_data=new_differential_dict,
+            differential_data=new_differential,
             degree=differential_degree,
             check=True,
         )

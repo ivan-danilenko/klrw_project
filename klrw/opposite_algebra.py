@@ -73,6 +73,14 @@ class OppositeAlgebraElement(ModuleElement):
     def __hash__(self):
         return hash(self.value)
 
+    def __reduce__(self):
+        """
+        For pickling.
+        """
+        return (
+            self.__class__, (self.parent(), self.value)
+        )
+
 
 class OppositeAlgebra(UniqueRepresentation, Module):
     """
@@ -131,7 +139,7 @@ class OppositeAlgebra(UniqueRepresentation, Module):
                 from sage.categories.homset import Hom
 
                 morphism = SetMorphism(
-                    Hom(self.algebra, self),
+                    Hom(other, self),
                     lambda x, self=self: self.element_class(
                         self, self.algebra(x.value)
                     ),
@@ -147,6 +155,17 @@ class OppositeAlgebra(UniqueRepresentation, Module):
             morphism = SetMorphism(
                 Hom(self.algebra, self),
                 lambda x, self=self: self.element_class(self, self.algebra(x)),
+            )
+            return morphism
+        if isinstance(algebra, OppositeAlgebra):
+            from sage.categories.morphism import SetMorphism
+            from sage.categories.homset import Hom
+
+            morphism = SetMorphism(
+                Hom(algebra, self),
+                lambda x, self=self: self.element_class(
+                    self, self.algebra(x.value)
+                ),
             )
             return morphism
         return None
@@ -184,6 +203,12 @@ class OppositeAlgebra(UniqueRepresentation, Module):
 
     def zero(self):
         return self(self.algebra.zero())
+
+    def from_base_ring(self, r):
+        """
+        Return the canonical embedding of ``r`` into ``self``.
+        """
+        return self(self.algebra.from_base_ring(r))
 
     def _repr_(self):
         result = "Endomorphism algebra of a free rank one module over "
