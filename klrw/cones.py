@@ -5,7 +5,7 @@ from itertools import product, chain
 
 from sage.structure.unique_representation import UniqueRepresentation
 from sage.misc.lazy_attribute import lazy_attribute
-from sage.matrix.constructor import matrix
+from sage.matrix.all import matrix
 
 from klrw.free_complex import (
     ComplexOfFreeModules,
@@ -302,8 +302,9 @@ class KLRWIteratedCone(KLRWPerfectComplex):
     Inputs:
      -- `morphisms` is an iterable of chain maps, `f_i`,
      -- `complexes` is an iterable of complexes `C_i`.
-     -- `max_parameter_iterations` controls how many iterations
-        are done in the computation of homotopies.
+     -- `cache_level` controls how far from the diagonal
+        caching is used. If it's `0`, no cache. If it's `1`,
+        cache is applied to the first subdiagonal with homotopies.
     We allow some (or all) `C_i`s to be a direct sum of
     complexes. Then the corresponding term in `complexes`
     has to be an iterable of complexes, and `morphisms`
@@ -323,13 +324,14 @@ class KLRWIteratedCone(KLRWPerfectComplex):
             | ShiftedComplexOfFreeModules
             | Iterable[ComplexOfFreeModules | ShiftedComplexOfFreeModules]
         ],
+        cache_level=0,
     ):
         """
         We don't cache results via `UniqueRepresentation`.
         """
         from sage.misc.classcall_metaclass import typecall
 
-        instance = typecall(cls, morphisms, complexes)
+        instance = typecall(cls, morphisms, complexes, cache_level)
         return instance
 
     def __init__(
@@ -343,7 +345,10 @@ class KLRWIteratedCone(KLRWPerfectComplex):
             | ShiftedComplexOfFreeModules
             | Iterable[ComplexOfFreeModules | ShiftedComplexOfFreeModules]
         ],
+        cache_level=0,
     ):
+        self._cache_level = cache_level
+        self._counter = defaultdict(int)
         self._complexes = self._normalize_complexes_(complexes)
         self._morphisms = self._normalize_morphisms_(morphisms)
         assert len(self._complexes) == len(self._morphisms) + 1
@@ -355,6 +360,7 @@ class KLRWIteratedCone(KLRWPerfectComplex):
         # We use indices `i, j, k` for the blocks (same for `C_i`s),
         # and `a, b, c` for the subblocks.
         self._off_diagonal_blocks = {}
+        self._homotopy_cache = {}
         self._set_subdiagonal_()
         self._set_differential_degree_and_sign_()
         self._shift_off_diagonal_blocks_()
@@ -364,6 +370,12 @@ class KLRWIteratedCone(KLRWPerfectComplex):
         self._make_extended_grading_group_()
         self._make_differential_()
         self._del_auxilliary_data_()
+        counter_of_counter = defaultdict(int)
+        for x in self._counter.values():
+            counter_of_counter[x] += 1
+        print(dict(counter_of_counter))
+        print("Done: ", sum(i * j for i, j in counter_of_counter.items()))
+        print("Repeated: ", sum((i - 1) * j for i, j in counter_of_counter.items()))
 
     @staticmethod
     def _normalize_complexes_(complexes):
@@ -534,13 +546,33 @@ class KLRWIteratedCone(KLRWPerfectComplex):
         # all blocks in i-th row to the rights
         # and all blocks in j-th column above
         # have to be filled in
-        for i in range(2, len(self._complexes)):
-            for j in range(i - 2, -1, -1):
+        # `k` parametrizes subdiagonals.
+        for k in range(2, len(self._complexes)):
+            for j in range(len(self._complexes) - k):
+                i = j + k
+                print("Making ({},{}) block".format(i, j))
                 self._complete_off_diagonal_block_(i, j)
+                # print(len(self._off_diagonal_blocks[i, j]))
+
+        column_width = max(
+            (
+                len(str(len(self._off_diagonal_blocks[i, j])))
+                for j in range(len(self._complexes) - 2)
+                for i in range(j + 1, len(self._complexes))
+            )
+        )
+
+        # Print data rows
+        for i in range(2, len(self._complexes)):
+            print(
+                " ".join(
+                    f"{str(len(self._off_diagonal_blocks[i, j])):{column_width}}"
+                    for j in range(i - 1)
+                )
+            )
 
     def _complete_off_diagonal_block_(self, i, j):
-        from klrw.homotopy import homotopy
-
+        #import multiprocessing as mp
         # when we compute the differential squared,
         # we get the condition
         # `differential(B_{i,j}) + B_{i,k}*B_{k,j} = 0'.
@@ -549,21 +581,114 @@ class KLRWIteratedCone(KLRWPerfectComplex):
         for k in range(j + 1, i):
             Bik = self._off_diagonal_blocks[i, k]
             Bkj = self._off_diagonal_blocks[k, j]
-            BikBkj.append(self._multiply_blocks_(Bik, Bkj))
+            BikBkj_term = self._multiply_blocks_(Bik, Bkj)
+            BikBkj.append(BikBkj_term)
 
         SumBikBkj = self._add_blocks_and_cleanup_(BikBkj)
 
-        Bij = {}
+        """
+        mp_context = mp.get_context("spawn")
+        with mp_context.Manager() as manager:
+            tasks = [
+                (
+                    a,
+                    b,
+                    sum,
+                    (i - j <= self._cache_level + 1),
+                )
+                for (a, b), sum in SumBikBkj.items()
+            ]
+            Bij = manager.dict()
+            with mp_context.Pool(processes=8) as pool:
+                homotopy_async_list = pool.starmap_async(
+                    self._task_, tasks
+                )
+                Bij = dict(homotopy_async_list.get())
+                print(Bij.keys())
+        """
+        Bij = []
         for a, b in SumBikBkj:
-            homotopy_ab = homotopy(
+            Bij[a, b] = -self._find_homotopy_(
                 SumBikBkj[a, b],
-                verbose=False,
+                use_cache=(i - j <= self._cache_level + 1),
             )
-            if homotopy_ab.is_zero():
-                continue
-            Bij[a, b] = -homotopy_ab
 
         self._off_diagonal_blocks[i, j] = Bij
+
+    @classmethod
+    def _task_(cls, a, b, morphism, use_cache=False):
+        return a, b, cls._task_find_homotopy_(morphism, use_cache=use_cache)
+
+    @staticmethod
+    def _task_find_homotopy_(morphism, use_cache=False):
+        from klrw.homotopy import homotopy
+
+        # If not in cache or cache not used.
+        if morphism.domain().KLRW_algebra().base().invertible_parameters:
+            max_iterations = 1
+        else:
+            max_iterations = 10
+        homotopy_ = homotopy(
+            morphism,
+            verbose=False,
+            max_iterations=max_iterations,
+        )
+        if homotopy_ is None:
+            raise ValueError("Homotopy does not exist")
+        if homotopy_.is_zero():
+            return None
+
+        return homotopy_
+
+    def _find_homotopy_(self, morphism, use_cache=False):
+        from klrw.homotopy import homotopy
+
+        # First normalize and check if in cache.
+        if use_cache:
+            for _, mat in morphism:
+                mat.set_immutable()
+
+            from klrw.free_complex import ShiftedObject
+
+            domain_original, domain_shift = ShiftedObject.original_and_shift(
+                morphism.domain()
+            )
+            # We shift, and then shift back for more effective caching.
+            morphism = morphism[-domain_shift]
+
+            if morphism in self._homotopy_cache:
+                homotopy_ = self._homotopy_cache[morphism]
+                homotopy_ = homotopy_[domain_shift]
+                # When we shift, we get signs for differential. Fix it.
+                if domain_original.differential.sign(domain_shift) == -1:
+                    homotopy_ = -homotopy_
+                return homotopy_
+
+        # If not in cache or cache not used.
+        if morphism.domain().KLRW_algebra().base().invertible_parameters:
+            max_iterations = 1
+        else:
+            max_iterations = 10
+        homotopy_ = homotopy(
+            morphism,
+            verbose=False,
+            max_iterations=max_iterations,
+        )
+        if homotopy_ is None:
+            raise ValueError("Homotopy does not exist")
+        if homotopy_.is_zero():
+            return None
+
+        # Cache if needed and shift homotopy back
+        if use_cache:
+            self._homotopy_cache[morphism] = homotopy_
+            homotopy_ = homotopy_[domain_shift]
+            # when we shift, we get signs for differential. Fix it.
+            if domain_original.differential.sign(domain_shift) == -1:
+                homotopy_ = -homotopy_
+            self._counter[morphism.domain(), morphism.codomain()] += 1
+
+        return homotopy_
 
     def _make_projectives_and_block_positions_(self):
         projectives = defaultdict(list)
@@ -620,6 +745,9 @@ class KLRWIteratedCone(KLRWPerfectComplex):
                     for (c, d), entry in mat.dict(copy=False).items():
                         diff_component[c + block_row_start, d + block_col_start] = entry
 
+        for mat in differential_dict.values():
+            mat.set_immutable()
+
         self.differential = self.DifferentialClass(
             underlying_module=self,
             differential_data=differential_dict,
@@ -628,6 +756,7 @@ class KLRWIteratedCone(KLRWPerfectComplex):
         )
 
     def _del_auxilliary_data_(self):
+        del self._homotopy_cache
         del self._complexes
         del self._morphisms
         del self._block_positions
@@ -654,62 +783,6 @@ class KLRWIteratedCone(KLRWPerfectComplex):
         self._extended_grading_group = get_from_all_and_assert_equality(
             lambda x: x.shift_group(), complexes_iter
         )
-
-    """
-    def differential(self):
-        diff_degree = self._domain.differential.degree()
-        morphism_shifted = self._morphism[diff_degree]
-
-        gradings = frozenset(self._domain_shifted.differential.support())
-        gradings |= frozenset(self._codomain.differential.support())
-        gradings |= frozenset(morphism_shifted.support())
-
-        diff_hom_degree = self._domain.differential.hom_degree()
-        differential = {}
-        for grading in gradings:
-            next_grading = grading + diff_hom_degree
-            # the matrix has block structure
-            # columns are splitted into two categories by left_block_size
-            left_block_size = self._domain_shifted.component_rank(grading)
-            # the total number of columns
-            new_domain_rk = left_block_size + self._codomain.component_rank(grading)
-            # rows are splitted into two categories by top_block_size
-            top_block_size = self._domain_shifted.component_rank(next_grading)
-            # the total number of rows
-            new_codomain_rk = top_block_size + self._codomain.component_rank(
-                next_grading
-            )
-
-            differential_component = matrix(
-                self._morphism.parent().end_algebra,
-                ncols=new_domain_rk,
-                nrows=new_codomain_rk,
-                sparse=True,
-            )
-
-            top_left_block = self._domain_shifted.differential(grading)
-            differential_component.set_block(0, 0, top_left_block)
-            bottom_left_block = morphism_shifted(grading)
-            differential_component.set_block(top_block_size, 0, bottom_left_block)
-            bottom_right_block = self._codomain.differential(grading)
-            differential_component.set_block(
-                top_block_size, left_block_size, bottom_right_block
-            )
-            if self.keep_subdivisions:
-                differential_component._subdivisions = (
-                    [0, top_block_size, new_codomain_rk],
-                    [0, left_block_size, new_domain_rk],
-                )
-            differential_component.set_immutable()
-            differential[grading] = differential_component
-
-        return self.DifferentialClass(
-            underlying_module=self,
-            differential_data=differential,
-            degree=diff_degree,
-            sign=self._codomain.differential.sign,
-        )
-    """
 
     def __reduce__(self):
         """
