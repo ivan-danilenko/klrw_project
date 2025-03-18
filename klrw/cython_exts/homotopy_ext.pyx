@@ -10,7 +10,6 @@ from sage.matrix.matrix0 import Matrix
 from klrw.klrw_algebra import KLRWAlgebra
 from klrw.gradings import HomologicalGradingGroupElement
 from klrw.dot_algebra import KLRWUpstairsDotsAlgebra
-from klrw.perfect_complex import KLRWPerfectComplex
 from cython.cimports.klrw.cython_exts.sparse_csc import CSC_Mat
 from cython.cimports.klrw.cython_exts.sparse_csr import CSR_Mat
 from cython.cimports.klrw.cython_exts.perfect_complex_corrections_ext import (

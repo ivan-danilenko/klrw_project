@@ -7,18 +7,13 @@ from types import MappingProxyType
 
 # from cython.cimports.libcpp.vector import queue
 
-from scipy.sparse import dok_matrix, csr_matrix, csc_matrix, spmatrix
+from scipy.sparse import dok_matrix, csc_matrix
 
-from sage.rings.polynomial.polydict import ETuple
-from sage.rings.integer_ring import ZZ
+from cython.cimports.sage.rings.polynomial.polydict import ETuple
 from sage.structure.element import Element
 
-
 from klrw.klrw_algebra import KLRWAlgebra
-from klrw.gradings import (
-    QuiverGradingGroupElement,
-    QuiverGradingGroup,
-)
+from klrw.gradings import QuiverGradingGroup
 from klrw.dot_algebra import KLRWUpstairsDotsAlgebra
 from cython.cimports.klrw.cython_exts.sparse_csc import CSC_Mat
 from cython.cimports.klrw.cython_exts.sparse_csr import CSR_Mat
@@ -139,7 +134,7 @@ def system_d_geom_d1_piece(
     klrw_algebra: KLRWAlgebra,
     d_geom_csc: CSC_Mat,
     d1_csc: CorrectionsMatrix,
-    relevant_coeff_degree: QuiverGradingGroupElement,
+    relevant_parameter_part: ETuple,
     basis_appearing_in_product: dict,
 ):
     end_algebra = klrw_algebra.opposite
@@ -188,7 +183,7 @@ def system_d_geom_d1_piece(
                     product = d_geom_entry * correction
                     for braid, poly in product.value:
                         for exp, scalar in poly.iterator_exp_coeff():
-                            if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
+                            if dot_algebra.etuple_ignoring_dots(exp) == relevant_parameter_part:
                                 key = (i, j, braid.word(), exp)
                                 result_index: cython.int
                                 if key in basis_appearing_in_product:
@@ -211,7 +206,7 @@ def system_d1_d_geom_piece(
     klrw_algebra: KLRWAlgebra,
     d_geom_csr: CSR_Mat,
     d1_csc: CorrectionsMatrix,
-    relevant_coeff_degree: QuiverGradingGroupElement,
+    relevant_parameter_part: ETuple,
     basis_appearing_in_product: dict,
 ):
     dot_algebra = klrw_algebra.base()
@@ -261,7 +256,7 @@ def system_d1_d_geom_piece(
                     product = correction * d_geom_entry
                     for braid, poly in product.value:
                         for exp, scalar in poly.iterator_exp_coeff():
-                            if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
+                            if dot_algebra.etuple_ignoring_dots(exp) == relevant_parameter_part:
                                 key = (i, j, braid.word(), exp)
                                 result_index: cython.int
                                 if key in basis_appearing_in_product:
@@ -285,7 +280,7 @@ def system_d_squared_piece(
     grading_group: QuiverGradingGroup,
     d_csr: CSR_Mat,
     d_csc: CSC_Mat,
-    relevant_coeff_degree: QuiverGradingGroupElement,
+    relevant_parameter_part: ETuple,
     basis_appearing_in_product: dict,
 ):
     assert d_csr._number_of_columns() == d_csc._number_of_rows(), (
@@ -333,7 +328,7 @@ def system_d_squared_piece(
                 if dot_product:
                     for braid, poly in dot_product.value:
                         for exp, scalar in poly.iterator_exp_coeff():
-                            if dot_algebra.exp_degree(exp, grading_group) == relevant_coeff_degree:
+                            if dot_algebra.etuple_ignoring_dots(exp) == relevant_parameter_part:
                                 key = (i, j, braid.word(), exp)
                                 result_index: cython.int
                                 assert (
@@ -516,8 +511,68 @@ def min_exp_in_product(left: CSR_Mat, right: CSC_Mat) -> ETuple | None:
                     for exp in poly.exponents():
                         if min_exp is None:
                             min_exp = exp
-                        elif exp < min_exp:
+                        elif _etuple_lt_(exp, min_exp):
                             min_exp = exp
                 entry_can_be_non_zero = False
 
     return min_exp
+
+
+@cython.ccall
+@cython.inline
+def _etuple_lt_(
+    first: ETuple,
+    second: ETuple,
+) -> cython.bint:
+    """
+    Compares two ETuples.
+
+    Current implementation of ETuples comparison in Sage is slow
+    because it uses conversion to tuples.
+
+    Based on `dual_etuple_iter` from
+    `sage.rings.polynomial.polydict.pyx`,
+    One can't cimport from a `.pyx` file, so we could not just import it.
+    """
+    index_first : cython.size_t = 0
+    index_second : cython.size_t = 0
+    exponent_first : cython.int
+    exponent_second : cython.int
+    while (
+        index_first < first._nonzero 
+        or index_second < second._nonzero
+    ):
+        if index_first < first._nonzero and index_second < second._nonzero:
+            if first._data[2*index_first] == second._data[2*index_second]:
+                exponent_first = first._data[2*index_first+1]
+                exponent_second = second._data[2*index_second+1]
+                index_first += 1
+                index_second += 1
+            elif first._data[2*index_first] > second._data[2*index_second]:
+                exponent_first = 0
+                exponent_second = second._data[2*index_second+1]
+                index_second += 1
+            else:
+                exponent_first = first._data[2*index_first+1]
+                exponent_second = 0
+                index_first += 1
+        else:
+            if index_second >= second._nonzero:
+                exponent_first = first._data[2*index_first+1]
+                exponent_second = 0
+                index_first += 1
+            elif index_first >= first._nonzero:
+                exponent_first = 0
+                exponent_second = second._data[2*index_second+1]
+                index_second += 1
+
+        if exponent_first < exponent_second:
+            return True
+        elif exponent_first > exponent_second:
+            return False
+        # if neither of the cases above, the exponents are equal
+        # and we have to proceed to the next position.
+
+    # if the cycle finished, all exponents are equal
+    # so ETuples are equal. Thus `first < second` is false.
+    return False

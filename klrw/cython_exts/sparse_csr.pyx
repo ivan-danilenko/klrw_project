@@ -166,8 +166,9 @@ class CSR_Mat:
                 entry = self.data[indptr]
 
                 if entry:
-                    output_data[entries_so_far] = entry
-                    output_indices[entries_so_far] = self.indices[indptr]
+                    if entries_so_far != indptr or not inplace:
+                        output_data[entries_so_far] = entry
+                        output_indices[entries_so_far] = self.indices[indptr]
                     entries_so_far += 1
 
                 indptr += 1
@@ -178,6 +179,8 @@ class CSR_Mat:
         output_indices = output_indices[:entries_so_far]
 
         if inplace:
+            self.indices = output_indices
+            self.data = output_data
             return self
         else:
             return CSR_Mat(
