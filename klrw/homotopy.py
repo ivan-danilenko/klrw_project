@@ -707,7 +707,11 @@ def system_on_homotopy_rhs(
 def solve_system(A, b, verbose=True):
     import gurobipy as gp
 
-    y = b.transpose()
+    # a bug in Gurobi since 12.0.1:
+    # subtraction is not supported with scipy's sparse matrices,
+    # but addition is supported.
+    # So, we use addition instead of == that does subtraction.
+    y_neg = -b.transpose()
 
     with gp.Env(empty=True) as env:
         if not verbose:
@@ -715,7 +719,7 @@ def solve_system(A, b, verbose=True):
         env.start()
         with gp.Model(env=env) as m:
             x = m.addMVar(A.shape[1], lb=-float("inf"), vtype="I")
-            m.addConstr(A @ x == y)
+            m.addConstr(A @ x + y_neg == 0)
             # set method to primal simplex method
             m.Params.Method = 0
             m.optimize()

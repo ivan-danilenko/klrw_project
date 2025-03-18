@@ -606,7 +606,7 @@ class KLRWIteratedCone(KLRWPerfectComplex):
                 Bij = dict(homotopy_async_list.get())
                 print(Bij.keys())
         """
-        Bij = []
+        Bij = {}
         for a, b in SumBikBkj:
             Bij[a, b] = -self._find_homotopy_(
                 SumBikBkj[a, b],
