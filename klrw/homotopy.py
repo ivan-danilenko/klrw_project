@@ -10,10 +10,7 @@ from sage.rings.integer_ring import ZZ
 from klrw.klrw_algebra import KLRWAlgebra
 from klrw.cython_exts.sparse_csc import CSC_Mat
 from klrw.cython_exts.sparse_csr import CSR_Mat
-from klrw.gradings import (
-    HomologicalGradingGroupElement,
-    ExtendedQuiverGradingGroupElement,
-)
+from klrw.gradings import HomologicalGradingGroupElement
 from klrw.perfect_complex import (
     KLRWDirectSumOfProjectives_Homomorphism,
     KLRWPerfectComplex,
@@ -213,9 +210,10 @@ def _homotopy_iterations_(
     exp = dot_algebra.etuple_ignoring_dots(exp)
     # print(dot_algebra.monomial(*exp))
     # print(new_image)
-    assert (
-        not exp.is_constant()
-    ), "The initial chain map does not commute mod extra variables."
+    if not initial_approximation.is_zero():
+        assert (
+            not exp.is_constant()
+        ), "The initial chain map does not commute mod extra variables."
 
     approximation = initial_approximation
     for k in range(max_iterations):
@@ -716,7 +714,7 @@ def solve_system(A, b, verbose=True):
             env.setParam("OutputFlag", 0)
         env.start()
         with gp.Model(env=env) as m:
-            x = m.addMVar(A.shape[1], lb=-float("inf"))
+            x = m.addMVar(A.shape[1], lb=-float("inf"), vtype="I")
             m.addConstr(A @ x == y)
             # set method to primal simplex method
             m.Params.Method = 0
@@ -729,16 +727,12 @@ def solve_system(A, b, verbose=True):
 
     from scipy.sparse import csr_matrix
 
-    # making an integer-valued vector from x
+    # making a sparse integer-valued vector from x
     # we make it sparse because most entries are expected to be zero
     x = csr_matrix(x, dtype="intc")
     x = x.transpose()
 
-    try:
-        assert (A @ x - b).nnz == 0, "Integer approximation is not a solution!"
-    except AssertionError as e:
-        print(A.shape, A.nnz)
-        raise e
+    assert (A @ x - b).nnz == 0, "Integer approximation is not a solution!"
 
     return x
 

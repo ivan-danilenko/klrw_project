@@ -172,7 +172,7 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                             dot_left, x, dot_right, r * self.idempotent(state)
                         )
                         assert dot_left * x != self.zero() or dot_left.is_zero()
-                        assert dot_right * x != self.zero() or dot_right.is_zero()
+                        assert x * dot_right != self.zero() or dot_right.is_zero()
                         cases8c += 1
         print("Relation 8c holds! Cases checked:", cases8c)
 
@@ -198,7 +198,7 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                         cases8d += 1
         print("Relation 8d holds! Cases checked:", cases8d)
 
-        cases9 = 0
+        cases10 = 0
         for state in states:
             for i in range(len(state) - 1):
                 if state[i] != state[i + 1]:
@@ -239,8 +239,8 @@ class KLRWAlgebraWithTests(KLRWAlgebra):
                             )
                         )
                         assert x1 * x2 != self.zero()
-                        cases9 += 1
-        print("Relation 9 holds! Cases checked:", cases9)
+                        cases10 += 1
+        print("Relation 10 holds! Cases checked:", cases10)
 
         cases12a = 0
         for state in states:

@@ -6,6 +6,7 @@ from itertools import chain, count
 
 from sage.structure.element_wrapper import ElementWrapper
 from sage.structure.unique_representation import UniqueRepresentation
+from sage.misc.inherit_comparison import InheritComparisonClasscallMetaclass
 from sage.structure.parent import Set_generic
 from sage.misc.cachefunc import cached_method
 
@@ -31,7 +32,9 @@ class KLRWbraid_data(NamedTuple):
     word_: tuple = ()
 
 
-class KLRWbraid(ElementWrapper):
+class KLRWbraid(
+    UniqueRepresentation, ElementWrapper, metaclass=InheritComparisonClasscallMetaclass
+):
     wrapped_class = KLRWbraid_data
     __lt__ = ElementWrapper._lt_by_value
     # slots save memory by not allowing other
@@ -40,6 +43,7 @@ class KLRWbraid(ElementWrapper):
     def __init__(self, parent, state, word=()):
         value = self.wrapped_class(state, word)
         super().__init__(parent, value)
+        self.parent().check_minimality(self)
 
     def __getitem__(self, key):
         raise NotImplementedError()
@@ -430,6 +434,14 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
     def braids_by_states(self, left_state, right_state):
         return self.braids_with_left_state_by_right_state(left_state)[right_state]
 
+    def _braids_with_right_state_iter_(self, state):
+        """
+        Not effective; use with caution.
+        """
+        for br in self:
+            if br.right_state() == state:
+                yield br
+
     def total_number_of_strands(self):
         return self.KLRWstate_set.total_number_of_strands()
 
@@ -539,9 +551,23 @@ class KLRWbraid_set(UniqueRepresentation, Set_generic):
         return self._element_constructor_(state=right_state, word=tuple(rw))
 
     # TODO: rewrite
-    def check_minimality(self):
-        pass
+    def check_minimality(self, element):
+        word = element.word()
+        if len(word) <= 1:
+            return
+        # numbers of moving strands moving to the lower indices
+        # (strand enumeration starts form 0)
+        moving_strands = (word[0],)
+        moving_strands += tuple(
+            word[i] for i in range(1, len(word))
+            if word[i] != word[i - 1] - 1
+        )
+        if any(
+            moving_strands[a - 1] >= moving_strands[a]
+            for a in range(1, len(moving_strands))
+        ):
+            raise ValueError("Braid {} is not minimal".format(element))
 
     # TODO: rewrite
-    def check(self):
-        self.check_minimality()
+    def check(self, element):
+        self.check_minimality(element)

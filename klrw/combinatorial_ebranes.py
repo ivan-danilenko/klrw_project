@@ -814,6 +814,7 @@ class CombinatorialEBrane:
                 mat._number_of_rows(),
                 len(mat._indptrs()) - 1,
                 mat.dict(),
+                sparse=True,
             )
             for hom_deg, mat in differential_csc.items()
         }

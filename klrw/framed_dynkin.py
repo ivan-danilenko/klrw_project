@@ -125,6 +125,10 @@ class FramedDynkinDiagram_class(UniqueRepresentation, DynkinDiagram_class):
     def non_framing_nodes(self):
         return self.cartan_type().index_set()
 
+    @cached_method
+    def framing_nodes(self):
+        return tuple(v.make_framing() for v in self.non_framing_nodes())
+
     def inject_nodes(self, scope=None, verbose=True):
         """
         Defines globally nodes
@@ -262,6 +266,18 @@ class FramedDynkinDiagram_with_dimensions(SageObject):
         assert node in self.quiver.vertices()
         self.dimensions_dict[node] = dim
 
+    @classmethod
+    def with_zero_dimensions(cls, quiver):
+        if isinstance(quiver, FramedDynkinDiagram_class):
+            return cls(quiver=quiver)
+        elif isinstance(quiver, CartanType_abstract):
+            return cls(ct=quiver)
+        else:
+            raise ValueError(
+                "Parameter `quiver` must be a Cartan Type "
+                + "or Dynkin Diagram, not {}".format(quiver.__class__)
+            )
+
     def dimensions_list(self):
         return tuple(sorted(self.dimensions_dict.items()))
 
@@ -301,6 +317,9 @@ class FramedDynkinDiagram_with_dimensions(SageObject):
 
     def non_framing_nodes(self, *args, **kwargs):
         return self.quiver.non_framing_nodes(*args, **kwargs)
+
+    def framing_nodes(self, *args, **kwargs):
+        return self.quiver.framing_nodes(*args, **kwargs)
 
     def inject_nodes(self, scope=None, verbose=True):
         if scope is None:

@@ -373,7 +373,7 @@ class KLRWDerivedFunctor(UniqueRepresentation):
                 morphisms.append(next_morphism)
             # We solve for homotopies by iterations only
             # if we don't have invertible parameters.
-            complex_summand = KLRWIteratedCone(morphisms, complexes)
+            complex_summand = KLRWIteratedCone(morphisms, complexes, cache_level=1)
             """
             initial_degree = chain.popleft()
             # we make the image of the chain ignoring
