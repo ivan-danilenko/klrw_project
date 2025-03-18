@@ -1,8 +1,11 @@
+from typing import Iterator
+
 from sage.combinat.root_system.root_system import RootSystem
 from sage.combinat.root_system.weight_space import WeightSpaceElement
 from sage.combinat.posets.posets import Poset
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
+from sage.matrix.constructor import matrix
 
 from klrw.framed_dynkin import (
     FramedDynkinDiagram_with_dimensions,
@@ -10,6 +13,7 @@ from klrw.framed_dynkin import (
 )
 from klrw.klrw_algebra import KLRWAlgebra
 from klrw.stable_envelopes import stable_envelope
+from klrw.perfect_complex import KLRWPerfectComplex
 
 
 def minuscule_weights(Phi: RootSystem):
@@ -24,18 +28,7 @@ def minuscule_weights(Phi: RootSystem):
     return minuscule_weights
 
 
-def index_of_a_simple_root(root: WeightSpaceElement, Phi: RootSystem):
-    root = Phi.weight_space()(root)
-    for ind, al in Phi.weight_space().simple_roots()._dictionary.items():
-        if al == root:
-            return ind
-    else:
-        raise ValueError("Weight {} not a simple root".format(root))
-
-
-def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
-    CT = Phi.cartan_type()
-
+def weight_poset_in_minuscule_rep(Phi: RootSystem, lambd: WeightSpaceElement):
     # checking if lambd is a weight of Phi
     assert Phi.weight_space().has_coerce_map_from(
         lambd.parent()
@@ -44,17 +37,6 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
     # checking if lambd is proportional to fundamental
     assert len(lambd) == 1, "The weight {} is not fundamental".format(lambd)
 
-    ((lam_index, scalar),) = tuple(lambd)
-
-    assert scalar == 1, "The weight {} is not fundamental".format(lambd)
-    # finding the index of the weight
-    for i in CT.index_set():
-        if lambd == Phi.weight_space().fundamental_weight(i):
-            lam_index = i
-            break
-    else:
-        "The weight {} is not fundamental for {}".format(lambd, Phi)
-
     # checking if the weight is minuscule
     allowed_values = set((1, 0, -1))
     assert all(
@@ -62,26 +44,41 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
     ), "The weight {} is not minuscule".format(lambd)
 
     print("Finding weight poset")
-    Orb = lambd.orbit()
+    orb = lambd.orbit()
+    rels = [
+        (weight, weight + Phi.root_lattice().simple_root(simple_root_index))
+        for weight in orb
+        for simple_root_index in weight.descents()
+    ]
+    return Poset((orb, rels), cover_relations=True)
 
-    def leq(x1, x2, Phi=Phi):
-        x = Phi.ambient_space()(x2 - x1)
-        ys = [
-            Phi.coambient_space()(y).coerce_to_sl()
-            for y in Phi.coweight_lattice().fundamental_weights()
-        ]
 
-        if Phi.cartan_type().type() == "A":
-            ys = [y.coerce_to_sl() for y in ys]
-        if Phi.cartan_type().type() == "E":
-            if Phi.cartan_type().rank() == 6:
-                ys = [y.coerce_to_e6() for y in ys]
-            elif Phi.cartan_type().rank() == 7:
-                ys = [y.coerce_to_e7() for y in ys]
+def strands_from_weights(weight_sequence: Iterator):
+    """
+    Given a sequence `mu_0, ... ,mu_k`
+    where `mu_m - mu_{m-1}` is a simple root (call it `alpha_{i(m)}`),
+    generates sequence `(Vi(1), ..., Vi(k)`.
+    """
+    previous_weight = next(weight_sequence)
+    for next_weight in weight_sequence:
+        index = (previous_weight - next_weight).to_simple_root()
+        yield NodeInFramedQuiver(index)
+        previous_weight = next_weight
 
-        return all(x.inner_product(y) >= 0 for y in ys)
 
-    pos = Poset(data=(Orb, leq))
+def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
+    ((lam_index, scalar),) = tuple(lambd)
+
+    assert scalar == 1, "The weight {} is not fundamental".format(lambd)
+    # finding the index of the weight
+    for i in Phi.cartan_type().index_set():
+        if lambd == Phi.weight_space().fundamental_weight(i):
+            lam_index = i
+            break
+    else:
+        "The weight {} is not fundamental for {}".format(lambd, Phi)
+
+    pos = weight_poset_in_minuscule_rep(Phi, lambd)
     # pos.plot(
     #     label_elements=False, title="Poset of the Weight Orbit", fontsize=10
     # ).show()
@@ -98,13 +95,7 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
                 ]
             )
         )
-        right_sequence = [
-            index_of_a_simple_root(
-                right_weight_sequence[i] - right_weight_sequence[i + 1], Phi
-            )
-            for i in range(len(right_weight_sequence) - 1)
-        ]
-        right_sequence = tuple(NodeInFramedQuiver(r) for r in right_sequence)
+        right_sequence = tuple(strands_from_weights(iter(right_weight_sequence)))
         # take arbitrary maximal chain ends with mu
         # [i.e. starts with my in the dual poset]
         left_weight_sequence = next(
@@ -114,22 +105,16 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
                 ]
             )
         )
-        left_sequence = [
-            index_of_a_simple_root(
-                left_weight_sequence[i] - left_weight_sequence[i - 1], Phi
-            )
-            for i in range(len(left_weight_sequence) - 1, 0, -1)
-        ]
-        left_sequence = tuple(NodeInFramedQuiver(r) for r in left_sequence)
+        left_sequence = tuple(strands_from_weights(reversed(left_weight_sequence)))
         sequences_by_weight[mu] = (left_sequence, right_sequence)
 
     left_framing = NodeInFramedQuiver(lam_index, framing=True)
-    dual_lam_index = CT.opposition_automorphism()[lam_index]
+    dual_lam_index = Phi.cartan_type().opposition_automorphism()[lam_index]
     right_framing = NodeInFramedQuiver(dual_lam_index, framing=True)
 
     print("Defining KLRW algebra")
     # define the corresponding framed quiver
-    DD = FramedDynkinDiagram_with_dimensions(CT)
+    DD = FramedDynkinDiagram_with_dimensions(Phi.cartan_type())
     DD[left_framing] += 1
     DD[right_framing] += 1
     # take the pair of sequences for any intermediate weight
@@ -162,21 +147,9 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
         for mu, (left_seq, right_seq) in sequences_by_weight.items()
     }
 
-    # making the algebra that is similar to KLWR, but without extra gradings
-    # cls, args, kwrds = KLRW._reduction
-    # R = QQ
-    # kwrds["base_R"] = R
-    # kwrds["default_vertex_parameter"] = R.one()
-    # kwrds["default_edge_parameter"] = R.one()
-    # kwrds["dot_scaling"] = False
-    # kwrds["edge_scaling"] = False
-    # kwrds["vertex_scaling"] = False
-    # KLRW_one_grading = cls(*args, **kwrds)
-
-    cls, args, kwrds = KLRW._reduction
-    R = QQ
-    kwrds["base_R"] = R
-    KLRW_QQ = cls(*args, **kwrds)
+    # TODO: avoid step with going to base QQ
+    # by properly implementing Ext groups over ZZ
+    KLRW_QQ = KLRW._replace_(base_R=QQ)
 
     stab = {mu: st.base_change(KLRW_QQ) for mu, st in stab.items()}
 
@@ -208,7 +181,28 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
         ext = ext_basis(0)
         e_brane = ext.cone()
 
-    print(e_brane)
+    # going back to ZZ base
+    differential_ZZ_dict = {}
+    for hom_deg, mat in e_brane.differential:
+        mat_dict_ZZ = {
+            (i, j): KLRW.sum_of_terms(
+                (braid, KLRW.base()(coeff)) for braid, coeff in entry.value
+            )
+            for (i, j), entry in mat.dict(copy=False).items()
+        }
+        differential_ZZ_dict[hom_deg] = matrix(
+            ring=KLRW.opposite,
+            ncols=mat.ncols(),
+            nrows=mat.nrows(),
+            entries=mat_dict_ZZ,
+        )
+
+    e_brane = KLRWPerfectComplex(
+        ring=KLRW,
+        projectives=e_brane.projectives(),
+        differential=differential_ZZ_dict,
+        differential_degree=e_brane.differential.degree(),
+    )
     return e_brane
 
     left_seq, right_seq = next(iter(sequences_by_weight.values()))
