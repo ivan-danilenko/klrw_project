@@ -46,3 +46,6 @@ KnotInfoDatabase
 
 # Setuptools files
 *.egg*
+
+# Virtual environment
+.venv

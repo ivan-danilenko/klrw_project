@@ -45,6 +45,11 @@ extensions = [
         sources=["{}/sparse_multiplication.pyx".format(PACKAGE_PATH)],
         include_dirs=[numpy.get_include()],
     ),
+    Extension(
+        "{}.homotopy_ext".format(PACKAGE_NAME),
+        sources=["{}/homotopy_ext.pyx".format(PACKAGE_PATH)],
+        include_dirs=[numpy.get_include()],
+    ),
 ]
 
 requirements = [
