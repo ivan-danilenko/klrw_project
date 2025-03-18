@@ -1,11 +1,14 @@
 from typing import Iterable, Any
-from dataclasses import dataclass, InitVar  # , replace
+from dataclasses import dataclass, InitVar
+from functools import total_ordering
 
 from sage.rings.ring import Ring
 from sage.rings.integer_ring import ZZ
 from sage.combinat.free_module import CombinatorialFreeModule
 from sage.modules.with_basis.indexed_element import IndexedFreeModuleElement
+from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
+from sage.structure.element import get_coercion_model
 
 from klrw.framed_dynkin import (
     NodeInFramedQuiver,
@@ -225,29 +228,43 @@ class QuiverGradingGroup(CombinatorialFreeModule):
         super()._element_constructor_(*args)
 
 
+@total_ordering
 @dataclass(frozen=True, repr=False)
 class QuiverGradingHomologicalLabel(QuiverGradingLabel):
     name: Any
 
     def __repr__(self):
         if self.name is not None:
-            return repr("h_" + self.name)
-        return repr("h")
+            return "h_" + repr(self.name)
+        return "h"
+
+    def __lt__(self, other):
+        return self.name < other.name
 
 
 class HomologicalGradingGroupElement(IndexedFreeModuleElement):
-    def sign(self):
+    pass
+
+
+@dataclass(frozen=True, eq=True)
+class SignMorphism:
+    contributing_generators: frozenset[QuiverGradingLabel]
+
+    def __post_init__(self):
+        if not isinstance(self.contributing_generators, frozenset):
+            super().__setattr__(
+                "contributing_generators",
+                frozenset(self.contributing_generators),
+            )
+
+    def __call__(self, grading):
         from sage.rings.finite_rings.integer_mod_ring import Zmod
 
-        parent = self.parent()
-        try:
-            homological_grading_label = parent.homological_grading_label
-        except AttributeError:
-            raise NotImplementedError("Need a different implementation of sign.")
-
-        coeff = self.coefficient(homological_grading_label)
-        degree = Zmod(2)(coeff)
-        if degree:
+        coeff = sum(
+            Zmod(2)(grading.coefficient(label))
+            for label in self.contributing_generators
+        )
+        if coeff:
             return ZZ(-1)
         else:
             return ZZ(1)
@@ -255,7 +272,7 @@ class HomologicalGradingGroupElement(IndexedFreeModuleElement):
 
 class HomologicalGradingGroup(CombinatorialFreeModule):
     @staticmethod
-    def __classcall__(
+    def __classcall_private__(
         cls,
         R: Ring = ZZ,
         homological_grading_names: Iterable[Any] = (None,),
@@ -290,6 +307,9 @@ class HomologicalGradingGroup(CombinatorialFreeModule):
             R, names, element_class=HomologicalGradingGroupElement, **kwrds
         )
 
+    def names(self):
+        return tuple(index.name for index in self.indices())
+
     def _element_constructor_(self, *args):
         if len(args) == 1:
             if isinstance(args[0], int):
@@ -304,6 +324,20 @@ class HomologicalGradingGroup(CombinatorialFreeModule):
         if other == ZZ:
             return lambda parent, x: self.term(self.homological_grading_label, x)
 
+        if isinstance(other, HomologicalGradingGroup):
+            if all(label in self.indices() for label in other.indices()):
+                map = {}
+                for index in other.indices():
+                    if index in self.indices():
+                        map[index] = self.monomial(index)
+                    else:
+                        map[index] = self.zero()
+
+                def on_basis(index, map_dict=map):
+                    return map_dict[index]
+
+                return other.module_morphism(on_basis=on_basis, codomain=self)
+
     def _convert_map_from_(self, other):
         """
         Integers are treated as ordinary homological gradings
@@ -312,6 +346,36 @@ class HomologicalGradingGroup(CombinatorialFreeModule):
             if other.homological_part == self:
                 return other.to_homological_part
 
+    @lazy_attribute
+    def default_sign_morphism(self):
+        try:
+            homological_grading_label = self.homological_grading_label
+        except AttributeError:
+            raise NotImplementedError("Need a different implementation of sign.")
+
+        return SignMorphism([homological_grading_label])
+
+    @staticmethod
+    def direct_sum(*summands):
+        return DirectSumOfHomologicalGradingGroup(*summands)
+
+    def __add__(self, other):
+        return self.direct_sum(self, other)
+
+    @lazy_attribute
+    def totalization_morphism(self):
+        """
+        All homological gradings are treated as one.
+        """
+        # only one grading
+        codomain = HomologicalGradingGroup(R=self.base())
+        gen = codomain.gens()[0]
+
+        return self._module_morphism(
+            on_basis=lambda _: gen,
+            codomain=codomain,
+        )
+
 
 class ExtendedQuiverGradingGroupElement(IndexedFreeModuleElement):
     def homological_part(self):
@@ -319,9 +383,6 @@ class ExtendedQuiverGradingGroupElement(IndexedFreeModuleElement):
 
     def equivariant_part(self):
         return self.parent().to_equivariant_part(self)
-
-    def sign(self):
-        return self.homological_part().sign()
 
     def ordinary_grading(self, as_scalar=True):
         """
@@ -335,11 +396,10 @@ class ExtendedQuiverGradingGroupElement(IndexedFreeModuleElement):
 
 class ExtendedQuiverGradingGroup(CombinatorialFreeModule):
     @staticmethod
-    def __classcall__(
+    def __classcall_private__(
         cls,
         equivariant_grading_group: QuiverGradingGroup,
         homological_grading_group: CombinatorialFreeModule | None = None,
-        R: Ring = ZZ,
     ):
         if homological_grading_group is None:
             homological_grading_group = HomologicalGradingGroup(R=ZZ)
@@ -347,21 +407,22 @@ class ExtendedQuiverGradingGroup(CombinatorialFreeModule):
             cls,
             equivariant_grading_group=equivariant_grading_group,
             homological_grading_group=homological_grading_group,
-            R=R,
         )
 
     def __init__(
         self,
         equivariant_grading_group: QuiverGradingGroup,
         homological_grading_group: CombinatorialFreeModule,
-        R: Ring,
     ):
+        ring = get_coercion_model().common_parent(
+            equivariant_grading_group.base_ring(), homological_grading_group.base_ring()
+        )
         # indices have different classes, so they are distinct and we can just join
         names = (
             homological_grading_group.indices().list()
             + equivariant_grading_group.indices().list()
         )
-        super().__init__(R, names, element_class=ExtendedQuiverGradingGroupElement)
+        super().__init__(ring, names, element_class=ExtendedQuiverGradingGroupElement)
         self.homological_part = homological_grading_group
         self.equivariant_part = equivariant_grading_group
 
@@ -422,6 +483,49 @@ class ExtendedQuiverGradingGroup(CombinatorialFreeModule):
 
         return super()._element_constructor_(*args)
 
+    def _morphism_from_equivariant_and_homological_part_(
+        self,
+        domain,
+        equivariant_morphism=None,
+        homological_morphism=None,
+    ):
+        """
+        Make a morphism from how it acts on equivariant and homological parts.
+
+        If a morphism is not given, it's considered to be the identity.
+        """
+
+        def morphism_map(x):
+            equivariant_part = x.equivariant_part()
+            if equivariant_morphism is not None:
+                equivariant_part = equivariant_morphism(equivariant_part)
+            equivariant_part = self.from_equivariant_part(equivariant_part)
+            homological_part = x.homological_part()
+            if homological_morphism is not None:
+                homological_part = homological_morphism(homological_part)
+            homological_part = self.from_homological_part(homological_part)
+            return equivariant_part + homological_part
+
+        return domain.module_morphism(function=morphism_map, codomain=self)
+
+    def _coerce_map_from_(self, other):
+        if isinstance(other, ExtendedQuiverGradingGroup):
+            if self.equivariant_part.has_coerce_map_from(
+                other.equivariant_part
+            ) and self.homological_part.has_coerce_map_from(other.homological_part):
+                equivariant_part = self.equivariant_part.coerce_map_from(
+                    other.equivariant_part
+                )
+                homological_part = self.homological_part.coerce_map_from(
+                    other.homological_part
+                )
+                return self._morphism_from_equivariant_and_homological_part_(
+                    domain=other,
+                    equivariant_morphism=equivariant_part,
+                    homological_morphism=homological_part,
+                )
+        return super()._coerce_map_from_(other)
+
     def _convert_map_from_(self, other):
         """
         Integers are treated as ordinary homological gradings
@@ -430,3 +534,212 @@ class ExtendedQuiverGradingGroup(CombinatorialFreeModule):
             return self.from_homological_part
         if other == self.equivariant_part:
             return self.from_equivariant_part
+
+    @lazy_attribute
+    def default_sign_morphism(self):
+        return self.homological_part.default_sign_morphism
+
+    @staticmethod
+    def merge(*summands):
+        return MergedExtendedQuiverGradingGroup(*summands)
+
+    def __add__(self, other):
+        if isinstance(other, HomologicalGradingGroup):
+            other = ExtendedQuiverGradingGroup(
+                self.equivariant_part,
+                other,
+            )
+        assert isinstance(other, ExtendedQuiverGradingGroup)
+        return self.merge(self, other)
+
+    @lazy_attribute
+    def totalization_morphism(self):
+        """
+        All homological gradings are treated as one.
+        """
+        hom_totalization_morphism = self.homological_part.totalization_morphism
+        codomain = ExtendedQuiverGradingGroup(
+            homological_grading_group=hom_totalization_morphism.codomain(),
+            equivariant_grading_group=self.equivariant_part,
+        )
+
+        return codomain._morphism_from_equivariant_and_homological_part_(
+            domain=self,
+            homological_morphism=hom_totalization_morphism,
+        )
+
+
+class DirectSumOfHomologicalGradingGroup(HomologicalGradingGroup):
+    """
+    A direct sum of gradings.
+    """
+
+    def __init__(
+        self,
+        *groups,
+    ):
+        from klrw.misc import get_from_all_and_assert_equality
+
+        assert all(isinstance(gr, HomologicalGradingGroup) for gr in groups)
+        assert groups, "Need at least one grading group"
+        R = get_from_all_and_assert_equality(lambda x: x.base_ring(), groups)
+
+        self._parts = groups
+        names = tuple(
+            self._part_label_to_sum_name_(i, label)
+            for i in range(len(groups))
+            for label in groups[i].indices()
+        )
+        HomologicalGradingGroup.__init__(
+            self,
+            homological_grading_names=names,
+            R=R,
+        )
+
+    @staticmethod
+    def _part_label_to_sum_name_(i: int, label: QuiverGradingHomologicalLabel):
+        """
+        Make the name of a label from a label for a part.
+
+        If the name of the label is `None`, then the new
+        name is the index of the part.
+        If the name of the label is not None, the new
+        name is a tuple `(i, old_name)`
+        """
+        if label.name is None:
+            return i
+        else:
+            return (i, label.name)
+
+    @classmethod
+    def _part_label_to_sum_label_(cls, i: int, label: QuiverGradingHomologicalLabel):
+        return QuiverGradingHomologicalLabel(cls._part_label_to_sum_name_(i, label))
+
+    @staticmethod
+    def _sum_label_to_part_label_(label: QuiverGradingHomologicalLabel):
+        name = label.name
+        if isinstance(name, int):
+            return QuiverGradingHomologicalLabel(None)
+        else:
+            return QuiverGradingHomologicalLabel(name[1])
+
+    @staticmethod
+    def _sum_label_to_part_index_(label):
+        name = label.name
+        if isinstance(name, int):
+            return name
+        else:
+            return name[0]
+
+    @cached_method
+    def summand_embedding(self, i):
+        """
+        Embeds gradings of pieces.
+        """
+        i = int(i)
+        assert i >= 0
+        assert i < len(self._parts)
+        return self._parts[i]._module_morphism(
+            lambda label: self.monomial(self._part_label_to_sum_label_(i, label)),
+            codomain=self,
+        )
+
+    @cached_method
+    def summand_projection(self, i):
+        """
+        Project to a direct summand.
+        """
+        i = int(i)
+        assert i >= 0
+        assert i < len(self._parts)
+        module = self._parts[i]
+        return self._module_morphism(
+            on_basis=lambda sum_label: (
+                module.monomial(self._sum_label_to_part_label_(sum_label))
+                if i == self._sum_label_to_part_index_(sum_label)
+                else module.zero()
+            ),
+            codomain=module,
+        )
+
+    def cartesian_product_of_elements(self, *elements):
+        """
+        Construct an element from parts.
+        """
+        return self.sum(
+            self.summand_embedding(i)(element) for i, element in enumerate(elements)
+        )
+
+    def sign_from_part(self, i, sign_on_part):
+        return SignMorphism(
+            (
+                self._part_label_to_sum_label_(i, label)
+                for label in sign_on_part.contributing_generators
+            )
+        )
+
+    def default_sign_from_part(self, i):
+        return self.sign_from_part(i, self._parts[i].default_sign_morphism)
+
+
+class MergedExtendedQuiverGradingGroup(ExtendedQuiverGradingGroup):
+    """
+    A direct sum of gradings with identification of the equivariant part.
+    """
+
+    def __init__(
+        self,
+        *groups,
+    ):
+        from klrw.misc import get_from_all_and_assert_equality
+
+        assert all(isinstance(gr, ExtendedQuiverGradingGroup) for gr in groups)
+        assert groups, "Need at least one grading group"
+        equivariant_part = get_from_all_and_assert_equality(
+            lambda x: x.equivariant_part,
+            groups,
+        )
+
+        self._parts = groups
+        homological_part = DirectSumOfHomologicalGradingGroup(
+            *(gr.homological_part for gr in groups)
+        )
+        ExtendedQuiverGradingGroup.__init__(
+            self,
+            equivariant_grading_group=equivariant_part,
+            homological_grading_group=homological_part,
+        )
+
+    @cached_method
+    def summand_embedding(self, i):
+        """
+        Embeds gradings of pieces.
+        """
+        i = int(i)
+        assert i >= 0
+        assert i < len(self._parts)
+        return self._morphism_from_equivariant_and_homological_part_(
+            domain=self._parts[i],
+            homological_morphism=self.homological_part.summand_embedding(i),
+        )
+
+    @cached_method
+    def summand_projection(self, i):
+        """
+        Project to a direct summand.
+        """
+        i = int(i)
+        assert i >= 0
+        assert i < len(self._parts)
+        return self._parts[i]._morphism_from_equivariant_and_homological_part_(
+            domain=self,
+            homological_morphism=self.homological_part.summand_projection(i),
+        )
+
+    def cartesian_product_of_elements(self, *elements):
+        """
+        Construct an element from parts.
+        """
+        return self.sum(
+            self.summand_embedding(i)(element) for i, element in enumerate(elements)
+        )
