@@ -554,25 +554,26 @@ class KLRWIteratedCone(KLRWPerfectComplex):
                 self._complete_off_diagonal_block_(i, j)
                 # print(len(self._off_diagonal_blocks[i, j]))
 
-        column_width = max(
-            (
-                len(str(len(self._off_diagonal_blocks[i, j])))
-                for j in range(len(self._complexes) - 2)
-                for i in range(j + 1, len(self._complexes))
-            )
-        )
-
-        # Print data rows
-        for i in range(2, len(self._complexes)):
-            print(
-                " ".join(
-                    f"{str(len(self._off_diagonal_blocks[i, j])):{column_width}}"
-                    for j in range(i - 1)
+        if self._off_diagonal_blocks:
+            column_width = max(
+                (
+                    len(str(len(self._off_diagonal_blocks[i, j])))
+                    for j in range(len(self._complexes) - 2)
+                    for i in range(j + 1, len(self._complexes))
                 )
             )
 
+            # Print data rows
+            for i in range(2, len(self._complexes)):
+                print(
+                    " ".join(
+                        f"{str(len(self._off_diagonal_blocks[i, j])):{column_width}}"
+                        for j in range(i - 1)
+                    )
+                )
+
     def _complete_off_diagonal_block_(self, i, j):
-        #import multiprocessing as mp
+        # import multiprocessing as mp
         # when we compute the differential squared,
         # we get the condition
         # `differential(B_{i,j}) + B_{i,k}*B_{k,j} = 0'.

@@ -12,7 +12,7 @@ from sage.categories.finite_dimensional_algebras_with_basis import (
 from sage.categories.action import Action
 from sage.rings.polynomial.polydict import ETuple
 from sage.misc.lazy_attribute import lazy_attribute
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_method, weak_cached_function
 from sage.matrix.constructor import matrix
 from sage.modules.free_module_element import vector
 
@@ -271,8 +271,8 @@ class RightDotAction(RightActionOnBimodule):
 
 
 class KLRWAlgebra(LeftFreeBimoduleMonoid):
-    # @weak_cached_function(cache=128)  # automatically a staticmethod
-    @staticmethod
+    @weak_cached_function(cache=128)  # automatically a staticmethod
+    #@staticmethod
     def __classcall_private__(
         cls,
         base_R,
@@ -285,6 +285,11 @@ class KLRWAlgebra(LeftFreeBimoduleMonoid):
         warnings=False,
         **kwrds,
     ):
+        """
+        Returns a new instance.
+
+        We use extra caching co
+        """
         return super().__classcall__(
             cls,
             base_R=base_R,
