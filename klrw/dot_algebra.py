@@ -19,7 +19,7 @@ from sage.rings.polynomial.polydict import ETuple
 from sage.rings.ring import CommutativeRing
 from sage.categories.action import Action
 
-from sage.misc.cachefunc import cached_method, weak_cached_function
+from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.misc_c import prod
 
@@ -223,14 +223,14 @@ class KLRWDotsAlgebra(UniqueRepresentation, CommutativeRing):
         Return the subalgebra algebra with no dots.
         """
         quiver_data = self.quiver_data.with_zero_dimensions(self.quiver_data.quiver)
-        return self.__class__(
-            self.base(),
-            quiver_data,
-            self.no_deformations,
-            self.default_vertex_parameter,
-            self.default_edge_parameter,
-            self.invertible_parameters,
-            self.term_order().name(),
+        return KLRWDotsAlgebra(
+            base_ring=self.base(),
+            quiver_data=quiver_data,
+            no_deformations=self.no_deformations,
+            default_vertex_parameter=self.default_vertex_parameter,
+            default_edge_parameter=self.default_edge_parameter,
+            term_order=self.term_order().name(),
+            invertible_parameters=self.invertible_parameters,
             **self.prefixes,
         )
 
@@ -761,6 +761,16 @@ class KLRWDotsAlgebra(UniqueRepresentation, CommutativeRing):
         }
         return ETuple(data=data, length=self.ngens())
 
+    def monomial_quotient_by_dots(self, et: ETuple):
+        """
+        Returns a monomial in the quotient by dots.
+        (can be zero)
+        """
+        if self.etuple_has_dots(et):
+            return self.without_dots.zero()
+        new_etuple = self.without_dots.etuple_ignoring_dots(et)
+        return self.without_dots.monomial(*new_etuple)
+
     def etuple_has_dots(self, et: ETuple):
         # we assume that the non-zero dots have first positions
         return any(ind >= self.number_of_non_dot_params for ind, _ in et.sparse_iter())
@@ -815,6 +825,20 @@ class KLRWDotsAlgebra(UniqueRepresentation, CommutativeRing):
             return
 
         return super()._coerce_map_from_(other)
+
+    def quotient_by_dots(self, elem):
+        """
+        Kill dots in `elem`.
+
+        Gets elements in the pure paramenter ring.
+        """
+        return sum(
+            (
+                coeff*self.monomial_quotient_by_dots(exp)
+                for exp, coeff in elem.iterator_exp_coeff()
+            ),
+            start=self.without_dots.zero(),
+        )
 
     def hom_to_simple(self, elem):
         """

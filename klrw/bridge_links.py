@@ -369,5 +369,76 @@ class ColoredOrientedBridgeLink(OrientedBridgeLink):
 
         return complex
 
-    def link_invariant(self):
-        pass
+    def _caps_brane_(
+        self,
+        reduced_cap: int | None = None,
+    ):
+        from klrw.simple_module import EBrane
+
+        top_color_tuple = ()
+        for i in range(self.bridge_number):
+            top_end = StrandEnd(strand=2 * i + 1, is_top=True)
+            color = self._ends_colors_()[top_end]
+            top_color_tuple += (color,)
+
+        return EBrane(*top_color_tuple, reduced_parts=(reduced_cap,))
+
+    @cached_method
+    def _link_homset_(self, reduced_cycle=None):
+        from klrw.simple_module import KLRWPerfectComplexToEbrane_Homset
+
+        if reduced_cycle is not None:
+            cup, cap = list(
+                self._oriented_cups_and_caps_iter_(cycle_number=reduced_cycle)
+            )[:2]
+            # we are not sure if the first one is a cup, not cap;
+            # may need to swap
+            if cup[0].is_top:
+                cup, cap = cap, cup
+
+            reduced_cup = (cup[0].strand - 1) // 2
+            reduced_cap = (cap[0].strand - 1) // 2
+        else:
+            reduced_cup = None
+            reduced_cap = None
+
+        cup = self._braided_cups_brane_(reduced_cup)
+        cap = self._caps_brane_(reduced_cap)
+
+        return KLRWPerfectComplexToEbrane_Homset(cup, cap)
+
+    def link_homology(self, base_ring=None, reduced_cycle=None):
+        """
+        Returns link homology.
+
+        If `base_ring` is not given, computation is done over Integers.
+        If `reduced_cycle` is given, computes reduced link invariant.
+        """
+        homset = self._link_homset_(reduced_cycle)
+
+        return homset.homology(base_ring)
+
+    def poincare_polynomial(self, base_field=None, reduced_cycle=None):
+        """
+        Returns Poincare polynomial of link homology.
+
+        If `base_field` is not given, computation is done over Rational numbers.
+        If `reduced_cycle` is given, computes reduced link invariant.
+        """
+        from sage.rings.polynomial.laurent_polynomial_ring import LaurentPolynomialRing
+        from sage.rings.all import ZZ, QQ
+
+        if base_field is None:
+            base_field = QQ
+        assert base_field.is_field(), "base_field has to be a field"
+
+        lau_poly = LaurentPolynomialRing(ZZ, 2, ["t", "q"])
+        homology = self.link_homology(base_ring=base_field, reduced_cycle=reduced_cycle)
+        t = lau_poly("t")
+        q = lau_poly("q")
+        poincare_polynomial = sum(
+            homology_group.ngens() * t ** grading[0] * q ** grading[1]
+            for grading, homology_group in homology.items()
+        )
+
+        return poincare_polynomial

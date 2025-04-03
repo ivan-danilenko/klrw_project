@@ -1,3 +1,4 @@
+from functools import cache
 from typing import Iterator
 
 from sage.combinat.root_system.root_system import RootSystem
@@ -28,6 +29,7 @@ def minuscule_weights(Phi: RootSystem):
     return minuscule_weights
 
 
+@cache
 def weight_poset_in_minuscule_rep(Phi: RootSystem, lambd: WeightSpaceElement):
     # checking if lambd is a weight of Phi
     assert Phi.weight_space().has_coerce_map_from(
@@ -53,7 +55,7 @@ def weight_poset_in_minuscule_rep(Phi: RootSystem, lambd: WeightSpaceElement):
     return Poset((orb, rels), cover_relations=True)
 
 
-def strands_from_weights(weight_sequence: Iterator):
+def moving_strands_from_weights(weight_sequence: Iterator):
     """
     Given a sequence `mu_0, ... ,mu_k`
     where `mu_m - mu_{m-1}` is a simple root (call it `alpha_{i(m)}`),
@@ -66,10 +68,13 @@ def strands_from_weights(weight_sequence: Iterator):
         previous_weight = next_weight
 
 
-def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
-    ((lam_index, scalar),) = tuple(lambd)
+@cache
+def standard_reduced_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
+    # TODO: rework, merging common parts with `standard_ebranes`.
+    # make klrw_options the same.
+    from klrw.one_term_complex import one_term_complex
 
-    assert scalar == 1, "The weight {} is not fundamental".format(lambd)
+    ((lam_index, scalar),) = tuple(lambd)
     # finding the index of the weight
     for i in Phi.cartan_type().index_set():
         if lambd == Phi.weight_space().fundamental_weight(i):
@@ -77,6 +82,39 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
             break
     else:
         "The weight {} is not fundamental for {}".format(lambd, Phi)
+
+    left_framing = NodeInFramedQuiver(lam_index, framing=True)
+    dual_lam_index = Phi.cartan_type().opposition_automorphism()[lam_index]
+    right_framing = NodeInFramedQuiver(dual_lam_index, framing=True)
+
+    klrw_options = {
+        "dot_scaling": True,
+        "edge_scaling": True,
+        "vertex_scaling": True,
+        "invertible_parameters": True,
+        "warnings": True,
+    }
+
+    return one_term_complex(
+        base_R=ZZ,
+        quiver=Phi.cartan_type(),
+        state=(left_framing, right_framing),
+        **klrw_options,
+    )
+
+
+@cache
+def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
+    ((lam_index, scalar),) = tuple(lambd)
+
+    assert scalar == 1, "The weight {} is not fundamental".format(lambd)
+    # finding the index of the weight
+    # for i in Phi.cartan_type().index_set():
+    #    if lambd == Phi.weight_space().fundamental_weight(i):
+    #        lam_index = i
+    #        break
+    # else:
+    #    "The weight {} is not fundamental for {}".format(lambd, Phi)
 
     pos = weight_poset_in_minuscule_rep(Phi, lambd)
     # pos.plot(
@@ -95,7 +133,7 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
                 ]
             )
         )
-        right_sequence = tuple(strands_from_weights(iter(right_weight_sequence)))
+        right_sequence = tuple(moving_strands_from_weights(iter(right_weight_sequence)))
         # take arbitrary maximal chain ends with mu
         # [i.e. starts with my in the dual poset]
         left_weight_sequence = next(
@@ -105,7 +143,9 @@ def standard_ebranes(Phi: RootSystem, lambd: WeightSpaceElement):
                 ]
             )
         )
-        left_sequence = tuple(strands_from_weights(reversed(left_weight_sequence)))
+        left_sequence = tuple(
+            moving_strands_from_weights(reversed(left_weight_sequence))
+        )
         sequences_by_weight[mu] = (left_sequence, right_sequence)
 
     left_framing = NodeInFramedQuiver(lam_index, framing=True)
