@@ -601,7 +601,9 @@ class KLRWPerfectComplexToEbrane_Homset(UniqueRepresentation):
 
             nrows = len(self._relevant_indices_[deg])
 
-            differential[deg] = matrix(
+            grading = deg - self.standard_differential_degree
+
+            differential[grading] = matrix(
                 scalars,
                 nrows=nrows,
                 ncols=ncols,
@@ -626,7 +628,7 @@ class KLRWPerfectComplexToEbrane_Homset(UniqueRepresentation):
                     i_new = self._relevant_indices_[codom_deg][j]
                     j_new = self._relevant_indices_[dom_deg][i]
 
-                    grading = dom_deg
+                    grading = dom_deg - self.standard_differential_degree
 
                     differential[grading][j_new, i_new] = new_elem
 
