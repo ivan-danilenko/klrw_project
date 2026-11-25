@@ -90,7 +90,7 @@ class Cube:
     ``s`` is to the right of its puncture.
     """
 
-    def __init__(self, KLRW, punctures):
+    def __init__(self, KLRW, punctures, build=True):
         self.KLRW = KLRW
         self.punctures = [(red, tuple(word)) for red, word in punctures]
         self.strand_colour = []
@@ -108,7 +108,8 @@ class Cube:
             NodeInFramedQuiverWithMarks(NodeInFramedQuiver(red, framing=True), p)
             for p, (red, _) in enumerate(self.punctures)
         )
-        self._build()
+        if build:
+            self._build()
 
     # -- states -------------------------------------------------------------
     def marked_state(self, eps):
@@ -288,6 +289,7 @@ def correct_differential(
     restrict=None,
     record_rank=False,
     parallel_processes=1,
+    corrections_function=None,
 ):
     """
     Order-by-order correction of ``differential`` (as in
@@ -329,14 +331,17 @@ def correct_differential(
     for it in range(max_iterations):
         t0 = time.time()
         monomial = dot_algebra.monomial(*exp)
-        corrections = possible_corrections(
-            KLRW,
-            projectives,
-            degree=degree,
-            relevant_parameter_part=exp,
-            parallel_processes=parallel_processes,
-            verbose=False,
-        )
+        if corrections_function is not None:
+            corrections = corrections_function(exp)
+        else:
+            corrections = possible_corrections(
+                KLRW,
+                projectives,
+                degree=degree,
+                relevant_parameter_part=exp,
+                parallel_processes=parallel_processes,
+                verbose=False,
+            )
         basis_in_product = {}
         A = system_on_corrections_lhs(
             klrw_algebra=KLRW,
@@ -349,17 +354,23 @@ def correct_differential(
             relevant_parameter_part=exp,
             verbose=False,
         )
-        b = system_on_corrections_rhs(
-            dot_algebra=dot_algebra,
-            grading_group=KLRW.grading_group,
-            d_csc=d_csc,
-            d_csr=d_csr,
-            projectives=projectives,
-            basis_appearing_in_product=basis_in_product,
-            degree=degree,
-            relevant_parameter_part=exp,
-            verbose=False,
-        )
+        try:
+            b = system_on_corrections_rhs(
+                dot_algebra=dot_algebra,
+                grading_group=KLRW.grading_group,
+                d_csc=d_csc,
+                d_csr=d_csr,
+                projectives=projectives,
+                basis_appearing_in_product=basis_in_product,
+                degree=degree,
+                relevant_parameter_part=exp,
+                verbose=False,
+            )
+        except AssertionError as err:
+            if verbose:
+                print("order {}: right-hand side outside the image of the ansatz ({})".format(monomial, str(err)[:120]))
+            log.append(dict(iteration=it, exp=exp, monomial=str(monomial), shape=(0, 0), x=None))
+            return None, log
         A = sp.csr_matrix(A)
         b = sp.csc_matrix(b)
         if b.shape[0] < A.shape[0]:

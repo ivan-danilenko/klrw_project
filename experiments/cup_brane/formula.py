@@ -112,24 +112,39 @@ class Stack:
         return s
 
     # -- enumeration -----------------------------------------------------------
+    def admissible(self, I, j):
+        """
+        All admissible sets F of exchange pairs for the mover j at the vertex I,
+        as a dict  F (sorted tuple of pairs) -> parent map.
+        Every admissible F arises from a smaller one by adding a leaf, so we grow them.
+        """
+        avail = [(a, b) for a, b in self.pairs if a not in I and b in I and j not in (a, b)]
+        found = {(): {}}
+        frontier = [()]
+        while frontier:
+            new_frontier = []
+            for F in frontier:
+                used = {x for p in F for x in p}
+                for p in avail:
+                    if p in F or p[0] in used or p[1] in used:
+                        continue
+                    G = tuple(sorted(F + (p,)))
+                    if G in found:
+                        continue
+                    parent = self.analyse(j, G)
+                    if parent is None:
+                        continue
+                    found[G] = parent
+                    new_frontier.append(G)
+            frontier = new_frontier
+        return found
+
     def terms_from(self, I):
         """All terms out of the vertex I: (J, sigma tuple, monomial, sign)."""
         I = frozenset(I)
-        avail = [(a, b) for a, b in self.pairs if a not in I and b in I]
         out = []
         for j in sorted(I):
-            # grow trees from the mover
-            def grow(F, used):
-                parent = self.analyse(j, F)
-                if parent is not None:
-                    yield F, parent
-                for p in avail:
-                    if F and p <= F[-1]:
-                        continue
-                    if p[0] in used or p[1] in used or j in p:
-                        continue
-                    yield from grow(F + (p,), used | set(p))
-            for F, parent in grow((), frozenset()):
+            for F, parent in self.admissible(I, j).items():
                 J = (I - {j} - {b for a, b in F}) | {a for a, b in F}
                 sigma = list(range(1, self.m + 1))
                 for a, b in F:
