@@ -1,0 +1,2 @@
+$ sage -python 05_T1_check.py A 5 all 7 9 40 2
+length 7: 40 words done [31s]

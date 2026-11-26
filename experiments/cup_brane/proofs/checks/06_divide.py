@@ -77,6 +77,8 @@ def divide(S, verbose=False):
 
 
 if __name__ == "__main__":
+    if "plus" in sys.argv:
+        sys.argv.remove("plus"); L.SHARED = True          # formula H+ of section 8
     ct = [sys.argv[1], int(sys.argv[2])]
     red = int(sys.argv[3]); word = tuple(int(c) for c in sys.argv[4])
     S = L.Setup(ct, red, word)

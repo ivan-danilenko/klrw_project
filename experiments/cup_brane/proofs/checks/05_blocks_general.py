@@ -17,7 +17,10 @@ and in K':
 
 It also checks that (*) holds.
 
-    sage -python 05_blocks_general.py TYPE RANK N N_WORDS MAXLEN [SEED]
+    sage -python 05_blocks_general.py TYPE RANK N N_WORDS MAXLEN [SEED] [a1]
+
+With the last argument "a1" everything is restricted to the components with a_1 not in K', the ones
+needed for the Reduction Lemma 4.5 with a = a_1.
 """
 import sys, importlib, itertools, random
 from collections import defaultdict
@@ -26,7 +29,7 @@ from cyclefree import find_cycle
 from formula import Stack
 
 
-def analyse(ct, w, res, stats, red=1):
+def analyse(ct, w, res, stats, red=1, restrict=False):
     S = L.Setup(ct, red, w)
     m = S.m
     c = w[-1]
@@ -41,6 +44,10 @@ def analyse(ct, w, res, stats, red=1):
 
             def record(K, kind, element):
                 d = S.describe(I, K, element)
+                if restrict and occ[0] in K:
+                    for k, v in d.items():
+                        groups[K, k].append(v)
+                    return
                 stats["%s: %s" % (kind, "0" if not d else "1 diagram" if len(d) == 1 else ">1 diagrams")] += 1
                 if len(d) != 1:
                     dirty[K] = True
@@ -72,13 +79,17 @@ def analyse(ct, w, res, stats, red=1):
                                 + tuple(y + 1 for y in bw[kk + 1:])
                             coef = r_c * S.mono((("t_%d_%d" % (c, w[s2 - 1]), 1),)) * S.mono(t.mono) * S.D(t.sign)
                             record(K, "E", coef * S.from_word(I, Ew))
-                    stats["terms of d' with %d bad letters" % nb] += 1
+                    if not (restrict and occ[0] in K):
+                        stats["terms of d' with %d bad letters" % nb] += 1
             for (K, k), g in groups.items():
                 assert sum(g) == 0, "equation (*) fails"
                 if len(g) != 2:
                     dirty[K] = True
-                stats["cancellation groups of size %d" % len(g)] += 1
+                if not (restrict and occ[0] in K):
+                    stats["cancellation groups of size %d" % len(g)] += 1
             for K in set(K for K, _ in groups) | set(dirty):
+                if restrict and occ[0] in K:
+                    continue
                 key = ("".join("+" if s in I else "-" for s in occ), "".join("+" if s in K else "-" for s in occ))
                 res[key][dirty[K]] += 1
 
@@ -88,6 +99,7 @@ if __name__ == "__main__":
     N = int(sys.argv[3])
     n_words, maxlen = int(sys.argv[4]), int(sys.argv[5])
     rng = random.Random(int(sys.argv[6]) if len(sys.argv) > 6 else 0)
+    restrict = len(sys.argv) > 7 and sys.argv[7] == "a1"
     res = defaultdict(lambda: defaultdict(int))
     stats = defaultdict(int)
     seen = set()
@@ -99,8 +111,10 @@ if __name__ == "__main__":
         if w in seen or w.count(w[-1]) != N + 1 or find_cycle(Stack(ct, w), max_pairs=4) is not None:
             continue
         seen.add(w)
-        analyse(ct, w, res, stats)
+        analyse(ct, w, res, stats, restrict=restrict)
     print("type %s, N = %d, %d non-cyclic words of length <= %d: equation (*) holds in all components" % (ct, N, len(seen), maxlen))
+    if restrict:
+        print("   (statistics restricted to the components with a_1 not in K')")
     for k, v in sorted(stats.items()):
         print("   %-45s %d" % (k, v))
     print("   status of a_1..a_N in I' / in K' :  clean components, dirty components")

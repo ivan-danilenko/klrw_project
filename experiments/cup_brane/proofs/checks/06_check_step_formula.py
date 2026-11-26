@@ -29,6 +29,8 @@ def check(ct, red, word):
 
 
 if __name__ == "__main__":
+    if "plus" in sys.argv:
+        sys.argv.remove("plus"); L.SHARED = True          # formula H+ of section 8
     ct = [sys.argv[1], int(sys.argv[2])]
     if sys.argv[3] == "random":
         n, maxlen, maxmult = int(sys.argv[4]), int(sys.argv[5]), int(sys.argv[6])

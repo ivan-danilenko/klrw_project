@@ -1,0 +1,5 @@
+$ sage -python 05_straighten.py 3000 1
+straightening lemma: 1371 words satisfy (S1),(S2) (863 of them non-reduced): all equal to the reduced diagram
+                     1629 words violate (S1) or (S2); for 1589 of them the equality fails
+vanishing lemma 1.4: 381 words, all zero;   bigon lemma 1.3: 868 words, all equal to the prediction
+exit code 0

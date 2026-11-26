@@ -353,10 +353,11 @@ idempotent and `N ≥ 0`.
 1. If `z ∈ e' A e_0` and `z μ ∈ 𝔪^{N+1} A`, then `z ∈ 𝔪^{N+1} A`.
 2. If `z ∈ e_1 A e'` and `μ z ∈ 𝔪^{N+1} A`, then `z ∈ 𝔪^{N+1} A`.
 
-*Proof.* 1. `z P = z μ μ^* ∈ 𝔪^{N+1} A`. By (F1) in the form quoted in the README, `e' A e_0`
-is a free right module over `R[x]` (dots at the right end) with basis the `β_σ`; write
-`z = Σ β_σ f_σ`. Then `𝔪^{N+1} e' A e_0 = ⊕ β_σ 𝔪^{N+1} R[x]`, so `f_σ P ∈ 𝔪^{N+1} R[x]` for
-all `σ`. Grade `R[x]` by the total degree in the variables `r`; `𝔪^{N+1} R[x]` consists of the
+*Proof.* 1. `z P = z μ μ^* ∈ 𝔪^{N+1} A`. By the standing fact quoted in the README (the
+algebra is free as a right module over the polynomial ring in the dots; this is the mirror
+image of (F1)), `e' A e_0` is a free right module over `R[x]` (dots at the right end); let
+`(b_σ)` be a basis and write `z = Σ b_σ f_σ`. Then
+`𝔪^{N+1} e' A e_0 = ⊕ b_σ 𝔪^{N+1} R[x]`, so `f_σ P ∈ 𝔪^{N+1} R[x]` for all `σ`. Grade `R[x]` by the total degree in the variables `r`; `𝔪^{N+1} R[x]` consists of the
 elements whose components of degree `≤ N` vanish. If `f_σ ∉ 𝔪^{N+1} R[x]`, let `g ≠ 0` be its
 component of lowest degree `d ≤ N`; as `P` has degree 0, the component of degree `d` of
 `f_σ P` is `g P ≠ 0`, a contradiction.
@@ -509,7 +510,7 @@ So (S2) holds, and Lemma 1.2 applies ((S1) is empty for a reduced word). ∎
 
 *Check.* `05_T1_check.py` (see section 8) verifies Lemmas 5.1, 5.3, (S2) and the equality of
 the basis braid with two random reduced words for every tree term of every word tested
-(more than 990 000 terms).
+(more than 1 100 000 terms).
 
 *Warning.* For general words (S2) can fail for a tree diagram (e.g. `A_3`, word `3232332`,
 `I = {5,6,7}`, mover 6, pairs `(1,5), (2,7)`); there Lemma 1.2 does not apply as it stands.
@@ -725,6 +726,7 @@ unaffected strands are, with their slots at `J`: the strands unaffected in both 
   at `−a_q`, `+b_q`, and `b_q < a`; `n_1 = 0` as in the second item.
 * `L_q` (`q ∈ 𝒯_{S^c}`) and an original unaffected left `y`, or `R_q` and an original
   unaffected right `y`: both strands are unaffected in `t_1`; `n_1 = 0`.
+* `M` and `A`: `A` is unaffected at the slot `m > a`; not crossed (`n_2 = 0`).
 * `L_q` and `A`: needs `a_q < m < b_q`; impossible.
 * `L_q` and `j`, iff `a_q < j < b_q`: in `t_1` the mover crosses the unaffected strand at
   `−a_q` (as `a_q < j`), so `n_1 = 1`: **a double crossing**. By (L1) `q` is not linked to
@@ -877,6 +879,7 @@ Lemma 4.2 for the slot `a`; and finally `E = 0` in all components):
 | `A 4 all 5 6` (all) | 2040 | 10128 / 168 / 0 | 10380 / 84 / 0 |
 | `D 4 all 7 8 60 1` (sample) | 120 | 4984 / 292 / 11 | 5485 / 122 / 5 |
 | `A 5 all 7 9 40 2` (sample) | 120 | 5143 / 180 / 0 | 5387 / 104 / 12 |
+| `D 5 all 8 9 30 3` (sample) | 60 | 4854 / 360 / 8 | 5392 / 214 / 0 |
 | `D 4 3421342 1342134 2` | 3 | 73 / 16 / 1 | 94 / 12 / 3 |
 
 All assertions pass. (`k = 2` needs a colour with three neighbours; the smallest example is
@@ -911,3 +914,318 @@ coefficient of `α_i` in `λ − μ`, which is at most its coefficient in `λ �
 `so_{2n}`: `ω_1 − w_0 ω_1 = 2 e_1 = 2(α_1 + … + α_{n−2}) + α_{n−1} + α_n`. For `D_4` the three
 minuscule representations are exchanged by triality. So every colour occurs at most twice,
 and this property passes to prefixes and reorderings. ∎
+
+---
+
+## 10. Beyond colour multiplicity two (target (T2)): what carries over, what the data say, what remains
+
+Notation: `w = w'·c` is an arbitrary word without cyclic configurations, the colour `c` occurs
+`N` times in `w'`, at the slots `a_1 < … < a_N`. Theorem B is the case "`N ≤ 1` at every step
+of the induction", which is the same as "every colour at most twice".
+
+### 10.1 Where "every colour at most twice" is used
+
+| step | uses T1? | what is used |
+|---|---|---|
+| Lemmas 1.1–1.4, Sliding Lemma 2.1–2.2 | no | relations of the algebra only |
+| Cone decomposition 3.1–3.3 | no | (for general words: a compatible choice of the reduced words) |
+| Cocycle identity 4.1, Reduction Lemma 4.2–4.6 | no | `d'² = 0`, (F1), first occurrence of a colour |
+| Theorem A | no | |
+| Lemma 6.1 | no | |
+| Lemmas 5.1–5.4 | **yes** | pairs have different colours, the link graph embeds into `Γ` |
+| Lemma 6.2 (tree diagrams satisfy (S2)) | **yes** | 5.1, 5.3; false in general (warning after 6.2) |
+| section 8, set-up | **yes** (`N = 1`) | the only pair with `m` is `(a, m)`; `a` is in no pair of `w'`; `a` is a first occurrence |
+| Lemma 8.1, Corollary 8.2 | only `N = 1` | the proof uses `N = 1`, Lemma 6.1 and the Sliding Lemma, nothing else: **it holds for every word in which `c` occurs once in `w'`** |
+| Lemma 8.3 (one bad letter) | **yes** | 5.4 |
+| Lemma 8.4 (families) | **yes** | 5.1, 5.2, `Γ` a forest |
+| Lemmas 8.5, 8.6 ((S1), (S2)) | **yes** | (L1)–(L3), i.e. 5.1, 5.3, 5.4 |
+| Lemma 8.7 (signs) | no | formal properties of `κ` (the exterior algebra calculus), given the family structure |
+
+### 10.2 The general form of the problem
+
+For an arbitrary word `w = w'·c` with `d'² = 0`, the Sliding Lemma turns `E = 0` into
+
+    Σ_{t', χ} coef'(t') γ_χ ψ_{E_χ(t')}  =  Σ_{J'} F_1{}_{;I',J'} ι_L(d'_{J',K'})  −  Σ_{J'} ι_R(d'_{I',J'}) F_1{}_{;J',K'}        (∗)
+
+for all `I', K'` (`t'` the terms of `d'` from `I'` to `K'`, `χ` the bad letters of a reduced
+word of `t'`, which are now the crossings of **any** strand of colour `c` standing to the left
+of a strand of adjacent colour). By Proposition 4.6, (∗) has to be established directly only
+for a set of components from which all others can be reached by the rules (r), (l); by
+Proposition 4.5 the components with `a_1 ∉ K'` suffice (`a_1` is a first occurrence; so is
+any first occurrence of any other colour).
+
+All statements of this subsection and of 10.3–10.4 about "the data" refer to the basis braids
+of `klrw` as diagrams of the tree terms, and are Tier 2: exact computations for the words
+listed. In all of them (∗) itself holds (it is equivalent to `d² = 0`).
+
+### 10.3 `N = 1`, the other colours arbitrary
+
+Here Corollary 8.2 holds as proved, so by the Reduction Lemma with `a = a_1`:
+
+> **Remaining identity (R1).** For `a ∉ I'`, `a ∉ K'`: equation (8.1) vanishes, i.e.
+> `Σ_{t', χ} coef'(t') γ_χ ψ_{E_χ(t')} = Σ_{(t_1,t_2)} coef(t_1) coef(t_2) β(t_1) β(t_2)`
+> (`t_1 ∋ (a,m)`, `t_2` with mover `a`).
+> **If (R1) holds for a word `w'·c` with `N = 1` and `d'² = 0`, then `d² = 0` for `w'·c`.**
+
+Data (`05_blocks_general.py A 3 1 80 8 1 a1`, `… D 4 1 60 8 2 a1`: 80 + 60 random non-cyclic
+words of length `≤ 8` in which the last colour occurs exactly twice, the other colours
+arbitrarily often), restricted to the components of (R1): every term of `d'` has at most one bad
+letter (2127 have one, 8130 none); every `E_χ` is a single basis diagram without dots; of the
+2949 products `β(t_1) β(t_2)`, 2813 are a single basis diagram without dots and 136 are
+**zero**; the basis diagrams cancel in pairs (2456 groups) or in fours (7 groups). No dots occur. Compared with section 8 the only new phenomenon is the
+vanishing products; in the examples inspected they are instances of Lemma 1.4 (two strands of
+the same colour cross twice: e.g. `A_2`, word `12112`, `I = {3,4,5}`,
+`(3; (2,5)) · (2; (1,4))`: the union `(3; (1,4), (2,5))` is blocked, the mover 3 of colour 1
+lies inside the pair `(1,4)` of colour 1). So (R1) should be provable by the method of
+section 8 once the combinatorics of sections 5–6 is replaced by non-cyclicity; what is
+missing is (i) a substitute for Lemma 6.2 (for general words (S2) fails for some tree
+diagrams, so the strong form of the Straightening Lemma is not enough), (ii) the family
+structure of Lemma 8.4 with blocked unions, for which the partner product does not exist and
+the product itself must vanish. **(R1) is not proved.**
+
+In the whole equation (all four blocks) dots do occur for `N = 1`
+(2582 product terms with dots among the same 80 words of `A_3`,
+`05_blocks_general.py A 3 1 80 8 1`), but all of them lie in components
+that follow by Proposition 4.6: `05_closure.py A 3 1 60 8 dots 1`: 358 components with dots,
+all deducible from the components without dots.
+
+### 10.4 `N ≥ 2`: the Reduction Lemma does not remove all dots; what it removes
+
+`05_blocks_general.py A 3 2 80 8 3` (80 non-cyclic words, `N = 2`): number of components of
+(∗) that are clean / not clean (clean = every `E_χ` and every product is one basis diagram
+without dots, cancellation in pairs), by the position of `(a_1, a_2)` in `I'` and in `K'`
+(`+` = on the right of the red strand):
+
+| `I'` \ `K'` | `++` | `+−` | `−+` | `−−` |
+|---|---|---|---|---|
+| `++` | 1006 / 95 | 0 / 109 | 102 / 7 | – |
+| `+−` | 411 / 199 | 966 / 135 | 252 / 288 | 102 / 7 |
+| `−+` | 553 / 653 | 0 / 1148 | 966 / 135 | 0 / 109 |
+| `−−` | – | 553 / 653 | 411 / 199 | 1006 / 95 |
+
+No block is clean. Restricted to the components with `a_1 ∉ K'`
+(`05_blocks_general.py A 3 2 80 8 3 a1`): terms of `d'` with 0 / 1 / 2 bad letters:
+6597 / 1419 / 810; sliding errors `E_χ` that are 0 / one diagram / several diagrams:
+109 / 2894 / 36; products that are 0 / one diagram / several: 463 / 6067 / 735; 704 products
+have coefficients with dots; cancellation groups of size 2 / 4 / 6: 4931 / 160 / 28.
+
+**Which dots does the cocycle argument remove?** (`05_closure.py`; a component is *dotted* if
+one of its products has a coefficient with dots; "deducible" = reachable by the rules (r),
+(l) of Proposition 4.6 from the other components.)
+
+| run | words | dotted components | not deducible from the dot-free ones | not deducible, if the dotted components **not** involving the pair `(a_1, m)` are known |
+|---|---|---|---|---|
+| `A 3 1 60 8` (`N = 1`) | 60 | 358 | 0 | – |
+| `A 3 2 40 7` (`N = 2`) | 40 | 264 | 172 (7 words) | 0 |
+| `A 2 2 40 7` (`N = 2`) | 40 | 474 | 308 (10 words) | 0 |
+| `D 4 2 25 7` (`N = 2`) | 25 | 110 | 16 (1 word) | 0 |
+| `A 2 3 20 8` (`N = 3`) | 20 | 953 | 758 (8 words) | 0 |
+| `A 3 3 20 8` (`N = 3`) | 20 | – | – | 0 (of 370) |
+
+(columns 4 and 5 are the modes `dots` and `dots-a1` with the seeds 1, 2, 1, 6, 3, 5).
+So, in all samples:
+
+> the Reduction Lemma removes exactly the dotted identities that involve the pair
+> `(a_1, m)` of the **first** occurrence of `c`; the dotted identities that only involve the
+> pairs `(a_i, m)`, `i ≥ 2`, are not reachable and have to be proved directly.
+
+For `N = 3` it is not enough to know the dotted components of the last pair `(a_3, m)`
+(`05_closure.py A 2 3 20 8 dots-aN 3`: 684 of 878 not deducible).
+
+**The smallest dotted identity that is not deducible** is in `A_2`, word `22112` (`c = 2`,
+`a_1 = 1`, `a_2 = 2`, slots 3, 4 of colour 1, `m = 5`), `I' = {3,4}`, `K' = {2}`: with
+`β_0` the reduced diagram `[−2 → −5, +3 → −3, +4 → −4, +5 → +2]` and `x_{e,i}` the dot on the
+`i`-th strand of colour `e` at the source,
+
+    m_3 · (4;(2,5))   =  + r_2 t_{21} ( t_{12} x_{1,1} + t_{21} x_{2,1} ) β_0
+    (3;(2,5)) · m_4   =  + r_2 t_{21} ( t_{12} x_{1,2} + t_{21} x_{2,3} ) β_0
+    m_4 · (3;(2,5))   =  − r_2 t_{21} ( t_{12} x_{1,2} + t_{21} x_{2,1} ) β_0
+    (4;(2,5)) · m_3   =  − r_2 t_{21} ( t_{12} x_{1,1} + t_{21} x_{2,3} ) β_0
+
+(coefficients of the tree formula included; `x_{2,1}` is the dot on `A_2`, `x_{2,3}` on `M`,
+`x_{1,1}, x_{1,2}` on the strands 3, 4). The third and the fourth product contain in addition
+`∓ r_1 r_2 t_{12} t_{21} β_0'`, where `β_0'` is the diagram in which the strands 3 and 4 do not
+cross (`+3 → −4`, `+4 → −3`); these two terms cancel each other. The same four products occur for a T1 word (drop the
+slot 1), where they are deduced by the Reduction Lemma with the twin `a`; here the twin
+`a_2` is not a first occurrence (the elementary move of `a_2` crosses `A_1`), so this is not
+available. In a sample (`A_3`, `N = 2`, 40 words) all 172 non-deducible dotted components
+have this shape: exactly four dotted products, two movers `j, j'`, one tree `F ∋ (a_i, m)`
+admissible with either mover, the products being `m_j·(j';F)`, `(j;F)·m_{j'}`,
+`m_{j'}·(j;F)`, `(j';F)·m_j` (in 8 of them `F` has a second pair;
+`05_closure.py A 3 2 40 7 dots 2 shapes`). The four expansions above are printed by
+`05_explore.py A 2 22112 v`.
+
+The following proposition proves this four-term identity directly in the simplest situation.
+It is valid for arbitrary words, in particular with further slots of colour `c` below `a`
+(`N ≥ 2`), and shows the mechanism with exact signs.
+
+**Proposition 10.2 (four-term bigon identity).** Let `w` be an arbitrary word,
+`a < j < j' < b` slots with `c(a) = c(b) = c`, `c(j) = e ∼ c`, `c(j') = e' ∼ c`, and `I` a
+vertex with `j, j', b ∈ I`, `a ∉ I`; put `K = (I ∖ \{j, j', b\}) ∪ \{a\}`. Assume
+
+* (H1) no slot strictly between `a` and `b` has the colour `c`;
+* (H2) no slot `< j` has the colour `e`, and no slot `< j'` has the colour `e'` (so `e ≠ e'`).
+
+Let `A, M` be the strands of `a, b`, and `β_0` the element of a reduced word from `e_I` with
+permutation `j ↦ −j`, `j' ↦ −j'`, `A ↦ −b`, `M ↦ +a`. Then all reduced words of the four
+terms below have the same element, and
+
+    P_1 := m_j(I) · β(I∖j; j', \{(a,b)\})   =  ( t_{ce} x_A + t_{ec} x_j ) β_0,
+    P_4 := β(I; j', \{(a,b)\}) · m_j         =  ( t_{ce} x_M + t_{ec} x_j ) β_0,
+    P_2 := β(I; j, \{(a,b)\}) · m_{j'}       =  ( t_{ce'} x_M + t_{e'c} x_{j'} ) β_0,
+    P_3 := m_{j'}(I) · β(I∖j'; j, \{(a,b)\}) =  ( t_{ce'} x_A + t_{e'c} x_{j'} ) β_0
+
+(dots at `e_I`). These are the only products of two tree terms from `I` to `K`, and with the
+coefficients of the tree formula they add up to zero: `(d²)_{I,K} = 0`.
+
+*Proof.* *Crossings.* The strands moved are `j`, `j'`, `A`, `M`; in each product each of them
+moves in exactly one factor. By Lemma 6.1: `j` crosses the red strand and unaffected strands
+of slots `< j`, `j'` those of slots `< j'`, `A = L_{(a,b)}` unaffected left strands with slots
+in `(a,b)`, `M = R_{(a,b)}` unaffected right strands with slots in `(a,b)`; a mover linked to
+`(a,b)` crosses neither `A` nor `M`. By (H1), (H2) none of the four crosses a strand of its
+own colour, and unaffected strands do not cross each other. So **no two strands of the same
+colour cross** in any of the four product words, (S2) holds trivially, and Lemmas 1.2, 1.3
+apply to the factors and to the products. A pair of strands can cross twice only if one of
+them moves in the first factor and the other in the second. Going through Lemma 6.1:
+
+* `P_1` (first `j`, then `j', A, M`): `(j, j')` once (in the second factor, `j < j'`);
+  `(j, A)` **twice** (`a < j`; then `A` passes the left slot `j ∈ (a,b)`); `(j, M)` never.
+* `P_4` (first `j', A, M`, then `j`): `(j', j)` once (first factor); `(M, j)` **twice** (`M`
+  passes the right slot `j`; then `j` passes the right slot `a < j`, now occupied by `M`);
+  `(A, j)` never.
+* `P_2` (first `j, A, M`, then `j'`): `(j, j')` once (second factor); `(M, j')` **twice**;
+  `(A, j')` never.
+* `P_3` (first `j'`, then `j, A, M`): `(j', j)` once (first factor); `(j', A)` **twice**;
+  `(j', M)` never.
+
+In each case the pair crossing twice has adjacent colours `c ∼ e` resp. `c ∼ e'`, and the
+permutation is that of `β_0`. Lemma 1.3 gives the four formulas.
+*Other products.* A product of two tree terms from `I` to `K` moves `j`, `j'` to the left as
+movers, removes `b` from the right and adds `a`; the only ways to do the latter with pairs
+are the pair `(a,b)` in one factor, or pairs `(y, b)`, `(a, y)` in the two factors with `y` of
+colour `c`, `a < y < b`, excluded by (H1).
+*Signs.* By (8.2), with `s = s_{(a,b)}`, and since the connector of `(a,b)` is the mover,
+which lies in the source vertex (factor `−1`), the signs of the four products are the
+coefficients of `ω_K` in `−∂_{j'} s ∂_j ω_I` (`P_1`), `−∂_j ∂_{j'} s ω_I` (`P_4`),
+`−∂_{j'} ∂_j s ω_I` (`P_2`), `−∂_j s ∂_{j'} ω_I` (`P_3`). As `∂_j s = s ∂_j`,
+`∂_{j'} s = s ∂_{j'}` and `∂_j ∂_{j'} = −∂_{j'} ∂_j`, the signs are `ε, −ε, ε, −ε` for
+`P_1, P_4, P_2, P_3`. The monomials are `r_c t_{ce'}` for `P_1, P_4` and `r_c t_{ce}` for
+`P_2, P_3`. Hence
+
+    (d²)_{I,K} = ε r_c ( t_{ce'} ( t_{ce} x_A − t_{ce} x_M ) + t_{ce} ( t_{ce'} x_M − t_{ce'} x_A ) ) β_0 = 0. ∎
+
+*Check.* `05_fourterm.py A 3 40 7 1`, `05_fourterm.py D 4 40 7 2`: 80 random words (arbitrary,
+random red colour), 384 cases, 64 of them with a further slot of colour `c` below `a`: the
+four products are the only ones, each equals the predicted element, and the sum is zero.
+
+When (H2) fails — e.g. for `22112`, where the two movers are twins — the dot of a mover has
+to pass a crossing with a strand of its own colour, which produces an additional term with
+one more factor `r` (in the data: `P_3` and `P_4` each get a second basis diagram, in which
+the two movers do not cross, with opposite coefficients). This case is **not proved**.
+
+### 10.5 List of what remains for (T2)
+
+Each item is verified by exact computation for the words of the runs quoted (and all are
+implied by the verification of `d² = 0` in `PROOFS.md` section 3 and `general_words.py`).
+
+1. **Diagrams.** A statement replacing Lemma 6.2 for general non-cyclic words: the element of
+   a tree term does not depend on the reduced word (front 01), or a version of the
+   Straightening Lemma with the positional form of the bad triples.
+2. **(R1)** of 10.3, for `N = 1` and arbitrary other colours: no dots; single diagrams,
+   vanishing products (Lemma 1.4), cancellation in pairs.
+3. For `N ≥ 2`, equation (∗) on the components with `a_1 ∉ K'` (or on any set of components
+   generating all others by Proposition 4.6). These contain
+   * (3a) dot-free identities: sliding errors of terms with several bad letters, some of
+     which vanish or have two basis terms; products that vanish or have several basis terms;
+   * (3b) the dotted identities attached to the pairs `(a_i, m)`, `i ≥ 2`; in all samples
+     they are four-term identities as in Proposition 10.2, in general with twin movers and
+     with larger trees. Proposition 10.2 proves the case (H1), (H2), `F = \{(a,b)\}`.
+4. Nothing else: by Propositions 3.3 and 4.5, items 1–3 for all non-cyclic words imply C1′.
+
+### 10.6 Attempts that did not work
+
+* *Cancelling all products in pairs.* False: the basis diagrams of `d²` cancel in groups of
+  2, 4, 8, with dots (section 0). A general product rule for two tree terms was not found;
+  products can have up to 7 basis terms and coefficients that do not factor
+  (`A_3`, `132213`, `m_4 · (3; (1,5), (2,6))`).
+* *A second reduction with a slot that is not a first occurrence* (e.g. `a_2`): the lowest
+  order term `m_{a_2}` crosses a strand of its own colour; `μ μ^* ∈ 𝔪 A`, and right
+  multiplication by a crossing of two strands of the same colour has a kernel. Lemma 4.3
+  fails.
+* *Combining the right-hand rule for one slot with the left-hand rule for another*, or
+  using all first occurrences at once: the lowest order of the cocycle identity gives one
+  relation between two unknown components (the "Koszul" relations `m_s m_{s'} = m_{s'} m_s`
+  produce genuine solutions), so the closure of Proposition 4.6 is strictly smaller than
+  everything; `05_closure.py` computes it.
+* *Clean components suffice for `N ≥ 2`?* No (10.4).
+
+
+---
+
+## 11. Status
+
+### Proved completely (human-checkable, using only (R1)–(R4), (F1) incl. its right-module form, (F2) is not needed, (F3))
+
+| statement | generality | checked by |
+|---|---|---|
+| Lemma 1.1 (word property), from (F3) | all words of crossings | – (combinatorial) |
+| Lemma 1.2 (Straightening), 1.3 (bigons), 1.4 (vanishing) | arbitrary states | `05_straighten.py` |
+| Lemmas 2.1, 2.2 (Sliding Lemma, sign `+γ`) | arbitrary words, red strand anywhere | `05_sliding.py` |
+| Lemmas 3.1, 3.2, Proposition 3.3 (cone, signs) | arbitrary words (with the convention on reduced words stated there) | `05_cone.py` |
+| Lemmas 4.1–4.4, Propositions 4.5, 4.6 (Reduction Lemma, deduction rule) | arbitrary words with `d'² = 0` | `05_reduction.py` (inputs 4.2, 4.4) |
+| Theorem A, Corollary 7.1 (new colour; reproves Theorem 5) | arbitrary `w'` | `05_T1_check.py` ("new colour: exact slides") |
+| Lemmas 5.1–5.4, 6.2 | T1 words | `05_T1_check.py` |
+| Lemmas 8.1–8.7, Proposition 8.8, **Theorem B** (`d² = 0` if every colour occurs at most twice) | T1 words, any `Γ` that is a forest, any red colour | `05_T1_check.py` |
+| Corollary 9.1 (one repeated colour), 9.2 (`sl_n` `ω_1, ω_2`; `so_{2n}` vector; `D_4`) | | |
+| Proposition 10.2 (four-term bigon identity under (H1), (H2)) | arbitrary words | `05_fourterm.py` |
+
+Inputs taken from elsewhere: the list of relations with signs (README, `alg.py`); Lemma 6.1 =
+items 1–6 of the proof of Proposition 3 of `PROOFS.md`; (F1) in both forms (free left and free
+right module over the dots), used only in Lemmas 3.1 (injectivity, not needed for Theorem B)
+and 4.3; (F3). Theorem B does not use the grading (F2), nor any result of the fronts 01–04, 06.
+
+Referee pass (done after the last change of sections 4 and 8): every case distinction was
+re-read against Lemma 6.1; two points were made explicit (the pair `(M, A)` in the list of
+Lemma 8.5; Lemma 4.3 now only uses freeness over the dots, with an arbitrary basis). The signs
+that enter are: `+γ` in the Sliding Lemma (`05_sliding.py`); the signs of the cone
+decomposition (`05_cone.py`); `coef(t_1) coef(t_2) = coef'(t') r_c t_{c,c(N)}` and the
+alternation `(−1)^{k−|S|}` (Lemma 8.7; `05_T1_check.py` compares the actual products of the
+elements of the formula with the sliding error and within each family); the final identity
+`E = 0` in all four blocks (`05_T1_check.py`, "chain map components").
+
+### Runs (all after the last edit of the scripts; every run ended without a failed assertion)
+
+see the list at the end of this section (filled in from the final runs).
+
+### Verified only by computation (Tier 2)
+
+* (R1) of 10.3 (`N = 1`, other colours arbitrary): structure of the components described
+  there (`05_blocks_general.py … a1`).
+* The statements of 10.4 on which dotted components are deducible (`05_closure.py`), and the
+  shape of the non-deducible ones.
+* Equation (∗) for all non-cyclic words of the runs of 10.3–10.4 (equivalent to `d² = 0`
+  there).
+
+### Not proved
+
+* Conjecture C1′ for words in which some colour occurs at least three times. Precisely: the
+  items 1–3 of 10.5.
+* (R1).
+* The four-term identity when (H2) fails (twin movers, or a mover crossing a strand of its
+  own colour) or for larger trees.
+
+### Failed attempts
+
+See 10.6.
+
+### Statements elsewhere that need a caveat
+
+* README, "Cone structure": correct, with the signs of Lemma 3.2 (`−d'` on `C_R`, `+1` for
+  `X_m`).
+* The sketch "first-order cancellation" in `PROOFS.md` §4 (C1) says that the red strand is
+  never the middle strand "because both moving strands start on its right"; the precise
+  statement is Remark (1) after Lemma 2.2 (a bad letter needs a black strand of colour `c` as
+  its **left** strand; a mover is always the right strand of its crossings).
+* For general words a tree diagram can violate (S2) (warning after Lemma 6.2); this does not
+  contradict the observed independence of the reduced word, but the strong Straightening
+  Lemma 1.2 does not prove it.

@@ -1,0 +1,3 @@
+$ sage -python 05_cone.py A 3 6 40 1
+cone decomposition: 40 words of type ['A', 3], 3124 terms, all checks passed
+exit code 0

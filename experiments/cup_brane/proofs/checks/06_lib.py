@@ -586,6 +586,9 @@ def is_chain_map(S, dA, G, dB, verts=None):
 
 
 # ---- conjectural closed formula for the one-step map (any multiplicity) -----------
+SHARED = False      # True: formula H+ (hanging pairs may start at a chain slot a_i, i >= 2), see section 8
+
+
 def step_formula_row(S, I, k=None, hanging=True):
     """
     Row of the one-step map Gamma^(k) : C^(k-1) -> C^(k) at the vertex I  (k = m by default):
@@ -617,6 +620,15 @@ def step_formula_row(S, I, k=None, hanging=True):
             pts = list(chain) + [k]
             arcs = [(pts[i], pts[i + 1]) for i in range(s)]
             used0 = set(pts)
+            prev = {}                      # chain slot a_i (i >= 2) -> a_{i-1}
+            cand_pairs = list(other_pairs)
+            if SHARED:
+                for i in range(1, s):
+                    prev[chain[i]] = chain[i - 1]
+                    for b in sorted(I):
+                        if chain[i] < b < k and S.col(b) == c:
+                            cand_pairs.append((chain[i], b))
+                used0 = {chain[0], k}
             # grow forests hanging from the chain
             found = {(): {}}
             frontier = [()]
@@ -624,8 +636,10 @@ def step_formula_row(S, I, k=None, hanging=True):
                 new = []
                 for F in frontier:
                     used = used0 | {x for p in F for x in p}
-                    for p in other_pairs:
+                    for p in cand_pairs:
                         if p in F or p[0] in used or p[1] in used:
+                            continue
+                        if p[0] not in prev and p[0] in chain:
                             continue
                         Gp = tuple(sorted(F + (p,)))
                         if Gp in found:
@@ -643,7 +657,10 @@ def step_formula_row(S, I, k=None, hanging=True):
                     sigma[u - 1] = v
                 img = {k: chain[0]}
                 for a, b in F:
-                    sigma[a - 1], sigma[b - 1] = b, a
+                    if a in prev:              # the left strand now in slot a came from the chain slot before a
+                        sigma[prev[a] - 1], sigma[b - 1] = b, a
+                    else:
+                        sigma[a - 1], sigma[b - 1] = b, a
                     img[b] = a
                 J = frozenset(img.get(x, x) for x in I)
                 eps = perm_sign([img.get(x, x) for x in sorted(I)])

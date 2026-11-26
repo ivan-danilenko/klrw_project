@@ -224,5 +224,11 @@ def _tok(node):
 
 
 if __name__ == "__main__":
-    main()
-    naturality()
+    if len(sys.argv) > 1 and sys.argv[1] == "negative":
+        # negative control: psi in place of phi everywhere -> naturality must fail
+        phi = lambda A, s, i: A.x(seqstr(s), i)   # noqa: E731
+        print("NEGATIVE CONTROL (psi instead of phi):")
+        naturality(n_tests=10)
+    else:
+        main()
+        naturality()
