@@ -157,6 +157,40 @@ connected, and it has more links than pairs. `cyclefree.py` searches for such co
 | `D_n` spinors, `n ≥ 6` (first 14 of 15 slots of `D_6`) | exist | incomplete |
 | `E_6` (first 14 of 16 slots), `E_7` | exist | incomplete |
 
+### The cyclic condition in terms of the weights of the representation
+
+Whether a stack admits a cyclic configuration depends only on its order ideal of the
+minuscule poset, i.e. on the weight `μ` reached by the chain `λ → μ`, and is inherited by
+larger ideals. Computed with `cyclic_weights.py` **[verified by enumeration for every weight
+of the cases listed; cycles with up to 4 pairs, re-tested with up to 6 near the threshold]**:
+
+> In every case there is a **unique minimal cyclic weight `μ_c`**: the stack of `μ` admits a
+> cyclic configuration if and only if `μ ≤ μ_c` in the usual order on weights (equivalently
+> `w ≥ w_c` in the Bruhat order of minimal coset representatives, or: the Schubert variety
+> of `μ` in `G/P_λ` contains that of `μ_c`).
+
+| representation | `μ_c` | `λ − μ_c` (strands) |
+|---|---|---|
+| `sl_8`, `Λ⁴ℂ⁸` | `−ω_3 + ω_4 − ω_5` = lowest weight `+ α_4` | (1,2,3,3,3,2,1), 15 |
+| `sl_n`, `Λ^k ℂ^n`, `4 ≤ k ≤ n−4` | weight of `e_1∧…∧e_{k−4}∧e_k∧e_{k+2}∧e_{k+3}∧e_{k+4}` | the same on nodes `k−3,…,k+3`, 15 |
+| `D_6`, half-spin `ω_6` | `−ω_3 + ω_4 − ω_5` = lowest weight `+ α_6 + α_4` = ½(−,−,−,+,−,+) | (1,2,3,3,2,2), 13 |
+| `D_n`, half-spin, `n ≥ 6` | ½(+,…,+,−,−,−,+,−,+) (the `D_6` pattern on the last six coordinates) | 13 |
+| `E_6`, `ω_1` (27) | `−ω_4 + ω_5` = lowest weight `+ α_6 + α_5` | (2,2,3,4,2,1), 14 |
+| `E_7`, `ω_7` (56) | `ω_3 − ω_4 + ω_7` | (1,2,2,4,3,2,1), 15 (one step, then the `E_6` case) |
+
+So there are three "seeds": `(A_7, ω_4)`, `(D_6, half-spin)`, `(E_6, 27)`; in each the cyclic
+weights are only the lowest two or three weights of the representation, and every larger
+case contains one of the seeds on a sub-diagram.
+
+For `sl_n`, `Λ^k ℂ^n` with basis `e_S`, `S = {s_1 < … < s_k}`: `e_S` is cyclic if and only if
+the Young diagram of `S` contains the shape (4,4,4,3) — the 4×4 square without its corner —
+i.e. `s_{k−2} ≥ k+2` and `s_{k−3} ≥ k` **[verified for all subsets, `sl_8 … sl_10`]**.
+
+The minimal cyclic configuration always has the same shape: three consecutive slots
+`x_1 < x_2 < x_3` of one colour `c` (the mover and one exchange pair), and one exchange pair
+in each of two colours `c′, c″` adjacent to `c`, with one slot between `x_1` and `x_2` (or
+below `x_1`) and the other above `x_3` (or between `x_2` and `x_3`).
+
 In the incomplete cases every term of the tree formula is still a term of the true
 differential with the right coefficient **[verified on 32 local pieces, see section 6]**;
 what is missing are additional terms attached to the cyclic configurations.
