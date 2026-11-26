@@ -79,6 +79,91 @@ def build_interval(cube, vertices):
     return by_h, index, projectives, d0
 
 
+def matching_bijections(model, posV, posU, target):
+    """
+    Colour preserving bijections sigma of the slots whose reduced diagram from V to U has
+    crossing content exactly ``target`` (a Counter of 's', 'e', 'w' types).  Colour by
+    colour, so that the same-colour and red-strand counts prune early.
+    """
+    import itertools
+    classes = {}
+    for s in range(1, model.m + 1):
+        classes.setdefault(model.col[s - 1], []).append(s)
+    BIG = model.BIG
+    per_colour = []
+    for c, sl in classes.items():
+        want_s = target.get(("s", c), 0)
+        want_w = target.get(("w", c), 0)
+        reds = [p for p, r in enumerate(model.reds) if r == c]
+        good = []
+        for perm in itertools.permutations(sl):
+            cnt = 0
+            ok = True
+            for a in range(len(sl)):
+                for b in range(a + 1, len(sl)):
+                    if (posV[sl[a]] - posV[sl[b]]) * (posU[perm[a]] - posU[perm[b]]) < 0:
+                        cnt += 1
+                        if cnt > want_s:
+                            ok = False
+                            break
+                if not ok:
+                    break
+            if not ok or cnt != want_s:
+                continue
+            w = 0
+            for a in range(len(sl)):
+                for p in reds:
+                    if (posV[sl[a]] - p * BIG) * (posU[perm[a]] - p * BIG) < 0:
+                        w += 1
+            if w != want_w:
+                continue
+            good.append(dict(zip(sl, perm)))
+        if not good:
+            return
+        per_colour.append((c, sl, good))
+    # adjacent-colour pairs
+    colours = [c for c, _, _ in per_colour]
+    adj = {}
+    for i, (c, sl, _) in enumerate(per_colour):
+        for k, (c2, sl2, _) in enumerate(per_colour[:i]):
+            if frozenset((c, c2)) in model.E:
+                adj[i, k] = ("e", min(c, c2), max(c, c2))
+    for ty, v in target.items():
+        if ty[0] == "e" and v and not any(t == ty for t in adj.values()):
+            return
+
+    def rec(i, sigma, remaining):
+        if i == len(per_colour):
+            if not any(remaining.values()):
+                yield dict(sigma)
+            return
+        c, sl, good = per_colour[i]
+        for g in good:
+            rem = dict(remaining)
+            ok = True
+            for k in range(i):
+                ty = adj.get((i, k))
+                if ty is None:
+                    continue
+                sl2 = per_colour[k][1]
+                cnt = 0
+                for a in sl:
+                    for b in sl2:
+                        if (posV[a] - posV[b]) * (posU[g[a]] - posU[sigma[b]]) < 0:
+                            cnt += 1
+                rem[ty] = rem.get(ty, 0) - cnt
+                if rem[ty] < 0:
+                    ok = False
+                    break
+            if not ok:
+                continue
+            sigma.update(g)
+            yield from rec(i + 1, sigma, rem)
+
+    remaining = {ty: v for ty, v in target.items() if ty[0] == "e"}
+    yield from rec(0, {}, remaining)
+
+
 def interval_corrections(cube, model, by_h, exp):
     """
     Complete ansatz at the parameter order ``exp`` on the interval: for every pair of
@@ -125,18 +210,12 @@ def interval_corrections(cube, model, by_h, exp):
                 if any(v < 0 for v in target.values()):
                     continue
                 posU = {s: model.pos(s, U) for s in slots}
-                tgt_proj = None
-                for sigma in model._bij:
-                    deficit = model.content_fast(posV, posU, sigma, target)
-                    if deficit is None or any(deficit.values()):
-                        continue
+                src_deg = interval_corrections.degrees[V]
+                tgt_deg = interval_corrections.degrees[U]
+                for sigma in matching_bijections(model, posV, posU, target):
                     _, _, braid = braid_for(cube, V, U, tuple(sigma[s] for s in slots))
-                    if tgt_proj is None:
-                        src_deg = interval_corrections.degrees[V]
-                        tgt_deg = interval_corrections.degrees[U]
                     for e in D.exps_by_degree_and_parameter_part(tgt_deg - src_deg - KLRW.braid_degree(braid), exp):
                         entries[row, col].append((braid, e))
-                    tgt_proj = True
         out[h] = corrections_matrix(len(by_h[h - 1]), len(by_h[h]), entries)
     return out
 
@@ -205,6 +284,16 @@ if __name__ == "__main__":
     if actual is None:
         print("NO SOLUTION on the interval")
         sys.exit()
+    import json
+    os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_local"), exist_ok=True)
+    name = "{}{}_W{}_{}__I_{}__K_{}.json".format(ct[0], ct[1], red, "".join(map(str, word)),
+                                                "-".join(map(str, sorted(I))), "-".join(map(str, sorted(K))))
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_local", name), "w") as f:
+        json.dump(dict(cartan_type=ct, red=red, word=list(word), I=sorted(I), K=sorted(K),
+                       vertices=[sorted(V) for V in vertices],
+                       terms=[[sorted(k[0]), sorted(k[1]), list(k[2]), [list(x) for x in k[3]], [list(x) for x in k[4]], c]
+                              for k, c in actual.items()]), f)
+    print("saved data_local/" + name)
     A, Pd = set(actual), set(predicted)
     wrong = [k for k in A & Pd if actual[k] != predicted[k]]
     print("terms: actual {}, formula {}, actual-not-formula {}, formula-not-actual {}, different coefficient {}".format(

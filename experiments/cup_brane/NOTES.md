@@ -120,27 +120,74 @@ which nothing crosses, i.e. in which the two `c`-strands have exchanged their ro
 is the label exchange. The triple `(V_k, W_k, V_k)` (which would produce `r_k u_k`) never
 arises because only one strand crosses `W`.
 
-## 4. What is not covered
+## 4. Range of validity: the tree formula is complete exactly when no cycles are possible
 
-* **`u`-corrections.** They do not occur inside a stable envelope. They can only enter through
-  the gluing maps between different `S_μ` (Phase 3, not done yet).
-* The formula is stated for the reduced diagram `β`. In all cases tested the element does
-  not depend on the reduced word used to draw it (`wordcheck.py`); the code uses the
-  basis ("lexmin") braid of `klrw`.
-* Non-minuscule words are outside the scope (the toy word `(a, b, a)` happens to obey the
-  formula).
-* Admissible configurations whose link graph has the right number of edges but is not a
-  tree do not occur in any tested case; whether they can exist in large types (two colours
-  occurring ≥ 4 times each) is open.
-* No proof. The formula was found from data with ≤ 10 strands and then *predicted* larger
-  cases correctly (section 5).
+Call a configuration (mover, `F`) *cyclic* if it has no blocked pairs, its link graph is
+connected, and it has more links than pairs. `cyclefree.py` searches for such configurations.
 
-## 5. Evidence
+| stack | cyclic configurations | status of the tree formula |
+|---|---|---|
+| `sl_n`, `ω_1, ω_2, ω_3` (and duals), checked `n ≤ 11` | none | complete **[verified]** |
+| `so_{2n}`, vector `ω_1`, checked `n ≤ 8` | none | complete **[verified]** |
+| `D_4` (all three), `D_5` spinors | none | complete **[verified]** |
+| `sl_n`, `ω_k` with `4 ≤ k ≤ n−3` (first: `sl_8, ω_4`, 15 of its 16 slots) | exist | incomplete |
+| `D_n` spinors, `n ≥ 6` (first 14 of 15 slots of `D_6`) | exist | incomplete |
+| `E_6` (first 14 of 16 slots), `E_7` | exist | incomplete |
 
-See `RESULTS.md` (generated) for the table of cases.
+In the incomplete cases every term of the tree formula is still a term of the true
+differential with the right coefficient **[verified on 32 local pieces, see section 6]**;
+what is missing are additional terms attached to the cyclic configurations.
 
-* `data/` — full-ansatz solver output (unique solutions), one stack, ≤ 6 strands.
-* `data2/` — full-ansatz solver output for two-puncture stable envelopes.
-* `data_fast/` — solver restricted to degree-allowed diagrams, up to 10 strands.
-* `formula.py CASE.json` — compares formula and stored differential term by term.
-* `verify.py` — builds `d` from the formula alone and checks homogeneity and `d² = 0`.
+`u`-corrections do not occur inside a stable envelope in any case. They can only enter
+through the gluing maps between different `S_μ` (not done).
+
+## 5. Evidence for the tree formula
+
+* **Exact agreement with the solver** (term by term, signs included): all one-stack cases
+  in `data/` and `data_fast/` (`A_3 … A_6`, `D_4, D_5, D_6`, up to 10 strands, up to 7512
+  terms) and all 15 two-puncture stable envelopes in `data2/`. Run `python3 formula.py FILE`.
+* **Uniqueness**: the complete ansatz (dots allowed) has a unique solution at every order
+  for all cases with ≤ 6 strands; the restricted ansatz for all cases up to 10 strands.
+* **`d² = 0` from the formula alone, full complex** (`verify.py`): every reduced word of
+  `A_3 ω_2`, `A_4 ω_2`, `D_4 ω_1`, `A_5 ω_3` (42 words), `D_5 ω_5` (12 words);
+  `A_6 ω_2`, `D_6 ω_1`, `D_5 ω_4` with other words; `A_6 ω_3` (12 strands, 4096 vertices —
+  not used to find the formula).
+* **`d² e_I = 0` on random vertices of large stacks** (`sample_verify.py`), none of them used
+  to find the formula: `A_7 ω_3` (15 strands, 200 vertices), `A_8 ω_3` (18, 150),
+  `A_9 ω_3` (21, 120), `A_{10} ω_2` (18, 150), `D_7 ω_1` (12, 200), `D_8 ω_1` (14, 200).
+  No failures. A deliberately wrong sign rule is detected by the same test.
+* The diagrams do not depend on the reduced word used to draw them (`wordcheck.py`).
+
+## 6. Beyond trees: what the true differential looks like (work in progress)
+
+Tools: `interval.py` solves for the true differential with the complete ansatz on a
+down-set of the cube (a subcomplex) of a 14–16 strand stack; `cyc_batch.py` lists minimal
+cyclic configurations; `data_local/` holds 32 such local solutions for `D_6`, `E_6`, `A_7 ω_4`.
+
+Findings **[verified on those local pieces]**:
+
+* all tree terms are present with the predicted coefficients; nothing else changes;
+* each cyclic configuration contributes extra terms **with one dot**, some with
+  coefficient 2, plus dot-free terms with one more power of `r`;
+* for a configuration whose link graph `G` is a single 4-cycle through the mover, the extra
+  terms are exactly
+
+      Σ_{e on the cycle}  sign(G−e) · mono(G−e) · ( t_{c_x c_y} · [dot on x] + t_{c_y c_x} · [dot on y] ) · β
+
+  i.e. a sum over the spanning trees `G − e`, the left-over link `e = (x, y)` being replaced
+  by its "bigon polynomial". Each pair on the cycle receives one dot on each of its two
+  strands, the mover two dots. The position of a dot along its strand is fixed by a
+  time-ordering rule (`cycle3.py`: draw the events on the right of the red strand from the
+  inside out and on the left from the outside in, exchange the two events of `e`, and put the
+  dots where the two strands touch). This reproduces all such cases in `D_6`, `E_6`, `A_7`
+  exactly;
+* equivalently the dotted part is the sum over orientations of `G` in which every pair has
+  at least one outgoing link, with weight `∏ t_{tail→head}` and one dot for each surplus
+  outgoing link — which suggests the general shape
+  `∏_p (r_p ∂_p) ∏_{links} (t_{xy} x_x + t_{yx} x_y)` with Demazure operators `∂_p`;
+* **not yet understood**: cycles that do not pass through the mover, configurations in which
+  a pair lies between two of its neighbours in the time order, and an additional kind of term
+  in which the moving strand itself exchanges its label with a strand of its own colour.
+
+So: no complete closed formula yet outside the cycle-free range; the data indicate that one
+exists (unique solutions, small integer coefficients, clear graph-theoretic structure).
