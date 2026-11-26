@@ -1,7 +1,7 @@
 """
 Candidate extension of the tree formula to configurations whose link graph has cycles.
 
-    sage -python cycle.py data_local/FILE.json
+    sage -python cycle.py pieces/FILE.json
 
 For a connected, unblocked configuration (V; j, F) with link graph G:
 

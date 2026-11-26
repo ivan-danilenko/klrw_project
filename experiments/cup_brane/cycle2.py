@@ -13,7 +13,7 @@ or L, alternating around the cycle:
     type L:  dot on the left strand of x at the target (mover: at the target),
              dot on the left strand of y right before its own move.
 
-    sage -python cycle2.py data_local/FILE.json ...
+    sage -python cycle2.py pieces/FILE.json ...
 """
 import sys, os, json, itertools
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

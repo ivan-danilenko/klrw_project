@@ -16,7 +16,7 @@ For a configuration with one cycle in its link graph, and a cycle link e = (x, y
 
 with the types alternating around the cycle.
 
-    sage -python cycle3.py data_local/FILE.json ...
+    sage -python cycle3.py pieces/FILE.json ...
 """
 import sys, os, json, itertools
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -122,6 +122,22 @@ def kiss_elements(cube, stack, V, j, F, links, link_index, side):
     return (d_first, d_second) if first == sx else (d_second, d_first)
 
 
+def role_types(j, links, cyc, first):
+    """Types of the cycle links: they change at a node that is a source or a sink of the cycle
+    for the order by b, and persist at a node lying between its two neighbours."""
+    flip = {"R": "L", "L": "R"}
+    types = [first]
+    n = len(cyc)
+    for i in range(n - 1):
+        e1, e2 = links[cyc[i]], links[cyc[i + 1]]
+        (node,) = set(e1[:2]) & set(e2[:2])
+        o1 = [z for z in e1[:2] if z != node][0]
+        o2 = [z for z in e2[:2] if z != node][0]
+        pure = (bkey(j, o1) > bkey(j, node)) == (bkey(j, o2) > bkey(j, node))
+        types.append(flip[types[-1]] if pure else types[-1])
+    return types
+
+
 def cyclic_element(cube, stack, V, j, F, links, cache, variant):
     KLRW = cube.KLRW
     D = KLRW.base()
@@ -139,6 +155,8 @@ def cyclic_element(cube, stack, V, j, F, links, cache, variant):
             first = "R" if variant == "A" else "L"
             other = "L" if first == "R" else "R"
             sides = [first if pos % 2 == 0 else other]
+        elif variant in ("roleR", "roleL"):
+            sides = [role_types(j, links, cyc, "R" if variant == "roleR" else "L")[pos]]
         else:
             sides = ["R", "L"]
         x, y = links[extra][0], links[extra][1]
@@ -215,6 +233,6 @@ if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     verbose = "-v" in sys.argv
     for p in args:
-        res = {v: compare(p, variant=v, verbose=verbose) for v in (("half",) if verbose else ("A", "B", "half"))}
+        res = {v: compare(p, variant=v, verbose=verbose) for v in (("roleL",) if verbose else ("roleR", "roleL", "half"))}
         print("%-46s" % os.path.basename(p).replace("__K_.json", ""), "  ".join(
             "%s: wrong %d, cyclic ok %d/%d%s" % (v, r[1], r[2], r[3], " (unrealisable)" if r[4] else "") for v, r in res.items()))

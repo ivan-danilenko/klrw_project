@@ -285,15 +285,15 @@ if __name__ == "__main__":
         print("NO SOLUTION on the interval")
         sys.exit()
     import json
-    os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_local"), exist_ok=True)
+    os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), "pieces"), exist_ok=True)
     name = "{}{}_W{}_{}__I_{}__K_{}.json".format(ct[0], ct[1], red, "".join(map(str, word)),
                                                 "-".join(map(str, sorted(I))), "-".join(map(str, sorted(K))))
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_local", name), "w") as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "pieces", name), "w") as f:
         json.dump(dict(cartan_type=ct, red=red, word=list(word), I=sorted(I), K=sorted(K),
                        vertices=[sorted(V) for V in vertices],
                        terms=[[sorted(k[0]), sorted(k[1]), list(k[2]), [list(x) for x in k[3]], [list(x) for x in k[4]], c]
                               for k, c in actual.items()]), f)
-    print("saved data_local/" + name)
+    print("saved pieces/" + name)
     A, Pd = set(actual), set(predicted)
     wrong = [k for k in A & Pd if actual[k] != predicted[k]]
     print("terms: actual {}, formula {}, actual-not-formula {}, formula-not-actual {}, different coefficient {}".format(

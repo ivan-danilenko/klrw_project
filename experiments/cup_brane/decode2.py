@@ -5,7 +5,7 @@ For every source/target pair of a local data file with terms beyond the tree for
 write   truth - tree  =  sum c * M * [reduced exchange diagram with one dot on strand s,
 placed after the first k same-colour crossings of s]   and print the solution.
 
-    sage -python decode2.py data_local/FILE.json
+    sage -python decode2.py pieces/FILE.json
 """
 import sys, os, json, itertools
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

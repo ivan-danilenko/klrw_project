@@ -1,7 +1,7 @@
 """
 Decode the dotted terms of the true differential for a configuration whose link graph has a cycle.
 
-    sage -python decode.py data_local/FILE.json "V" "U"
+    sage -python decode.py pieces/FILE.json "V" "U"
 
 Finds integers c with   truth(V -> U) - (tree formula) = sum c * M * (dot on strand s at end) * beta
 where beta is the reduced exchange diagram, M a parameter monomial, s a slot (strand at the

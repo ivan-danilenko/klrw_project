@@ -162,7 +162,14 @@ through the gluing maps between different `S_μ` (not done).
 
 Tools: `interval.py` solves for the true differential with the complete ansatz on a
 down-set of the cube (a subcomplex) of a 14–16 strand stack; `cyc_batch.py` lists minimal
-cyclic configurations; `data_local/` holds 32 such local solutions for `D_6`, `E_6`, `A_7 ω_4`.
+cyclic configurations; `pieces/` holds 32 such local solutions for `D_6`, `E_6`, `A_7 ω_4`.
+
+Caveat: on such a piece the correction is unique at 569 of the 750 orders solved; at the
+other 181 orders the local system has a kernel and the solver picks the solution with the
+fewest terms, which agrees with the tree formula. The extra terms below all arise at orders
+where the solution is unique given the lower orders. Totals over the pieces: 36 659 true
+terms, of which 35 861 are the tree-formula terms (all present, all with the right
+coefficient) and 798 are new.
 
 Findings **[verified on those local pieces]**:
 
@@ -185,9 +192,32 @@ Findings **[verified on those local pieces]**:
   at least one outgoing link, with weight `∏ t_{tail→head}` and one dot for each surplus
   outgoing link — which suggests the general shape
   `∏_p (r_p ∂_p) ∏_{links} (t_{xy} x_x + t_{yx} x_y)` with Demazure operators `∂_p`;
-* **not yet understood**: cycles that do not pass through the mover, configurations in which
-  a pair lies between two of its neighbours in the time order, and an additional kind of term
-  in which the moving strand itself exchanges its label with a strand of its own colour.
+* in every single-cycle configuration examined, the dotted part is consistent with the same
+  spanning-tree expression, with the tree signs `sign(G−e)` of section 2. A pair `X` on the
+  cycle receives two dots (one from each of its cycle links). If `X` is a source or a sink of
+  the cycle for the order by `b` (it has the smaller `b`, resp. the larger `b`, in both
+  links) the two tree signs agree and the dots sit on its left and on its right strand. If
+  `X` lies between its two neighbours the tree signs are opposite and both dots sit on the
+  same strand, so that only their `r`-correction survives. The mover always gets one dot at
+  the source and one at the target;
+* **additional term type, not yet understood**: dot-free terms in which the strand that
+  crosses the red strand is not the one from the mover's slot — the moving strand "hands
+  over" to a strand of its own colour instead of crossing it (on the right, on the left, or
+  both), so that the bijection of slots is no longer a product of transpositions. They occur
+  only next to cyclic configurations, and some of them connect vertices that no
+  mover-plus-pairs configuration connects;
+* **not yet tested**: link graphs with two or more independent cycles (they need `D_7`, `E_7`
+  or larger type `A` pieces).
+
+`CATALOGUE_cyclic.txt` lists every true term beyond the tree formula in the 32 local pieces
+(113 families): 336 dotted terms (52 of them with coefficient 2), 99 dot-free terms in which
+the mover keeps its slot, 89 in which it changes slot. `cycle3.py` implements the bigon rule.
+With the types of the bigons (drawn on the left or on the right of the red strand) changing
+at sources/sinks of the cycle and persisting at in-between nodes (`roleL`), it reproduces
+85 of the 99 components that are targets of a single-cycle configuration in the 32 local
+pieces, among them all 40 in `D_6`; the 14 others are in `A_7 ω_4` and `E_6` and presumably
+need the other of the two global choices of types. A further 75 components (out of about
+33 000 compared) differ because of the hand-over terms described above.
 
 So: no complete closed formula yet outside the cycle-free range; the data indicate that one
 exists (unique solutions, small integer coefficients, clear graph-theoretic structure).
