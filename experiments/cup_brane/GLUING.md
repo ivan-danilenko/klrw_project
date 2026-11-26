@@ -104,9 +104,41 @@ the `sl_2` cup; the I-brane is the part of the tensor product of these `n` compl
 the colours in `{A, B_L}` precede those in `{B_R, C}`, with the higher terms (i)–(iii) as
 corrections. The number of components `S_k → S_l` depends only on `n` and `d = k − l`.
 
-## 3. Open
+## 3. `ω_2` and `D_4`: work over the polynomial algebra
 
-* `ω_2`, `D_4` and beyond: choose a normal form for the gluing maps (they are only defined up
-  to homotopy) and look for the analogue of the rule above; the data are in `glue/data/`.
+Over the Laurent ring the gluing maps for `ω_2` and `D_4` are defined only up to large
+spaces of homotopies. Rescaling each envelope by a unit monomial makes the glued complex
+polynomial, and **over the polynomial algebra most of the freedom disappears**
+(`glue/glue_poly.py`, base ℚ, parameters not inverted) **[verified]**:
+
+| `sl_4`, `ω_2`, step (element that changes stack) | chain maps | null-homotopic |
+|---|---|---|
+| 1 (`p1`, colour 2) | 7 | 6 |
+| 2 (`p3`, colour 3), 3 (`p2`, colour 1), 4 (`p3`) | 1 | 0 |
+| 5 (`p4`, colour 2) | 7 | 6 |
+
+(`p1 … p4` are the elements of the 2×2 minuscule poset, colours 2, 1, 3, 2.) With the
+opposite sign of the shift there is no chain map at all, so the polynomial normalisation is
+forced.
+
+In poset language (`glue/poset_table.py`, `glue/poly_step.py`) every element is in one of
+four states — `A`, `B_L` (in the ideal: left / right of the first red strand), `B_R`, `C`
+(not in the ideal: left / right of the second red strand) — exactly as in the `ω_1` formula.
+The unique maps of steps 2–4, where the element `p` that changes stack has a colour occurring
+once, have the `ω_1` shape:
+
+* (i) `p: A → B_R` and (ii) `p: B_L → C`, each with coefficient `u_2`;
+* (iii) `p: B_L → B_R` together with one neighbour of `p` in the poset moving one region to
+  the right (`p1: A → B_L` or `p4: B_R → C`), with coefficient `t_{2,c(p)}`.
+
+Steps 1 and 5 (the element changing stack has colour 2, like its partner in the other stack)
+contain the same three kinds of terms with coefficients `1`, `r_2² t_21 t_23`, … and, in
+addition, terms of order `r_2` in which `p1` and `p4` exchange labels, some with one dot;
+there a 6-dimensional family of homotopies remains and a normal form is still to be chosen.
+
+## 4. Open
+
+* A rule for the steps in which the element changing stack has a repeated colour, and for the
+  components between non-adjacent envelopes; then the same for `sl_5 ω_2` and `D_4`.
 * The memory use of the Ext computation (about 16 GB for `sl_5 ω_2`) limits the brute-force
   gluing to roughly these sizes.
