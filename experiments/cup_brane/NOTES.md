@@ -5,8 +5,9 @@ KLRW algebra (which cases: section 5), **[derived]** = pen-and-paper argument,
 **[conjecture]** = extrapolation.
 
 Conventions are those of `klrw/` with all three scalings switched on
-(`dot_scaling`, `edge_scaling`, `vertex_scaling`), base ring ℤ, parameters
-`r_i` (= ħ), `t_ij`, `u_i`.
+(`dot_scaling`, `edge_scaling`, `vertex_scaling`), base ring ℤ. The parameters are all
+independent: one `r_c` per colour (the ħ of that colour), one `t_{c c'}` for every *ordered*
+pair of adjacent colours (`t_{c c'} ≠ t_{c' c}`), one `u_c` per colour.
 
 ## 1. Set-up
 
@@ -21,34 +22,50 @@ red strand); homological degree `|I|`. The idempotent of `I` is, read from left 
 
     [slots not in I, decreasing]   W_k   [slots in I, increasing].
 
-The undeformed differential is `δ₀ e_I = Σ_{j∈I} ± (strand j moves to the left of W_k)`.
+The undeformed differential is `δ₀ e_I = Σ_{j∈I} ± (strand j moves to the left of W_k)`,
+with the sign `(−1)^{#{i ∈ I : i > j}}` (the case `F = ∅` of the sign `κ` below).
 
 ## 2. The formula
 
-Fix a vertex `I`. A **term** of `d e_I` is given by
+**Scope.** The formula below is the complete differential exactly for the stacks without
+cyclic configurations (section 4) **[verified, section 5]**; in general it gives a correct
+part of the differential **[verified on local pieces, section 6]**. That it holds for all
+`n` in the families of section 4 is a **[conjecture]**.
+
+Fix a vertex `I`. Write `c(p) = c(a_p) = c(b_p)` for the colour of a pair. A **term** of
+`d e_I` is given by
 
 * a **mover** `j ∈ I`, and
 * a set `F` of pairwise disjoint **exchange pairs** `p = (a_p < b_p)` of slots with
-  `c(a_p) = c(b_p)`, `a_p ∉ I`, `b_p ∈ I`, `j ∉ p`,
+  `c(a_p) = c(b_p)`, `a_p ∉ I`, `b_p ∈ I`, `b_p ≠ j`,
 
 subject to the admissibility condition below. Its target is
 
-    J = ( I ∖ ({j} ∪ {b_p}) ) ∪ {a_p}.
+    J = ( I ∖ ({j} ∪ {b_p : p ∈ F}) ) ∪ {a_p : p ∈ F}.
 
 **Diagram.** `β(I; j, F) : e_I → e_J` has no dots. The mover goes from slot `j` on the right
-to slot `j` on the left. For every pair, the strand in the left slot `a_p` moves outwards to
-the left slot `b_p`, and the strand in the right slot `b_p` moves inwards to the right slot
-`a_p`. All other strands keep their slots. So only the mover crosses the red strand, and
-the two strands of a pair "exchange their labels". Strands cross minimally.
+to slot `j` on the left. For every pair, the strand sitting in slot `a_p` to the left of the
+red strand moves outwards to slot `b_p` (still on the left), and the strand sitting in slot
+`b_p` to the right of the red strand moves inwards to slot `a_p` (still on the right). All
+other strands keep their slots. So only the mover crosses the red strand, and the two
+strands of a pair "exchange their labels". Strands cross minimally; in all tested cases the
+element does not depend on the reduced word chosen (`wordcheck.py`), the stored data use the
+basis braid of `klrw`.
 
 **Links.** Call a pair `p` *linked to the mover* if `a_p < j < b_p` and `c(j)` is adjacent to
 `c(p)` in the Dynkin diagram. Call two pairs `p, q` *linked* if they are interlaced
-(`a_p < a_q < b_p < b_q`) and their colours are adjacent.
+(`a_p < a_q < b_p < b_q` or `a_q < a_p < b_q < b_p`) and their colours are adjacent.
 
 **Admissibility.**
 1. no pair of the mover's colour has `a_p < j < b_p`;
 2. no two pairs of the same colour are interlaced;
-3. the graph with vertices `{mover} ∪ F` and the links as edges is a **tree**.
+3. the graph with vertices `{mover} ∪ F` and the links as edges is a **tree**
+   (connected and without cycles).
+
+Condition 1 only matters for pairs attached through other pairs (a pair of the mover's
+colour is never linked to the mover). Condition 2 and repeated factors such as `r_c²` need a
+colour occurring four times; they do not occur in the cycle-free stacks and are tested only
+on the local pieces of section 6.
 
 Root the tree at the mover. Every pair `p` then has a parent, and a **connector** `x_p`: the
 slot of the parent that lies strictly inside the interval `(a_p, b_p)`. Explicitly `x_p = j`
@@ -60,6 +77,8 @@ if the parent is the mover; if the parent is a pair `q` then `x_p = a_q` when
     coefficient(I; j, F)  =  ε · ∏_{p ∈ F}  r_{c(p)} · t_{c(p), c(x_p)}
 
     ε = κ(I; j, F) · (−1)^{ #{ p ∈ F : x_p ∈ I } }
+
+(`x_p ∈ I` means: the connector is the mover, or the right-hand slot `b_q` of the parent pair.)
 
 where `κ` is the Koszul sign: write `I` as an increasing sequence, replace every `b_p` by
 `a_p` in place, delete `j` with the sign `(−1)^{number of entries to its right}`, and
@@ -79,9 +98,13 @@ Consequences:
 * the slots not involved in a term are completely free (may be on either side).
 
 **Two punctures.** For a stable envelope `S_μ` (one stack around each puncture) number the
-slots globally, stack after stack. The differential is given by the same formula, where
-pairs and links only exist inside one stack and `κ` is computed with the global numbering.
-Equivalently `S_μ` is the product of its two stacks, with no cross terms.
+slots globally, stack after stack from left to right; the idempotent of a vertex is the
+concatenation of the idempotents of the two stacks, each as in section 1. The differential
+is given by the same formula, where pairs and links only exist inside one stack and `κ` is
+computed with the global numbering. Equivalently `S_μ` is the product of its two stacks with
+no cross terms, with the sign convention `d(x ⊗ y) = (−1)^{|y|} dx ⊗ y + x ⊗ dy`
+(`x` in the first stack). The red colours do not enter the formula. **[verified on the 15
+envelopes of `data2/`]**
 
 Implementation: `formula.py` (`Stack.terms_from(I)`, `Stack.all_terms()`), pure Python.
 
@@ -143,6 +166,10 @@ through the gluing maps between different `S_μ` (not done).
 
 ## 5. Evidence for the tree formula
 
+* **Independent re-implementation**: `review/reimpl.py` was written from the text of
+  sections 1–2 alone (by a separate agent that did not read `formula.py`) and reproduces all
+  31 files of `data/`, `data_fast/`, `data2/` — 40 084 terms — exactly; `review/probe.py`
+  shows which alternative readings of the text the data exclude.
 * **Exact agreement with the solver** (term by term, signs included): all one-stack cases
   in `data/` and `data_fast/` (`A_3 … A_6`, `D_4, D_5, D_6`, up to 10 strands, up to 7512
   terms) and all 15 two-puncture stable envelopes in `data2/`. Run `python3 formula.py FILE`.
