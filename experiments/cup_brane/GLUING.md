@@ -136,6 +136,13 @@ contain the same three kinds of terms with coefficients `1`, `r_2² t_21 t_23`, 
 addition, terms of order `r_2` in which `p1` and `p4` exchange labels, some with one dot;
 there a 6-dimensional family of homotopies remains and a normal form is still to be chosen.
 
+The same computation for the larger cases (chain maps / null-homotopic maps per step, over
+the polynomial algebra):
+
+* `D_4`, `ω_1`:  (Ext = 1 at every step)\n* `sl_5`, `ω_2`:  (Ext = 1 at every step)\n
+So the maps are unique at the early steps and when the element changing stack has a colour
+not shared with a neighbour in the other stack, and a normal form is needed at the others.
+
 ## 4. Open
 
 * A rule for the steps in which the element changing stack has a repeated colour, and for the
