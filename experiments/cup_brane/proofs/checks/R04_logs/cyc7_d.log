@@ -1,0 +1,9 @@
+(d) d_T + (X_dot + X_r): non-zero components of d^2: 0
+(d) d_T + (X_dot only): non-zero components of d^2: 6
+(d) d_T + (no X): non-zero components of d^2: 6
+    tree formula has a term I0 -> J0: False
+    order r1 r2^2 t12 t21^3     : 8 homogeneous basis elements (dots allowed), rank 8, kernel 0
+    order r1 r2^2 t12^2 t21^2   : 6 homogeneous basis elements (dots allowed), rank 6, kernel 0
+    order r1 r2^3 t12 t21^3     : 4 homogeneous basis elements (dots allowed), rank 4, kernel 0
+    order r1^2 r2^2 t12^2 t21^2 : 2 homogeneous basis elements (dots allowed), rank 2, kernel 0
+    [504s]

@@ -10,6 +10,8 @@ GLUING.md section 2 and of 02_omega1_ibrane.md; nothing is imported from glue/ o
     python3 proofs/checks/R02_formula.py grading NMAX       # Thm 6.3, Def 6.2, Lemma 7.1, Cor 7.2 with an own F2 grading
     python3 proofs/checks/R02_formula.py homology NMAX      # Thm 8.1: every b, at x = 0 and at a random x, mod p
     python3 proofs/checks/R02_formula.py uniq NMAX          # Thm 7.3: full-ansatz chain maps / homotopies in K_1, mod p
+    python3 proofs/checks/R02_formula.py uniqR NMAX         # same with one generic parameter point (coefficients in Frac R)
+    python3 proofs/checks/R02_formula.py minimal NMAX       # Cor. 6.5: f(k) is the least per-envelope rescaling
 
 Conventions (from the text): vertex (k, s), s[c-1] in {'A','L','R','C'} (L = B_L, R = B_R);
 idempotent [A decreasing] W1 [B increasing] Wn [C decreasing]; labels 0 = W1, n+1 = Wn.
@@ -719,6 +721,7 @@ def check_grading(n):
                             stats['C_terms_with_unique_elt'] += (cnt == 1 and m == 0)
                         else:
                             stats['C_elements_nonterm'] += cnt
+                            stats['C_nonterm_q_allows_m>=0'] = stats.get('C_nonterm_q_allows_m>=0', 0) + (m is not None and m >= 0)
     return dict(vertices=len(TT), inhomogeneous=inhom, delta_text_offsets=len(consts), **stats)
 
 
@@ -799,7 +802,7 @@ def check_homology(n, seed=5):
 
 
 # ----------------------------------------------------------------------------- Thm 7.3 full ansatz in K_1
-def check_uniq(n, seed=11, npts=None):
+def check_uniq(n, seed=11, npts=None, fixed_params=False):
     """Unknowns: every homogeneous x^alpha mu beta(v,w) (v in S_k, w in S_l, l < k, hdeg drop 1) found by the
     own grading solver (with dots, any |alpha|); homotopies: the same with hdeg drop 0.  Equations: the
     components out of S_k of (delta_{C_{k-1}} + d_{S_k} + g)^2, evaluated in K_1 (Pol_1, Lemma 2.3) at npts random
@@ -826,8 +829,11 @@ def check_uniq(n, seed=11, npts=None):
             if w not in Dl:
                 Dl[w] = gadd(Dl[v], bb, s); st.append(w)
     pts = []
+    par0 = {nm: rnd.randrange(1, p) for nm in params(n)}
     for _ in range(npts):
-        par = {nm: rnd.randrange(1, p) for nm in params(n)}
+        # fixed_params: one generic parameter point, only x varies -> unknown coefficients may be arbitrary
+        # elements of (the fraction field of) R, i.e. this tests rank one over R for the q-grading alone
+        par = dict(par0) if fixed_params else {nm: rnd.randrange(1, p) for nm in params(n)}
         xs = [None] + [rnd.randrange(1, p) for _ in range(n)]
         pts.append((par, xs))
     inv = lambda a: pow(a, p - 2, p)
@@ -919,6 +925,34 @@ def eval_dots(xs, alpha, p):
     return out
 
 
+# ----------------------------------------------------------------------------- Cor. 6.5 minimality
+def check_minimal(n):
+    """per variable, the least exponents e(k) (e(0) = 0) with mu_t * f(k)/f(l) polynomial for every term, by the
+    longest-path recursion e(k) = max_t (e(l) - m_t); compared with f(k) = prod_{y<=k} pi_y"""
+    def pi_(y):
+        e = {}
+        for x in range(y, n + 1):
+            e = addexp(e, {pname(n, 'R%d' % x): 1})
+        for x in range(1, y):
+            e = addexp(e, {pname(n, 'L%d' % x): 1})
+        return e
+    f = [{}]
+    for k in range(1, n + 1):
+        f.append(addexp(f[-1], pi_(k)))
+    cons = defaultdict(list)          # k -> list of (l, exponent dict)
+    for v in vertices(n):
+        for w, tag in terms(n, v):
+            if w[0] < v[0]:
+                cons[v[0]].append((w[0], coefficient(n, v, tag)))
+    bad = 0
+    for pnm in params(n):
+        e = [0]
+        for k in range(1, n + 1):
+            e.append(max(e[l] - mu.get(pnm, 0) for l, mu in cons[k]))
+        bad += any(e[k] != f[k].get(pnm, 0) for k in range(n + 1))
+    return len(params(n)), bad
+
+
 # ----------------------------------------------------------------------------- main
 if __name__ == '__main__':
     what = sys.argv[1]; N = int(sys.argv[2])
@@ -953,5 +987,9 @@ if __name__ == '__main__':
                     bad += (hom != tuple(comb(n, i) if i <= n else 0 for i in range(len(hom))))
             print('n=%d: %d realised vectors b = o(s), %d (b, point) cases, unexpected homology: %d; b = 1^{n+1} at x=0: %s'
                   % (n, len(res) // 2, len(res), bad, [h for b, lab, h in res if b == sb and lab == 'x=0']), flush=True)
+        elif what == 'minimal':
+            print('n=%d: variables %d, variables where f(k) is not the least rescaling: %d' % ((n,) + check_minimal(n)), flush=True)
         elif what == 'uniq':
             print('n=%d:' % n, check_uniq(n), flush=True)
+        elif what == 'uniqR':
+            print('n=%d:' % n, check_uniq(n, fixed_params=True), flush=True)

@@ -1,0 +1,2 @@
+Theorem A, 7x7 box: {'diagrams': 3432, 'cyclic': 2116, 'crit_disagree': 0, 'pat_disagree': 0, 'heap_disagree': 0, 'not_chain': 0, 'lemma32_fail': 0, 'visited_max': 19923} (205.1s)
+(run stopped by the referee after the Theorem A line; the remaining sub-checks are those of the 6x6 run)

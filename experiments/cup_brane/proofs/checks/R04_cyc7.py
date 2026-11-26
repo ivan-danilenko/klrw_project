@@ -315,4 +315,123 @@ def part_z1():
 
 
 if __name__ == "__main__":
-    {"b": part_b, "c": part_c, "d": part_d, "z1": part_z1}[sys.argv[1]]()
+    if sys.argv[1] in ("b", "c", "d", "z1"):
+        {"b": part_b, "c": part_c, "d": part_d, "z1": part_z1}[sys.argv[1]]()
+
+
+# ---------------------------------------------------------------------------------------------
+def part_c2():
+    """(1) reproduce the author's rank 5 by dropping the products delta_1 . kappa;
+    (2) build the solving kappa* and check (d_T + kappa*)^2 = 0 mod r^4 by direct multiplication;
+    (3) try to continue to a full dot-free differential d_T + eps, eps in (r)^2, order by order."""
+    from sage.all import lcm
+    C = Ctx()
+    t0 = time.time()
+    d0, d01, dT = C.tree(0), C.tree(1), C.tree()
+    d1only = C.tree(onlypairs=1)
+    sq = compose(C, dT, dT)
+    sqd = {(I, K): x for I, row in sq.items() for K, x in row.items()}
+    cands2 = candidates(C, -1, 2, True)
+    els = [(I, J, C.mono(n, m) * C.basis(I, J, s)) for (I, J, s, n, m, a) in cands2]
+    idx2 = {}
+    cols = [vectorize(C, anticomm(C, d0, I, J, el), lambda e: C.rdeg(e) == 2, idx2) for I, J, el in els]
+    M = matrix(QQ, max(len(idx2), 1), len(cols), {(r_, c_): v for c_, col in enumerate(cols) for r_, v in col.items()})
+    ker = [v * lcm([QQ(c).denominator() for c in v.list()]) for v in M.right_kernel().basis()]
+
+    def kap(v):
+        k = defaultdict(lambda: defaultdict(lambda: C.K.zero()))
+        for i, c in v.dict().items():
+            I, J, el = els[i]
+            k[I][J] += C.D(int(c)) * el
+        return k
+
+    def r3(mp_pairs):
+        return mp_pairs
+
+    for variant in ("full", "author (no delta_1.kappa)"):
+        idx3 = {}
+        obs = vectorize(C, sqd, lambda e: C.rdeg(e) == 3, idx3)
+        vecs = []
+        for v in ker:
+            k = kap(v)
+            tot = defaultdict(lambda: C.K.zero())
+            for I, row in k.items():
+                for J, el in row.items():
+                    # kappa . (delta_0 + delta_1)
+                    for K, y in d01.get(J, {}).items():
+                        tot[I, K] += el * y
+                    # (delta_0 [+ delta_1]) . kappa
+                    for Ip, row2 in (d01 if variant == "full" else d0).items():
+                        x = row2.get(I)
+                        if x is not None:
+                            tot[Ip, J] += x * el
+            vecs.append(vectorize(C, tot, lambda e: C.rdeg(e) == 3, idx3))
+        n = len(idx3)
+        Mk = matrix(QQ, n, len(vecs), {(r_, c_): v for c_, col in enumerate(vecs) for r_, v in col.items()})
+        ob = vector(QQ, n, obs)
+        print("(c2) %-28s rank %d, with (d_T^2)_3: %d" % (variant, Mk.rank(), Mk.augment(ob.column()).rank()))
+        if variant == "full":
+            sol = Mk.solve_right(-ob)
+            print("     solution coefficients on the kernel basis:", list(sol))
+            kstar = defaultdict(lambda: defaultdict(lambda: C.K.zero()))
+            den = lcm([QQ(c).denominator() for c in sol])
+            assert den == 1, "non-integral solution"
+            for v, c in zip(ker, sol):
+                for I, row in kap(v).items():
+                    for J, el in row.items():
+                        kstar[I][J] += C.D(int(c)) * el
+    # (2) direct check
+    d = {I: dict(row) for I, row in dT.items()}
+    for I, row in kstar.items():
+        for J, el in row.items():
+            d[I][J] = d[I].get(J, C.K.zero()) + el
+    print("     kappa* =")
+    for I, row in kstar.items():
+        for J, el in row.items():
+            if not el.is_zero():
+                print("        %s -> %s : %s" % (sorted(I), sorted(J), el))
+    cur = d
+    for order in range(3, 12):
+        sq = compose(C, cur, cur)
+        byr = Counter()
+        for row in sq.values():
+            for x in row.values():
+                for braid, coeff in x:
+                    for e in coeff.dict():
+                        byr[C.rdeg(e)] += 1
+        print("     d = d_T + kappa* + (dot-free corrections up to r^%d): d^2 coefficients by r-degree %s" % (
+            order - 1, dict(sorted(byr.items()))))
+        if not byr:
+            print("     ==> DOT-FREE DIFFERENTIAL FOUND (d^2 = 0 exactly)")
+            break
+        k0 = min(byr)
+        if k0 < order:
+            print("     unexpected: d^2 has r-degree", k0, "< ", order)
+        k0 = min(byr)
+        # solve [delta_0, eps_k0] = -(d^2)_k0 with dot-free eps of r-degree k0
+        ck = candidates(C, -1, k0, True)
+        idx = {}
+        obs = vectorize(C, {(I, K): x for I, row in sq.items() for K, x in row.items()}, lambda e: C.rdeg(e) == k0, idx)
+        elk = [(I, J, C.mono(n, m) * C.basis(I, J, s)) for (I, J, s, n, m, a) in ck]
+        colsk = [vectorize(C, anticomm(C, d0, I, J, el), lambda e: C.rdeg(e) == k0, idx) for I, J, el in elk]
+        nr = len(idx)
+        Mk = matrix(QQ, max(nr, 1), max(len(colsk), 1), {(r_, c_): v for c_, col in enumerate(colsk) for r_, v in col.items()})
+        ob = vector(QQ, max(nr, 1), obs)
+        rk1, rk2 = Mk.rank(), Mk.augment(ob.column()).rank()
+        print("     order r^%d: %d dot-free candidates, rank %d, with obstruction %d" % (k0, len(ck), rk1, rk2))
+        if rk2 > rk1:
+            print("     ==> obstruction at r^%d NOT removable by dot-free terms of r-degree %d alone" % (k0, k0))
+            break
+        sol = Mk.solve_right(-ob)
+        if any(QQ(c).denominator() != 1 for c in sol):
+            print("     non-integral solution", sol)
+        new = {I: dict(row) for I, row in cur.items()}
+        for (I, J, el), c in zip(elk, sol):
+            if c:
+                new[I][J] = new[I].get(J, C.K.zero()) + C.D(QQ(c)) * el
+        cur = new
+    print("   [%.0fs]" % (time.time() - t0))
+
+
+if __name__ == "__main__" and sys.argv[1] == "c2":
+    part_c2()

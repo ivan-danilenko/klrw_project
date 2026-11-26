@@ -10,3 +10,5 @@
   ... 5000 / 9280 (word, red) cases, 1258224 products, 0 failures [404s]
   ... 5500 / 9280 (word, red) cases, 1532064 products, 0 failures [520s]
   ... 6000 / 9280 (word, red) cases, 1809664 products, 0 failures [674s]
+  ... 6500 / 9280 (word, red) cases, 2091192 products, 0 failures [781s]
+  ... 7000 / 9280 (word, red) cases, 2363456 products, 0 failures [904s]
