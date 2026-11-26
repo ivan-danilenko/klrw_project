@@ -142,8 +142,9 @@ over the polynomial algebra; Ext is one-dimensional at every step):
 * `D_4`, `ω_1`: 173/172, 59/58, 1/0, 1/0, 1/0, 33/32, 228/227
 * `sl_5`, `ω_2`: 208/207, 58/57, 1/0, 70/69, 79/78, 21/20, 94/93, 87/86, 230/229
 
-So the gluing map is unique at some steps and needs a normal form at the others; the
-freedom grows towards the last steps.
+So the gluing map is unique only at a few steps (3 of 7 for `D_4`, 1 of 9 for `sl_5 ω_2`);
+elsewhere large families of homotopies remain even over the polynomial algebra, and a
+normal form is needed.
 
 ## 4. Open
 
