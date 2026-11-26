@@ -1,0 +1,351 @@
+{
+ "case": "A1_w1",
+ "normal_form": null,
+ "cartan_type": [
+  "A",
+  1
+ ],
+ "node": 1,
+ "left_framing": "W1",
+ "right_framing": "W1",
+ "variables": [
+  "r_1",
+  "u_1",
+  "x_1_1"
+ ],
+ "weights_in_gluing_order": [
+  "Lambda[1]",
+  "-Lambda[1]"
+ ],
+ "envelopes": [
+  {
+   "index": 0,
+   "weight": "Lambda[1]",
+   "dynkin_labels": {
+    "1": 1
+   },
+   "left_word": [],
+   "right_word": [
+    1
+   ],
+   "n_strands": 1,
+   "n_projectives": 2,
+   "n_differential_terms": 1,
+   "seconds": 0.03587007522583008,
+   "vertices": {
+    "0": [
+     [
+      0
+     ]
+    ],
+    "1": [
+     [
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "index": 1,
+   "weight": "-Lambda[1]",
+   "dynkin_labels": {
+    "1": -1
+   },
+   "left_word": [
+    1
+   ],
+   "right_word": [],
+   "n_strands": 1,
+   "n_projectives": 2,
+   "n_differential_terms": 1,
+   "seconds": 0.0006651878356933594,
+   "vertices": {
+    "0": [
+     [
+      0
+     ]
+    ],
+    "1": [
+     [
+      1
+     ]
+    ]
+   }
+  }
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "envelope": 1,
+   "weight": "-Lambda[1]",
+   "shift": {
+    "homological": 0,
+    "equivariant": "-d_{0} - d_{V1--W1}"
+   },
+   "hom_dims": {
+    "graded_maps": 2,
+    "cycles": 1,
+    "boundaries": 0,
+    "ext": 1
+   },
+   "seconds_ext": 0.1694939136505127,
+   "map_terms": [
+    {
+     "word": [
+      1
+     ],
+     "left_state": [
+      "V1",
+      "W1",
+      "W1"
+     ],
+     "right_state": [
+      "W1",
+      "V1",
+      "W1"
+     ],
+     "params": {},
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 0,
+     "src_envelope": 1,
+     "src_eps": [
+      0
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      0
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      2
+     ],
+     "left_state": [
+      "W1",
+      "V1",
+      "W1"
+     ],
+     "right_state": [
+      "W1",
+      "W1",
+      "V1"
+     ],
+     "params": {},
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 1,
+     "src_envelope": 1,
+     "src_eps": [
+      1
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      1
+     ],
+     "rigid": true
+    }
+   ],
+   "n_map_terms": 2,
+   "n_rigid_terms": 2,
+   "removable_by_homotopy": {
+    "u": null,
+    "negative_exponent": null,
+    "r_inverse": null,
+    "t_inverse": null,
+    "u_inverse": null,
+    "dots": null,
+    "any_parameter": null
+   },
+   "seconds_cone": 0.0019378662109375,
+   "cone_size": 4
+  }
+ ],
+ "failed": null,
+ "projectives": [
+  {
+   "index": 0,
+   "hom_deg": 0,
+   "position": 0,
+   "state": [
+    "W1",
+    "V1",
+    "W1"
+   ],
+   "equivariant_degree": "0",
+   "equivariant_degree_dict": {},
+   "envelope": 0,
+   "eps": [
+    0
+   ]
+  },
+  {
+   "index": 1,
+   "hom_deg": 1,
+   "position": 0,
+   "state": [
+    "V1",
+    "W1",
+    "W1"
+   ],
+   "equivariant_degree": "-d_{0} - d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -1,
+    "V1--W1": -1
+   },
+   "envelope": 1,
+   "eps": [
+    0
+   ]
+  },
+  {
+   "index": 2,
+   "hom_deg": 1,
+   "position": 1,
+   "state": [
+    "W1",
+    "W1",
+    "V1"
+   ],
+   "equivariant_degree": "-d_{0} - d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -1,
+    "V1--W1": -1
+   },
+   "envelope": 0,
+   "eps": [
+    1
+   ]
+  },
+  {
+   "index": 3,
+   "hom_deg": 2,
+   "position": 0,
+   "state": [
+    "W1",
+    "V1",
+    "W1"
+   ],
+   "equivariant_degree": "-2*d_{0} - 2*d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -2,
+    "V1--W1": -2
+   },
+   "envelope": 1,
+   "eps": [
+    1
+   ]
+  }
+ ],
+ "differential_degree": -1,
+ "terms": [
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "W1"
+   ],
+   "right_state": [
+    "V1",
+    "W1",
+    "W1"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "-1",
+   "source": 3,
+   "target": 1,
+   "src_envelope": 1,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    2
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "W1"
+   ],
+   "right_state": [
+    "W1",
+    "W1",
+    "V1"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 3,
+   "target": 2,
+   "src_envelope": 1,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "V1",
+    "W1",
+    "W1"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "W1"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 1,
+   "target": 0,
+   "src_envelope": 1,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    2
+   ],
+   "left_state": [
+    "W1",
+    "W1",
+    "V1"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "W1"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 2,
+   "target": 0,
+   "src_envelope": 0,
+   "tgt_envelope": 0
+  }
+ ],
+ "all_coefficients_integral": true,
+ "rebuilt_over_ZZ_d2_zero": true,
+ "timings": {
+  "stable_envelopes": 0.03661704063415527,
+  "gluing": 0.1714317798614502,
+  "rebuild_ZZ": 0.001790761947631836,
+  "total": 0.4577949047088623
+ },
+ "solver_stats": {
+  "ilp_calls": 2,
+  "ilp_solutions": 1,
+  "corr_solves": 0,
+  "homotopy_solves": 0
+ },
+ "conventions": {
+  "eps": "eps[s]=1: strand s is to the right of its red strand; strands 0..len(left)-1 are the left word (first = innermost around W_left), the rest the right word (last = innermost around W_right); state = [left eps=0 reversed] W_left [left eps=1] [right eps=0] W_right [right eps=1 reversed]",
+  "term": "KLRW element coeff*braid, left_state = source projective, right_state = target projective; dots indexed on the left state",
+  "envelope": "index into weights_in_gluing_order; the glued complex is Cone(S_k[shift] -> E_{k-1}) iterated"
+ }
+}

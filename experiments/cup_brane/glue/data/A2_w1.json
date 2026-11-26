@@ -1,0 +1,1525 @@
+{
+ "case": "A2_w1",
+ "normal_form": null,
+ "cartan_type": [
+  "A",
+  2
+ ],
+ "node": 1,
+ "left_framing": "W1",
+ "right_framing": "W2",
+ "variables": [
+  "r_1",
+  "r_2",
+  "t_1_2",
+  "u_1",
+  "t_2_1",
+  "u_2",
+  "x_1_1",
+  "x_2_1"
+ ],
+ "weights_in_gluing_order": [
+  "Lambda[1]",
+  "-Lambda[1] + Lambda[2]",
+  "-Lambda[2]"
+ ],
+ "envelopes": [
+  {
+   "index": 0,
+   "weight": "Lambda[1]",
+   "dynkin_labels": {
+    "1": 1
+   },
+   "left_word": [],
+   "right_word": [
+    1,
+    2
+   ],
+   "n_strands": 2,
+   "n_projectives": 4,
+   "n_differential_terms": 4,
+   "seconds": 0.0788271427154541,
+   "vertices": {
+    "0": [
+     [
+      0,
+      0
+     ]
+    ],
+    "1": [
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      0
+     ]
+    ],
+    "2": [
+     [
+      1,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "index": 1,
+   "weight": "-Lambda[1] + Lambda[2]",
+   "dynkin_labels": {
+    "1": -1,
+    "2": 1
+   },
+   "left_word": [
+    1
+   ],
+   "right_word": [
+    2
+   ],
+   "n_strands": 2,
+   "n_projectives": 4,
+   "n_differential_terms": 4,
+   "seconds": 0.001493215560913086,
+   "vertices": {
+    "0": [
+     [
+      0,
+      0
+     ]
+    ],
+    "1": [
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      0
+     ]
+    ],
+    "2": [
+     [
+      1,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "index": 2,
+   "weight": "-Lambda[2]",
+   "dynkin_labels": {
+    "2": -1
+   },
+   "left_word": [
+    1,
+    2
+   ],
+   "right_word": [],
+   "n_strands": 2,
+   "n_projectives": 4,
+   "n_differential_terms": 4,
+   "seconds": 0.0014278888702392578,
+   "vertices": {
+    "0": [
+     [
+      0,
+      0
+     ]
+    ],
+    "1": [
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      0
+     ]
+    ],
+    "2": [
+     [
+      1,
+      1
+     ]
+    ]
+   }
+  }
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "envelope": 1,
+   "weight": "-Lambda[1] + Lambda[2]",
+   "shift": {
+    "homological": 0,
+    "equivariant": "-d_{0} - d_{V1--W1}"
+   },
+   "hom_dims": {
+    "graded_maps": 5,
+    "cycles": 1,
+    "boundaries": 0,
+    "ext": 1
+   },
+   "seconds_ext": 0.1823561191558838,
+   "map_terms": [
+    {
+     "word": [
+      1
+     ],
+     "left_state": [
+      "V1",
+      "W1",
+      "V2",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "V1",
+      "V2",
+      "W2"
+     ],
+     "params": {},
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 0,
+     "src_envelope": 1,
+     "src_eps": [
+      0,
+      0
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      0,
+      0
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      1
+     ],
+     "left_state": [
+      "V1",
+      "W1",
+      "W2",
+      "V2"
+     ],
+     "right_state": [
+      "W1",
+      "V1",
+      "W2",
+      "V2"
+     ],
+     "params": {},
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 1,
+     "src_envelope": 1,
+     "src_eps": [
+      0,
+      1
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      0,
+      1
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      3
+     ],
+     "left_state": [
+      "W1",
+      "V1",
+      "V2",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "V1",
+      "W2",
+      "V2"
+     ],
+     "params": {
+      "t_1_2": -1,
+      "u_1": 1,
+      "t_2_1": 1,
+      "u_2": -1
+     },
+     "dots": {},
+     "coeff": "-1",
+     "hom_deg_in_cone_domain": 1,
+     "src_envelope": 1,
+     "src_eps": [
+      1,
+      0
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      0,
+      1
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      2,
+      3
+     ],
+     "left_state": [
+      "W1",
+      "V1",
+      "V2",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "V2",
+      "W2",
+      "V1"
+     ],
+     "params": {
+      "t_1_2": -1,
+      "u_1": 1
+     },
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 1,
+     "src_envelope": 1,
+     "src_eps": [
+      1,
+      0
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      1,
+      0
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      2,
+      3
+     ],
+     "left_state": [
+      "W1",
+      "V1",
+      "W2",
+      "V2"
+     ],
+     "right_state": [
+      "W1",
+      "W2",
+      "V2",
+      "V1"
+     ],
+     "params": {
+      "t_1_2": -1,
+      "u_1": 1
+     },
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 2,
+     "src_envelope": 1,
+     "src_eps": [
+      1,
+      1
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      1,
+      1
+     ],
+     "rigid": true
+    }
+   ],
+   "n_map_terms": 5,
+   "n_rigid_terms": 5,
+   "removable_by_homotopy": {
+    "u": false,
+    "negative_exponent": false,
+    "r_inverse": null,
+    "t_inverse": false,
+    "u_inverse": false,
+    "dots": null,
+    "any_parameter": false
+   },
+   "seconds_cone": 0.002875089645385742,
+   "cone_size": 8
+  },
+  {
+   "step": 2,
+   "envelope": 2,
+   "weight": "-Lambda[2]",
+   "shift": {
+    "homological": -1,
+    "equivariant": "-2*d_{0} - d_{V1--V2} - d_{V1--W1}"
+   },
+   "hom_dims": {
+    "graded_maps": 7,
+    "cycles": 1,
+    "boundaries": 0,
+    "ext": 1
+   },
+   "seconds_ext": 0.020848751068115234,
+   "map_terms": [
+    {
+     "word": [
+      1,
+      2
+     ],
+     "left_state": [
+      "V2",
+      "V1",
+      "W1",
+      "W2"
+     ],
+     "right_state": [
+      "V1",
+      "W1",
+      "V2",
+      "W2"
+     ],
+     "params": {},
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 1,
+     "src_envelope": 2,
+     "src_eps": [
+      0,
+      0
+     ],
+     "tgt_envelope": 1,
+     "tgt_eps": [
+      0,
+      0
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      2,
+      1,
+      3
+     ],
+     "left_state": [
+      "V2",
+      "V1",
+      "W1",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "V2",
+      "W2",
+      "V1"
+     ],
+     "params": {},
+     "dots": {},
+     "coeff": "-1",
+     "hom_deg_in_cone_domain": 1,
+     "src_envelope": 2,
+     "src_eps": [
+      0,
+      0
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      1,
+      0
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      3
+     ],
+     "left_state": [
+      "V1",
+      "W1",
+      "V2",
+      "W2"
+     ],
+     "right_state": [
+      "V1",
+      "W1",
+      "W2",
+      "V2"
+     ],
+     "params": {
+      "t_2_1": 1,
+      "u_2": -1
+     },
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 2,
+     "src_envelope": 2,
+     "src_eps": [
+      0,
+      1
+     ],
+     "tgt_envelope": 1,
+     "tgt_eps": [
+      0,
+      1
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      1
+     ],
+     "left_state": [
+      "V1",
+      "W1",
+      "V2",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "V1",
+      "V2",
+      "W2"
+     ],
+     "params": {
+      "t_1_2": 1,
+      "u_1": -1
+     },
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 2,
+     "src_envelope": 2,
+     "src_eps": [
+      0,
+      1
+     ],
+     "tgt_envelope": 1,
+     "tgt_eps": [
+      1,
+      0
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      1,
+      2
+     ],
+     "left_state": [
+      "V2",
+      "W1",
+      "V1",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "V1",
+      "V2",
+      "W2"
+     ],
+     "params": {},
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 2,
+     "src_envelope": 2,
+     "src_eps": [
+      1,
+      0
+     ],
+     "tgt_envelope": 1,
+     "tgt_eps": [
+      1,
+      0
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      1,
+      3,
+      2
+     ],
+     "left_state": [
+      "V2",
+      "W1",
+      "V1",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "W2",
+      "V2",
+      "V1"
+     ],
+     "params": {
+      "t_1_2": -1,
+      "u_1": 1,
+      "t_2_1": 1,
+      "u_2": -1
+     },
+     "dots": {},
+     "coeff": "-1",
+     "hom_deg_in_cone_domain": 2,
+     "src_envelope": 2,
+     "src_eps": [
+      1,
+      0
+     ],
+     "tgt_envelope": 0,
+     "tgt_eps": [
+      1,
+      1
+     ],
+     "rigid": true
+    },
+    {
+     "word": [
+      3
+     ],
+     "left_state": [
+      "W1",
+      "V1",
+      "V2",
+      "W2"
+     ],
+     "right_state": [
+      "W1",
+      "V1",
+      "W2",
+      "V2"
+     ],
+     "params": {
+      "t_2_1": 1,
+      "u_2": -1
+     },
+     "dots": {},
+     "coeff": "1",
+     "hom_deg_in_cone_domain": 3,
+     "src_envelope": 2,
+     "src_eps": [
+      1,
+      1
+     ],
+     "tgt_envelope": 1,
+     "tgt_eps": [
+      1,
+      1
+     ],
+     "rigid": true
+    }
+   ],
+   "n_map_terms": 7,
+   "n_rigid_terms": 7,
+   "removable_by_homotopy": {
+    "u": false,
+    "negative_exponent": false,
+    "r_inverse": null,
+    "t_inverse": false,
+    "u_inverse": false,
+    "dots": null,
+    "any_parameter": false
+   },
+   "seconds_cone": 0.003668069839477539,
+   "cone_size": 12
+  }
+ ],
+ "failed": null,
+ "projectives": [
+  {
+   "index": 0,
+   "hom_deg": 0,
+   "position": 0,
+   "state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "equivariant_degree": "0",
+   "equivariant_degree_dict": {},
+   "envelope": 0,
+   "eps": [
+    0,
+    0
+   ]
+  },
+  {
+   "index": 1,
+   "hom_deg": 1,
+   "position": 0,
+   "state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "equivariant_degree": "-d_{0} - d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -1,
+    "V1--W1": -1
+   },
+   "envelope": 1,
+   "eps": [
+    0,
+    0
+   ]
+  },
+  {
+   "index": 2,
+   "hom_deg": 1,
+   "position": 1,
+   "state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "equivariant_degree": "-d_{0} - d_{V2--W2}",
+   "equivariant_degree_dict": {
+    "0": -1,
+    "V2--W2": -1
+   },
+   "envelope": 0,
+   "eps": [
+    0,
+    1
+   ]
+  },
+  {
+   "index": 3,
+   "hom_deg": 1,
+   "position": 2,
+   "state": [
+    "W1",
+    "V2",
+    "W2",
+    "V1"
+   ],
+   "equivariant_degree": "-d_{0} - d_{V1--V2}",
+   "equivariant_degree_dict": {
+    "0": -1,
+    "V1--V2": -1
+   },
+   "envelope": 0,
+   "eps": [
+    1,
+    0
+   ]
+  },
+  {
+   "index": 4,
+   "hom_deg": 2,
+   "position": 0,
+   "state": [
+    "V2",
+    "V1",
+    "W1",
+    "W2"
+   ],
+   "equivariant_degree": "-2*d_{0} - d_{V1--V2} - d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -2,
+    "V1--V2": -1,
+    "V1--W1": -1
+   },
+   "envelope": 2,
+   "eps": [
+    0,
+    0
+   ]
+  },
+  {
+   "index": 5,
+   "hom_deg": 2,
+   "position": 1,
+   "state": [
+    "V1",
+    "W1",
+    "W2",
+    "V2"
+   ],
+   "equivariant_degree": "-2*d_{0} - d_{V2--W2} - d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -2,
+    "V2--W2": -1,
+    "V1--W1": -1
+   },
+   "envelope": 1,
+   "eps": [
+    0,
+    1
+   ]
+  },
+  {
+   "index": 6,
+   "hom_deg": 2,
+   "position": 2,
+   "state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "equivariant_degree": "-2*d_{0} - 2*d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -2,
+    "V1--W1": -2
+   },
+   "envelope": 1,
+   "eps": [
+    1,
+    0
+   ]
+  },
+  {
+   "index": 7,
+   "hom_deg": 2,
+   "position": 3,
+   "state": [
+    "W1",
+    "W2",
+    "V2",
+    "V1"
+   ],
+   "equivariant_degree": "-2*d_{0} - d_{V2--W2} - d_{V1--V2}",
+   "equivariant_degree_dict": {
+    "0": -2,
+    "V2--W2": -1,
+    "V1--V2": -1
+   },
+   "envelope": 0,
+   "eps": [
+    1,
+    1
+   ]
+  },
+  {
+   "index": 8,
+   "hom_deg": 3,
+   "position": 0,
+   "state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "equivariant_degree": "-3*d_{0} - 2*d_{V1--V2} - d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -3,
+    "V1--V2": -2,
+    "V1--W1": -1
+   },
+   "envelope": 2,
+   "eps": [
+    0,
+    1
+   ]
+  },
+  {
+   "index": 9,
+   "hom_deg": 3,
+   "position": 1,
+   "state": [
+    "V2",
+    "W1",
+    "V1",
+    "W2"
+   ],
+   "equivariant_degree": "-3*d_{0} - d_{V1--V2} - 2*d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -3,
+    "V1--V2": -1,
+    "V1--W1": -2
+   },
+   "envelope": 2,
+   "eps": [
+    1,
+    0
+   ]
+  },
+  {
+   "index": 10,
+   "hom_deg": 3,
+   "position": 2,
+   "state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "equivariant_degree": "-3*d_{0} - d_{V2--W2} - 2*d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -3,
+    "V2--W2": -1,
+    "V1--W1": -2
+   },
+   "envelope": 1,
+   "eps": [
+    1,
+    1
+   ]
+  },
+  {
+   "index": 11,
+   "hom_deg": 4,
+   "position": 0,
+   "state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "equivariant_degree": "-4*d_{0} - 2*d_{V1--V2} - 2*d_{V1--W1}",
+   "equivariant_degree_dict": {
+    "0": -4,
+    "V1--V2": -2,
+    "V1--W1": -2
+   },
+   "envelope": 2,
+   "eps": [
+    1,
+    1
+   ]
+  }
+ ],
+ "differential_degree": -1,
+ "terms": [
+  {
+   "word": [
+    2,
+    1
+   ],
+   "left_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "V2",
+    "V1",
+    "W1",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 8,
+   "target": 4,
+   "src_envelope": 2,
+   "tgt_envelope": 2
+  },
+  {
+   "word": [
+    2
+   ],
+   "left_state": [
+    "V2",
+    "W1",
+    "V1",
+    "W2"
+   ],
+   "right_state": [
+    "V2",
+    "V1",
+    "W1",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 9,
+   "target": 4,
+   "src_envelope": 2,
+   "tgt_envelope": 2
+  },
+  {
+   "word": [
+    3
+   ],
+   "left_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "V1",
+    "W1",
+    "W2",
+    "V2"
+   ],
+   "params": {
+    "t_2_1": 1,
+    "u_2": -1
+   },
+   "dots": {},
+   "coeff": "1",
+   "source": 8,
+   "target": 5,
+   "src_envelope": 2,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "params": {
+    "t_1_2": 1,
+    "u_1": -1
+   },
+   "dots": {},
+   "coeff": "1",
+   "source": 8,
+   "target": 6,
+   "src_envelope": 2,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    1,
+    2
+   ],
+   "left_state": [
+    "V2",
+    "W1",
+    "V1",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 9,
+   "target": 6,
+   "src_envelope": 2,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    1,
+    3,
+    2
+   ],
+   "left_state": [
+    "V2",
+    "W1",
+    "V1",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "W2",
+    "V2",
+    "V1"
+   ],
+   "params": {
+    "t_1_2": -1,
+    "u_1": 1,
+    "t_2_1": 1,
+    "u_2": -1
+   },
+   "dots": {},
+   "coeff": "-1",
+   "source": 9,
+   "target": 7,
+   "src_envelope": 2,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "right_state": [
+    "V1",
+    "W1",
+    "W2",
+    "V2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 10,
+   "target": 5,
+   "src_envelope": 1,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    3
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "-1",
+   "source": 10,
+   "target": 6,
+   "src_envelope": 1,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    2,
+    3
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "right_state": [
+    "W1",
+    "W2",
+    "V2",
+    "V1"
+   ],
+   "params": {
+    "t_1_2": -1,
+    "u_1": 1
+   },
+   "dots": {},
+   "coeff": "1",
+   "source": 10,
+   "target": 7,
+   "src_envelope": 1,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 1,
+   "target": 0,
+   "src_envelope": 1,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    3
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 2,
+   "target": 0,
+   "src_envelope": 0,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    3,
+    2
+   ],
+   "left_state": [
+    "W1",
+    "V2",
+    "W2",
+    "V1"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 3,
+   "target": 0,
+   "src_envelope": 0,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "-1",
+   "source": 11,
+   "target": 8,
+   "src_envelope": 2,
+   "tgt_envelope": 2
+  },
+  {
+   "word": [
+    2,
+    1
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "V2",
+    "W1",
+    "V1",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 11,
+   "target": 9,
+   "src_envelope": 2,
+   "tgt_envelope": 2
+  },
+  {
+   "word": [
+    3
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "params": {
+    "t_2_1": 1,
+    "u_2": -1
+   },
+   "dots": {},
+   "coeff": "1",
+   "source": 11,
+   "target": 10,
+   "src_envelope": 2,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    1,
+    2
+   ],
+   "left_state": [
+    "V2",
+    "V1",
+    "W1",
+    "W2"
+   ],
+   "right_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 4,
+   "target": 1,
+   "src_envelope": 2,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    2,
+    1,
+    3
+   ],
+   "left_state": [
+    "V2",
+    "V1",
+    "W1",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "V2",
+    "W2",
+    "V1"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "-1",
+   "source": 4,
+   "target": 3,
+   "src_envelope": 2,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    3
+   ],
+   "left_state": [
+    "V1",
+    "W1",
+    "W2",
+    "V2"
+   ],
+   "right_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "-1",
+   "source": 5,
+   "target": 1,
+   "src_envelope": 1,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "V1",
+    "W1",
+    "V2",
+    "W2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "-1",
+   "source": 6,
+   "target": 1,
+   "src_envelope": 1,
+   "tgt_envelope": 1
+  },
+  {
+   "word": [
+    1
+   ],
+   "left_state": [
+    "V1",
+    "W1",
+    "W2",
+    "V2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 5,
+   "target": 2,
+   "src_envelope": 1,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    3
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "params": {
+    "t_1_2": -1,
+    "u_1": 1,
+    "t_2_1": 1,
+    "u_2": -1
+   },
+   "dots": {},
+   "coeff": "-1",
+   "source": 6,
+   "target": 2,
+   "src_envelope": 1,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    2,
+    3
+   ],
+   "left_state": [
+    "W1",
+    "V1",
+    "V2",
+    "W2"
+   ],
+   "right_state": [
+    "W1",
+    "V2",
+    "W2",
+    "V1"
+   ],
+   "params": {
+    "t_1_2": -1,
+    "u_1": 1
+   },
+   "dots": {},
+   "coeff": "1",
+   "source": 6,
+   "target": 3,
+   "src_envelope": 1,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    3,
+    2
+   ],
+   "left_state": [
+    "W1",
+    "W2",
+    "V2",
+    "V1"
+   ],
+   "right_state": [
+    "W1",
+    "V1",
+    "W2",
+    "V2"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "-1",
+   "source": 7,
+   "target": 2,
+   "src_envelope": 0,
+   "tgt_envelope": 0
+  },
+  {
+   "word": [
+    2
+   ],
+   "left_state": [
+    "W1",
+    "W2",
+    "V2",
+    "V1"
+   ],
+   "right_state": [
+    "W1",
+    "V2",
+    "W2",
+    "V1"
+   ],
+   "params": {},
+   "dots": {},
+   "coeff": "1",
+   "source": 7,
+   "target": 3,
+   "src_envelope": 0,
+   "tgt_envelope": 0
+  }
+ ],
+ "all_coefficients_integral": true,
+ "rebuilt_over_ZZ_d2_zero": true,
+ "timings": {
+  "stable_envelopes": 0.0818631649017334,
+  "gluing": 0.2097480297088623,
+  "rebuild_ZZ": 0.008408784866333008,
+  "total": 0.5878729820251465
+ },
+ "solver_stats": {
+  "ilp_calls": 11,
+  "ilp_solutions": 8,
+  "corr_solves": 0,
+  "homotopy_solves": 0
+ },
+ "conventions": {
+  "eps": "eps[s]=1: strand s is to the right of its red strand; strands 0..len(left)-1 are the left word (first = innermost around W_left), the rest the right word (last = innermost around W_right); state = [left eps=0 reversed] W_left [left eps=1] [right eps=0] W_right [right eps=1 reversed]",
+  "term": "KLRW element coeff*braid, left_state = source projective, right_state = target projective; dots indexed on the left state",
+  "envelope": "index into weights_in_gluing_order; the glued complex is Cone(S_k[shift] -> E_{k-1}) iterated"
+ }
+}
