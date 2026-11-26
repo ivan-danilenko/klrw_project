@@ -50,14 +50,20 @@ same-colour crossings replaced by the intertwiner `φ = (x_1 − x_2)ψ − r_c`
    including the minuscule words of `A_5 ω_3` (9 strands) and `D_5` spinor (10 strands).
    By Proposition 5.2, Conjecture H implies Conjecture C1′ (tree formula for every
    cycle-free word).
-5. **[computed]** Cyclic case (`A_2`, word `1221122`, red 1, 7 strands; §8): the true
-   differential is the tree formula plus one component (dotted terms, a coefficient 2,
-   hand-over terms). A comparison map `Γ : Cone(Φ_7) → (C, d_true)` **exists**, is unique up
-   to homotopy (the space of chain maps modulo null-homotopic ones is 1-dimensional), and a
-   sparsest representative is the formula of Conjecture H plus four terms. So the true
-   differential *is* `G^{-1} d_Φ G`; but the tree-only formula for `h` does not produce it
-   (the division `Φ − [d′, h]` by `z` fails in 21 components), and the general rule for the
-   extra terms of `h` is open.
+5. **[computed]** Cyclic case (§8). For the 7-strand cyclic word `1221122` (`A_2`, red 1)
+   the true differential is the tree formula plus one component (dotted terms, a
+   coefficient 2, hand-over terms). A comparison map `Γ : Cone(Φ_7) → (C, d_true)` **exists**
+   and is unique up to homotopy (chain maps modulo null-homotopic ones: dimension 1). The
+   tree-only formula of Conjecture H is not enough (the division of `Φ − [d′, h]` by `ζ`
+   fails in 21 components), but a small extension `H⁺` (Definition 8.1: a hanging pair may
+   start at a chain slot) is: **`F = ζ^{-1}(Φ − (d′⊗1)h⁺ − h⁺(1⊗d′))` is polynomial and equals
+   the true differential exactly**, including the dotted terms, the coefficient 2 and the
+   hand-over terms; for red 2 it equals the differential computed independently by the
+   first-order front (`04_data/cyclic7_1221122_W2_tree.json`), in all components.
+   *Iterated division* (§8.5) starting from `d_Φ` therefore defines the differential without
+   reference to the tree formula; it was exact on every word tested (cycle-free and
+   cyclic, table in §8.5). What is missing is a proof, and a term-by-term description of
+   the quotient in the cyclic case.
 
 Conventions fixed here: `φ = (x_1 − x_2)ψ − r` with the dots *before* the crossing (README);
 consequently the diagonal of `G` is `ζ_I = ∏_{x∈I} ∏_{i<x, c(i)=c(x)} (x_i − x_x)`, which is
@@ -340,7 +346,9 @@ the diagonal of `G` is `∏_{x∈I} ζ_x`. (`06_lib.d_mixed` implements `C^{(k)}
 ---
 ## 6. Words in which every colour occurs at most twice
 
-Throughout this section every colour occurs at most twice in `w`.
+Throughout this section every colour occurs at most twice in `w`. (Statements are identified
+by type *and* number: Definition 6.2 and Theorem 6.2, Corollary 6.3 and Lemma 6.3 are
+different statements.)
 
 ### 6.1 Notation
 
@@ -922,7 +930,30 @@ the script solves this for `d_k(I → K)` in the complete ansatz and reports non
 components. If all divisions are exact, `d_m` is a differential (`d_m = G^{-1}d_ΦG`,
 `G = Γ^{(1)}⋯Γ^{(m)}`), obtained without any information about the tree formula.
 
-RESULTS_8_5
+**Results** (`06_divide_all.py … plus`; "exact" = all divisions exact, and then `d_m² = 0`
+was verified again):
+
+| word | cyclic | result |
+|---|---|---|
+| `A_2` red 1: `12121`, `1211`; red 2: `2112` | no | exact; `d_m` = tree formula |
+| `A_2` red 1 `1221122` | yes | exact; `d_m` = stored true differential in all components (tree formula + the component of §8.1) |
+| `A_2` red 2 `1221122` | yes | exact; `d_m` = the differential `04_data/cyclic7_1221122_W2_tree.json` computed by the first-order front, in all components (`06_compare_04.py`) |
+| `A_2` red 2 `2211221` | yes | exact; `d_m² = 0`; 3 components differ from the tree formula |
+| `A_3` red 1 `1322312` (one step, `06_divide.py`) | yes | exact; `d² = 0`; 3 components differ from the tree formula (§8.6) |
+RESULTS_8_5_MORE
+
+On cycle-free words the formula `H⁺` passes the same tests as the formula of Conjecture H
+(`06_check_step_formula.py … plus` on the samples `A 3 random 40 7 3 11`,
+`A 2 random 30 7 4 3`, `D 4 random 40 7 3 7`: all cycle-free words hold), so `H⁺` can
+replace `H` in Conjecture H.
+
+**Conjecture H⁺.** For every word, iterated division with the formula `H⁺` is exact. (Then
+`d_m` is a differential on the cube, `d_m = G^{-1}d_ΦG`; for cycle-free words it is the tree
+formula.)
+
+The evidence in the cyclic case is the handful of words above; in particular I have no
+example with two independent cycles, and none in which a cyclic configuration needs a
+chain of length 3.
 
 ### 8.6 The example `1322312` (`A_3`, red 1)
 
@@ -1076,3 +1107,29 @@ to the statements).
 * Words in which some elementary move is invertible (e.g. red 2, word `121`) have a
   contractible cube; there "existence of `G`" is empty and solutions are not unique. All
   uniqueness statements are for words without such a move.
+
+---
+
+## Appendix: scripts (`proofs/checks/`)
+
+All take `TYPE RANK RED WORD` (e.g. `A 2 1 1212`) unless stated; run with `sage -python`
+from `proofs/checks/`.
+
+| script | what it does | used in |
+|---|---|---|
+| `06_lib.py` | library: labelled states, `ψ`, `φ`, `Φ_j`, `d_Φ`, tree `d`, `C^{(k)}` (`d_mixed`), complete ansatz (`basis`, own enumeration of monomials), linear systems for chain maps (`ChainMapSystem`), `𝒟`, `q_{ab}`, brackets, the formulas `G_formula_row` (Definition 6.2) and `step_formula_row` (Conjecture H; `SHARED = True` for `H⁺`) | all |
+| `06_check_basic.py` | naturality of `Φ_m` on all states, `ζ` central, `d_Φ² = 0` | §2, §4 |
+| `06_check_labelled.py` | independence of the reduced word, product rule, sliding of dots, expansion of the tree terms | §3, Lemma 6.5 |
+| `06_check_bigons.py [N] [SEED]` (plain `python3`) | the six statements of Lemma 6.6 | §6.4 |
+| `06_check_G_formula.py` (also `TYPE RANK random N MAXLEN [SEED]`) | `d_Φ G = G d_tree` for Definition 6.2 | Theorem 6.2 |
+| `06_check_minuscule.py TYPE RANK RED [min\|max]` | Theorem 6.2 and Conjecture H on minuscule words | §6, §7 |
+| `06_check_factorisation.py` | `G = Γ^{(1)}⋯Γ^{(m)}` | §7.2 |
+| `06_solve_G.py … [print]`, `06_batch_G.py` | solve for `G` in the complete ansatz; uniqueness, homotopies | §7.1 |
+| `06_solve_step.py … [print] [k …]` | solve for the one-step maps | §7.1 |
+| `06_check_step_formula.py` (also `random N MAXLEN MAXMULT [SEED]`, `plus`) | Conjecture H (resp. `H⁺`): each `Γ^{(k)}` is a chain map | §7.2, §8.5 |
+| `06_cyclic_true_d.py` | corrected differential in the complete ansatz, stored in `06_data/` (2 minutes for 7 strands) | §8.1 |
+| `06_cyclic_step.py`, `06_cyclic_homotopy.py` | comparison map for a stored differential; chain maps modulo homotopy (2 minutes each) | §8.2 |
+| `06_divide.py … [plus]` | one division `ζ F = Φ − [d′, h]`, comparison with the tree formula and a stored differential | §8.4, §8.6 |
+| `06_divide_all.py … [plus] [print]` | iterated division from `d_Φ` | §8.5 |
+| `06_compare_04.py [FILE]` | iterated division against the differential stored in `04_data/` | §8.5 |
+| `06_cyclic_G.py` | global `G` in the complete ansatz against a stored differential — **not completed** for 7 strands (too large); superseded by `06_cyclic_step.py` | — |

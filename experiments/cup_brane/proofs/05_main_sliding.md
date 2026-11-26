@@ -1367,7 +1367,28 @@ elements of the formula with the sliding error and within each family); the fina
 
 ### Runs (all after the last edit of the scripts; every run ended without a failed assertion)
 
-see the list at the end of this section (filled in from the final runs).
+`zsh 05_logs/run_all.sh` (from `proofs/checks`) reproduces all of them; the outputs are in
+`proofs/checks/05_logs/*.log`, each ending with `exit code 0`.
+
+| run (`sage -python …`) | result |
+|---|---|
+| `05_straighten.py 3000 1` | Lemma 1.2: 1371 words; 1.3: 868; 1.4: 381; no failure |
+| `05_sliding.py 300 1` | 308 cases, 142 bad letters, 0 failures |
+| `05_cone.py A 3 6 40 1`, `05_cone.py D 4 6 30 2` | 70 words, 5062 terms |
+| `05_reduction.py A 3 40 6 1`, `05_reduction.py D 4 25 6 2` | 2428 + 2148 cases |
+| `05_T1_check.py A 3 all 2 6` | 267 words (all T1 words of length ≤ 6) |
+| `05_T1_check.py D 4 all 2 6` | 2320 words (all) |
+| `05_T1_check.py A 4 all 5 6` | 2040 words (all) |
+| `05_T1_check.py D 4 all 7 8 60 1` | 120 words |
+| `05_T1_check.py A 5 all 7 9 40 2` | 120 words |
+| `05_T1_check.py D 5 all 8 9 30 3` | 60 words |
+| `05_T1_check.py D 4 3421342 1342134 2` | 3 words (`k = 2`) |
+| `05_F3_check.py A 3 2 13`, `… D 4 2 134`, `… A 4 2 134` | 132 words (Theorem C) |
+| `05_fourterm.py A 3 40 7 1`, `05_fourterm.py D 4 40 7 2` | 384 cases |
+| `05_explore_stats.py A 3 3 6 T1` | the numbers of section 0 |
+| `05_explore.py A 2 22112 v` | the expansions of 10.4 |
+| `05_blocks_general.py A 3 1 80 8 1 [a1]`, `… D 4 1 60 8 2 a1`, `… A 3 2 80 8 3 [a1]` | data of 10.3, 10.4 |
+| `05_closure.py …` (11 runs, see `run_all.sh`) | table of 10.4 |
 
 ### Verified only by computation (Tier 2)
 

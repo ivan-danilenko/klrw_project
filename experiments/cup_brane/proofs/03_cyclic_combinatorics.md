@@ -255,8 +255,9 @@ Conversely, interlaced with `b_r < b_p` means `a_r < a_p < b_r < b_p`. So
 The path search `03_lib.Word.search(mover_on_cycle=True)` uses this: a cycle through the
 mover exists iff some induced path `M — v_1 — … — v_r` plus a pair linked to `M` and to some
 `v_i` exists (take a shortest cycle through `M`; it is chordless, since a chord would give a
-shorter cycle through `M`). `03_patterns.py` checks Lemma 2.5 on 4973 minimal cyclic
-configurations whose cycle avoids the mover.
+shorter cycle through `M`). `03_patterns.py` checks Lemma 2.5 on 7549 minimal cyclic
+configurations whose cycle avoids the mover (3031 from random words, 4518 from Young diagrams,
+`E_7` and `D_7` spin).
 
 ### 2.4 Cycle shortening and the pattern theorem
 
@@ -299,7 +300,7 @@ ones are linked; `x*` is linked to both ends; all are distinct. ∎
 non-interlacing of `u', y`, both links, the absence of blocks, the new cycle) at **every**
 turning point of every chordless cycle of length ≥ 6 occurring in the minimal cyclic
 configurations of 3000 random words and of `λ = 5^4, 5^5, 6^3 4^3`, `E_7`, `D_7` spin:
-4288 surgeries, on cycles of length 6, 8, 10.
+4488 surgeries, on cycles of length 6 (3224), 8 (1156), 10 (108).
 
 > **Theorem 2.8 (Theorem P).** For every word `w` over a forest, the following are
 > equivalent:
@@ -585,7 +586,7 @@ the 6×6 box, 362 are cyclic; all contain T, 262 also B, 162 also N.
 > **Corollary 3.4.** (a) `sl_n` with `ω_1, ω_2, ω_3, ω_{n−3}, ω_{n−2}, ω_{n−1}`: no stack is
 > cyclic, for every `n`. (b) The full minuscule poset `k × (n−k)` of `Λ^k ℂ^n` is cyclic iff
 > `4 ≤ k ≤ n − 4` (so `n ≥ 8`; first case `sl_8, ω_4`). (c) The cyclic stacks of `Λ^k ℂ^n` are
-> those of the weights `μ ≤ μ_c`, `μ_c = e_{\{1,…,k−4\} ∪ \{k, k+2, k+3, k+4\}}`
+> those of the weights `μ ≤ μ_c`, `μ_c = e_S`, `S = {1,…,k−4} ∪ {k, k+2, k+3, k+4}`
 > (`λ(μ_c) = (4,4,4,3)`), whenever `4 ≤ k ≤ n−4`; there are none otherwise.
 
 *Proof.* (a) `λ ⊆ k × (n−k)` has at most `k ≤ 3` rows, so `λ_4 = 0`, or at most `n − k ≤ 3`
@@ -792,7 +793,7 @@ can be upgraded to "proved".
 >
 > | representation | `I_c` | `μ_c` | `λ − μ_c` | slots |
 > |---|---|---|---|---|
-> | `sl_n`, `Λ^k`, `4 ≤ k ≤ n−4` | `λ = (4,4,4,3)` | `e_{\{1..k−4\} ∪ \{k,k+2,k+3,k+4\}}`; `sl_8`: lowest `+ α_4` | `(1,2,3,3,3,2,1)` on nodes `k−3 … k+3` | 15 |
+> | `sl_n`, `Λ^k`, `4 ≤ k ≤ n−4` | `λ = (4,4,4,3)` | `e_S`, `S = {1..k−4} ∪ {k,k+2,k+3,k+4}`; `sl_8`: lowest `+ α_4` | `(1,2,3,3,3,2,1)` on nodes `k−3 … k+3` | 15 |
 > | `D_n` half-spin `ω_n`, `n ≥ 6` | `ℓ = (5,4,3,1)` | `½(+,…,+,−,−,−,+,−,+)`; `D_6`: `−ω_3+ω_4−ω_5` | `(1,2,3,3,2,2)` on nodes `n−5 … n` | 13 |
 > | `E_6`, `ω_1` | Theorem E(a) | `−ω_4 + ω_5` = lowest `+ α_5 + α_6` | `(2,2,3,4,2,1)` | 14 |
 > | `E_6`, `ω_6` | Theorem E(b) | `ω_3 − ω_4` | `(1,2,2,4,3,2)` | 14 |
