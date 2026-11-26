@@ -198,8 +198,11 @@ Findings **[verified on those local pieces]**:
   the cycle for the order by `b` (it has the smaller `b`, resp. the larger `b`, in both
   links) the two tree signs agree and the dots sit on its left and on its right strand. If
   `X` lies between its two neighbours the tree signs are opposite and both dots sit on the
-  same strand, so that only their `r`-correction survives. The mover always gets one dot at
-  the source and one at the target;
+  same strand, so that only their `r`-correction survives. In all examples the surviving term is a *hand-over*: `r` times the
+  diagram in which the strand of `X` does not cross an unaffected strand of its own colour lying
+  inside the interval of `X` — on the left if that strand is on the left, on the right if it
+  is on the right (checked by moving such a strand across, piece `E6 … I_6-7-12-13-14`).
+  The mover always gets one dot at the source and one at the target;
 * **additional term type, not yet understood**: dot-free terms in which the strand that
   crosses the red strand is not the one from the mover's slot — the moving strand "hands
   over" to a strand of its own colour instead of crossing it (on the right, on the left, or
