@@ -144,6 +144,7 @@ def cyclic_element(cube, stack, V, j, F, links, cache, variant):
     col = stack.col
     cyc = cycle_order(F, links)
     total = KLRW.zero()
+    canon = [None]
     for subset, parent in spanning_trees(F, links):
         (extra,) = [i for i in range(len(links)) if i not in subset]
         mono = stack.monomial(parent)
@@ -166,6 +167,49 @@ def cyclic_element(cube, stack, V, j, F, links, cache, variant):
         cy = col[j - 1] if y == "m" else col[y[0] - 1]
         tx = D("t_%d_%d" % (cx, cy))
         ty = D("t_%d_%d" % (cy, cx))
+        if variant in ("endL", "endR", "mix"):
+            # types are chosen separately for the two ends of the link:
+            # at a source/sink of the cycle the two links get different sides,
+            # at an in-between node each link contributes on both sides.
+            both = {side: kiss_elements(cube, stack, V, j, F, links, extra, side) for side in "RL"}
+            if both["R"] is None or both["L"] is None:
+                raise RuntimeError("bigon not realisable: %s %s" % (F, links[extra][:2]))
+            for which, node, tcoef in ((0, x, tx), (1, y, ty)):
+                # the other cycle link at this node
+                nb = [i for i in cyc if i != extra and node in links[i][:2]]
+                (other_link,) = nb
+                o1 = [z for z in links[extra][:2] if z != node][0]
+                o2 = [z for z in links[other_link][:2] if z != node][0]
+                pure = (bkey(j, o1) > bkey(j, node)) == (bkey(j, o2) > bkey(j, node))
+                if pure:
+                    # the link that comes first in the cyclic order gets the first side
+                    first_side = "L" if variant == "endL" else "R"
+                    second_side = "R" if first_side == "L" else "L"
+                    cyc_pos = {i: k for k, i in enumerate(cyc)}
+                    # compare positions of the two links as seen from this node, using the smaller partner first
+                    mine_first = bkey(j, o1) < bkey(j, o2) or (bkey(j, o1) == bkey(j, o2) and cyc_pos[extra] < cyc_pos[other_link])
+                    side = first_side if mine_first else second_side
+                    total += 2 * sign * cache[mono] * tcoef * both[side][which]
+                elif variant != "mix":
+                    total += 2 * sign * cache[mono] * tcoef * (both["L"][which] + both["R"][which])
+                else:
+                    # in-between node: dots in the canonical drawing, right before / right after the
+                    # node's own move on each side (so every same-colour crossing is counted once)
+                    if canon[0] is None:
+                        ro_c, lo_c = canonical_orders(j, F)
+                        sp = {}
+                        w_c = simulate(cube, V, j, F, ro_c, lo_c, None, sp)
+                        canon[0] = (w_c, sp)
+                    w_c, sp = canon[0]
+                    is_y = bkey(j, o1) < bkey(j, node)      # node has the larger b in this link
+                    a_n, b_n = node
+                    # as y: left strand before its move, right strand after its move;
+                    # as x: left strand after its move, right strand before its move
+                    l_idx = sp["L", node][0] if is_y else sp["L", node][1]
+                    r_idx = sp["R", node][1] if is_y else sp["R", node][0]
+                    total += 2 * sign * cache[mono] * tcoef * (
+                        element_with_dot(cube, V, w_c, l_idx, a_n) + element_with_dot(cube, V, w_c, r_idx, b_n))
+            continue
         for side in sides:
             res = kiss_elements(cube, stack, V, j, F, links, extra, side)
             if res is None:
@@ -233,6 +277,6 @@ if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     verbose = "-v" in sys.argv
     for p in args:
-        res = {v: compare(p, variant=v, verbose=verbose) for v in (("roleL",) if verbose else ("roleR", "roleL", "half"))}
+        res = {v: compare(p, variant=v, verbose=verbose) for v in (("mix",) if verbose else ("mix", "endL", "roleL"))}
         print("%-46s" % os.path.basename(p).replace("__K_.json", ""), "  ".join(
             "%s: wrong %d, cyclic ok %d/%d%s" % (v, r[1], r[2], r[3], " (unrealisable)" if r[4] else "") for v, r in res.items()))

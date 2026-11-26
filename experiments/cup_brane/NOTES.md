@@ -241,13 +241,23 @@ Findings **[verified on those local pieces]**:
 
 `CATALOGUE_cyclic.txt` lists every true term beyond the tree formula in the 32 local pieces
 (113 families): 336 dotted terms (52 of them with coefficient 2), 99 dot-free terms in which
-the mover keeps its slot, 89 in which it changes slot. `cycle3.py` implements the bigon rule.
-With the types of the bigons (drawn on the left or on the right of the red strand) changing
-at sources/sinks of the cycle and persisting at in-between nodes (`roleL`), it reproduces
-85 of the 99 components that are targets of a single-cycle configuration in the 32 local
-pieces, among them all 40 in `D_6`; the 14 others are in `A_7 ω_4` and `E_6` and presumably
-need the other of the two global choices of types. A further 75 components (out of about
-33 000 compared) differ because of the hand-over terms described above.
+the mover keeps its slot, 89 in which it changes slot. `cycle3.py` implements the resulting rule for a configuration with one cycle (variant
+`mix`): sum over the spanning trees `G − e` with their tree signs and monomials; the left-over
+link `e = (x, y)` contributes `t_{c_x c_y}·[dot on x] + t_{c_y c_x}·[dot on y]`, where
+
+* at a source or sink of the cycle the two links of the node put their dots on different
+  sides (left strand / right strand; for the mover: source / target), at the touching points
+  of the time-ordered drawing;
+* at an in-between node `X` each link puts a dot on both strands of `X`, right before or right
+  after the move of `X` in the canonical drawing (as the node with the larger `b`: left strand
+  before, right strand after; as the node with the smaller `b`: left strand after, right
+  strand before). The two links come with opposite tree signs, so only hand-over terms remain.
+
+This reproduces 95 of the 101 components that are targets of a single-cycle configuration in
+the 33 local pieces: all 17 in `A_7 ω_4`, all 40 in `D_6`, 38 of 44 in `E_6`. The 6 others
+(one piece and its mirror image, cycle not through the mover) involve the hand-over terms
+below. About 70 further components (out of about 33 000 compared) differ only by hand-over
+terms that land in vertices which are not the target of any mover-plus-pairs configuration.
 
 So: no complete closed formula yet outside the cycle-free range; the data indicate that one
 exists (unique solutions, small integer coefficients, clear graph-theoretic structure).
