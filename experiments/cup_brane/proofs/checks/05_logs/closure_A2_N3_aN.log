@@ -1,0 +1,9 @@
+$ sage -python 05_closure.py A 2 3 20 8 dots-aN 3
+   1122211 : hard 54 , not deducible 54 , e.g. [([3, 4], [1]), ([3, 4], [2])]
+   1211221 : hard 32 , not deducible 16 , e.g. [([5, 6], [1]), ([5, 6], [3])]
+   11222121 : hard 217 , not deducible 216 , e.g. [([3, 4], [1]), ([3, 4], [2])]
+   1112221 : hard 48 , not deducible 48 , e.g. [([4, 5], [1]), ([4, 5], [2])]
+   22112112 : hard 213 , not deducible 212 , e.g. [([3, 4], [1]), ([3, 4], [2])]
+   2211212 : hard 54 , not deducible 54 , e.g. [([3, 4], [1]), ([3, 4], [2])]
+type ['A', 2], N = 3, mode dots-aN: 20 words; 878 hard components, 684 of them not deducible; 8 words with a remainder
+exit code 0

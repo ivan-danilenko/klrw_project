@@ -13,7 +13,7 @@ What it does, exactly:
  3. for every ideal I (by increasing size): I is cyclic if some lower cover I - {x}
     (x maximal) is cyclic (PROOFS.md Prop. 7: I - {x} is a prefix of a linear extension of
     I); otherwise the EXHAUSTIVE search 03_lib.Word.search decides (no bound on the number
-    of pairs; see Lemma 2 of the write-up).  With --all the search is run on every ideal
+    of pairs; see Lemma 2.3 of the write-up).  With --all the search is run on every ideal
     and the inheritance shortcut is only used as a cross-check;
  4. prints the minimal cyclic ideals, as weights, root contents and slot lists, and a
     witness for each; with --blocks also the variant in which blocks are ignored.
@@ -41,9 +41,7 @@ def setup(typ, n, k):
     A = L.cartan(typ, n)
     lam = tuple(1 if j == k else 0 for j in range(n + 1))
     paths = {lam: 1}
-    for mu in sorted(orbit, key=lambda mu: -sum(mu[1:])):   # not a topological order in general
-        pass
-    order = sorted(ideals, key=len)
+    order = sorted(ideals, key=len)            # weights by depth: a topological order of the weight graph
     by_wt = {wt[I]: I for I in ideals}
     for I in order[1:]:
         mu = wt[I]

@@ -1,5 +1,5 @@
 """
-Theorem P (pattern characterisation) and Lemma 5 (cycle shortening) of
+Theorem 2.8 (pattern characterisation), Lemma 2.7 (cycle shortening), Lemma 2.5 (replacement) of
 proofs/03_cyclic_combinatorics.md.  Pure Python.
 
     python3 proofs/checks/03_patterns.py [N_WORDS] [SEED]
@@ -9,12 +9,12 @@ For random arbitrary words (types A2..A5, D4, E6; lengths 4..16):
      (detected by a literal, independent implementation of the pattern definitions);
      for words of length <= 11 also against the brute force over all configurations;
  (2) every pattern occurrence found is a cyclic configuration with 3 pairs;
- (3) Lemma 5, step by step: for every inclusion-minimal cyclic configuration whose cycle has
+ (3) Lemma 2.7, step by step: for every inclusion-minimal cyclic configuration whose cycle has
      length L >= 6, written as a pair family on the word extended by one slot of the mover's
      colour, and for EVERY turning point z (neighbours x, y of equal colour) the new chord
      x* = (s, t) defined in the proof is linked to u and w, the family (C - {x,y,z}) + {x*}
      has no block, and its link graph has the cycle  x*, w, ..., u  of length L - 2;
- (4) Lemma 4 (replacement): for every minimal cyclic configuration whose cycle avoids the
+ (4) Lemma 2.5 (replacement): for every minimal cyclic configuration whose cycle avoids the
      mover, replacing the cycle vertex with the largest right end b by a mover at its left
      end gives an unblocked configuration whose link graph is the cycle.
 """
@@ -175,7 +175,7 @@ if __name__ == "__main__":
         if s is not None and m <= 14:
             for j, F in W.minimal_cyclic():
                 check_shortening(W, j, F, stats)
-    print("Theorem P, Lemmas 4 and 5 confirmed on %d random words:" % N)
+    print("Theorem 2.8, Lemmas 2.5 and 2.7 confirmed on %d random words:" % N)
     for k in sorted(stats):
         print("   %-22s %d" % (k, stats[k]))
     # longer chordless cycles: all minimal cyclic configurations of some minuscule words
@@ -192,7 +192,7 @@ if __name__ == "__main__":
         W = L.Word(word, L.adjacency(typ, n))
         for j, F in W.minimal_cyclic():
             check_shortening(W, j, F, stats)
-    print("Lemmas 4 and 5 on all minimal cyclic configurations of lambda = 5^4, 5^5, 6^3 4^3 and of"
+    print("Lemmas 2.5 and 2.7 on all minimal cyclic configurations of lambda = 5^4, 5^5, 6^3 4^3 and of"
           " the full E7 and D7-spin posets:")
     for k in sorted(stats):
         print("   %-22s %d" % (k, stats[k]))

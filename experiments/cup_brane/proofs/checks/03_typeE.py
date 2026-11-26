@@ -6,8 +6,8 @@ E7 (omega_7).  Pure Python, about a minute.
 
 For every order ideal I of the minuscule poset (27 resp. 56 ideals) cyclicity is decided by
 THREE independent methods, which must agree:
-  M1  the exhaustive tree search 03_lib.Word.search          (relies on Lemma 2)
-  M2  the literal pattern detector 03_patterns.patterns     (relies on Theorem P)
+  M1  the exhaustive tree search 03_lib.Word.search          (relies on Lemma 2.3)
+  M2  the literal pattern detector 03_patterns.patterns     (relies on Theorem 2.8)
   M3  brute force over ALL configurations: every mover and every set of pairwise disjoint
       equal-coloured pairs avoiding it (03_lib.Word.brute)   (relies on nothing but the definitions)
 Then it checks that the cyclic ideals are exactly the ideals containing the unique minimal

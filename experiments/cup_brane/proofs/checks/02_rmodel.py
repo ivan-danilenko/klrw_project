@@ -4,13 +4,13 @@ The "R-model" of the omega_1 I-brane (proofs/02_omega1_ibrane.md, sections 3-5),
     python3 proofs/checks/02_rmodel.py N_MAX
 
 Checks, for n = 1..N_MAX:
-  (a) [Prop. 3.4 + Lemma 4.2] the scalar complex of the I-brane (GLUING.md formula, bigon rule of
+  (a) [Prop. 4.2 with Lemma 4.3] the scalar complex of the I-brane (GLUING.md formula, bigon rule of
       Lemma 2.3, reference bits b = 1) becomes, after the diagonal change of basis
       f_v = sigma(v) phi(v) e_v, exactly the R-model with q_x = T_x Q_x  (entry by entry, as
       polynomials in the dots with Laurent coefficients);
   (b) [Theorem 5.1] in the R-model over Z[q_0..q_n] (free variables):  delta^2 = W * H with
       W = sum_x (-1)^x q_x  and  H = sum_{j<k} (-1)^(j+1) e_j (x) N_{j,k};
-  (c) [Lemma 5.3, 5.4] the block identities (Psi = 0, Inner = -W_[0,D] N_{0,D}) for D <= N_MAX+?;
+  (c) [Lemmas 5.3, 5.4] the block identities (Psi = 0, Inner = -W_[0,D] N_{0,D}) for D <= N_MAX+2;
   (d) the closed formula for sigma(v) (vertex signs) and phi(v).
 
 R-model: vertex (k, R), 0 <= k <= n, R subset {1..n}  (R = A u C).  Lambda(r_1..r_n), order
@@ -245,7 +245,7 @@ def check_blocks(D):
 
 # ----------------------------------------------------------------------------- comparison with the I-brane
 def sigma(n, v):
-    """Vertex sign of Lemma 4.2: (-1)^(C(|A|,2) + C(|C|,2) + sum(A) + |B_L| |C|)."""
+    """Vertex sign of Prop. 4.2: (-1)^(C(|A|,2) + C(|C|,2) + sum(A) + |B_L| |C|)."""
     k, A, C = v
     a, c = len(A), len(C)
     bl = k - a

@@ -41,5 +41,11 @@ run closure_A2_N3_a1 05_closure.py A 2 3 20 8 dots-a1 3
 run closure_A2_N3_aN 05_closure.py A 2 3 20 8 dots-aN 3
 run closure_A3_N3_a1 05_closure.py A 3 3 20 8 dots-a1 5
 ) &
+(
+run F3_A3 05_F3_check.py A 3 2 13
+run F3_D4 05_F3_check.py D 4 2 134
+run F3_A4 05_F3_check.py A 4 2 134
+run explore_22112 05_explore.py A 2 22112 v
+) &
 wait
 echo "all runs finished" > 05_logs/DONE

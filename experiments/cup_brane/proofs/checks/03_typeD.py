@@ -1,5 +1,5 @@
 """
-Type D (Theorem D and Proposition D.1 of proofs/03_cyclic_combinatorics.md).  Pure Python.
+Type D (Theorem D, Lemmas 4.2, 4.3, Prop. 4.1, Cor. 4.4 of proofs/03_cyclic_combinatorics.md).  Pure Python.
 
     python3 proofs/checks/03_typeD.py [NMAX]          (default NMAX = 11)
 
@@ -97,6 +97,24 @@ def main(NMAX):
         for I in L.order_ideals(len(vword), less):
             assert L.Word([vword[s] for s in I], adj).search() is None
     print("D_n vector representation, 4 <= n <= %d: chain checked, multiplicities <= 2, no cyclic ideal" % NMAX)
+    # mu_c = weight of I_(5,4,3,1): epsilon-coordinates and root content (Cor. 4.4(b))
+    from fractions import Fraction as Fr
+    for n in range(6, NMAX + 1):
+        E, col = ideal_word(n, (5, 4, 3, 1))
+        mu = L.chain_weights("D", n, n, col)[-1]
+        eps = [Fr(0)] * (n + 1)
+        for i in range(1, n + 1):                  # omega_i in epsilon-coordinates
+            if i <= n - 2:
+                for t in range(1, i + 1):
+                    eps[t] += mu[i]
+            else:
+                for t in range(1, n + 1):
+                    eps[t] += Fr(mu[i], 2) * (-1 if (i == n - 1 and t == n) else 1)
+        want = [1] * (n - 6) + [-1, -1, -1, 1, -1, 1]
+        assert [int(2 * e) for e in eps[1:]] == want, (n, eps)
+        cont = Counter(col)
+        assert [cont[c] for c in range(n - 5, n + 1)] == [1, 2, 3, 3, 2, 2] and len(col) == 13
+    print("mu_c = 1/2(+,...,+,-,-,-,+,-,+), omega_n - mu_c = (1,2,3,3,2,2) on nodes n-5..n: n = 6..%d" % NMAX)
     for n in range(4, min(NMAX, 9) + 1):
         Mi.weight_order_check("D", n, n)
         Mi.weight_order_check("D", n, 1)

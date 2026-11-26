@@ -20,7 +20,7 @@ Dynkin diagram.  A configuration is a mover ``j`` and a set ``F`` of pairwise di
 A configuration is *cyclic* if it has no block, its link graph on {mover} u F is connected and
 #links > #pairs.  A word is cyclic if it admits a cyclic configuration.
 
-Search method (exhaustive, no bound on the number of pairs).  Lemma 2 of the write-up:
+Search method (exhaustive, no bound on the number of pairs).  Lemma 2.3 of the write-up:
 every cyclic configuration contains a cyclic configuration of the form  T + {p}  where T is a
 *tree configuration* (no block, link graph a tree) and p is a pair, disjoint from T and
 from the mover, not blocked by T or by the mover, with at least two links into T.  Every tree
@@ -245,10 +245,10 @@ class Word:
         Exhaustive search for cyclic configurations.
         Returns the first witness (j, F) found, or None; with ``collect=True`` returns the
         list of ALL configurations T+{p} (T a tree configuration, p with >= 2 links into T)
-        -- this list contains every inclusion-minimal cyclic configuration (Lemma 2).
+        -- this list contains every inclusion-minimal cyclic configuration (Lemma 2.3(c)).
         ``mover_on_cycle``: only accept p linked to the mover (then the configuration has a
         cycle through the mover; conversely every configuration with a cycle through the
-        mover contains such a T+{p}, Lemma 3).
+        mover contains such a T+{p}; Cor. 2.6 and the remark after it).
         ``allow_blocks``: ignore blocks altogether (the "blocked" variant).
         Also returns the number of tree configurations visited (``self.ntrees``).
         """
@@ -292,7 +292,7 @@ class Word:
         return found if collect else None
 
     def _search_paths(self, allow_blocks=False, movers=None):
-        """Cycle through the mover.  Lemma 3: such a configuration exists iff there are an
+        """Cycle through the mover (remark after Cor. 2.6): such a configuration exists iff there are an
         induced path  mover - v_1 - ... - v_r  (no blocks; v_{i+1} linked to v_i only) and a
         pair p, unblocked against it, linked to the mover and to at least one v_i.
         Enumerates induced paths only (state = (vertex set, end)), no length bound."""
@@ -438,7 +438,7 @@ def popcount(x):
 def shape(W, j, F):
     """Describe a (minimal) cyclic configuration: cycle length, distance of the mover from the
     cycle, colours along the cycle.  Assumes the link graph is a chordless cycle with a
-    pendant path (Lemma 2)."""
+    pendant path (Lemma 2.3)."""
     edges, _ = W.graph(j, F)
     V = ["m"] + list(F)
     adjl = defaultdict(set)

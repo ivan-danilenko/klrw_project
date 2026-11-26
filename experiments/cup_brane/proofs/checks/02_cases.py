@@ -14,7 +14,7 @@ proof (exactly one label; the labelling uses only the two term tags), and checks
     coefficient  (-1)^(j+1) (-1)^x q_x * (sign of N_{j,k} on the source);
   * no component contains anything else.
 
-Labels (block (j, k], D = k - j, relative colour c' = c - j; see Lemmas 5.3, 5.4, and 5.5):
+Labels (block (j, k], D = k - j, relative colour c' = c - j; see Theorem 5.1 and Lemmas 5.3, 5.4):
   KOS                      both internal (j = k)
   dO                       an internal move on an outer colour and a gluing term k -> j whose
                            extra colour (if any) is a different colour        partner: other order

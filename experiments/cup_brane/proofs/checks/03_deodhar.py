@@ -3,7 +3,7 @@ Section 7 of proofs/03_cyclic_combinatorics.md: cyclic versus Deodhar.  Pure Pyt
 
     python3 proofs/checks/03_deodhar.py [--big]
 
-Part 1 (type A, patterns; this is the computational shadow of Proposition 7.2).  For every
+Part 1 (type A, patterns; this is the computational shadow of Proposition 7.1).  For every
 k-subset S of [n], n <= 12: the Grassmannian permutation w_S (w(1..k) = S increasing,
 w(k+1..n) = complement increasing) is 321-avoiding; it contains one of the four hexagon
 patterns of Billey-Warrington (7) iff the partition lambda(S), lambda_i = s_{k+1-i} - (k+1-i),

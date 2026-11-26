@@ -9,13 +9,13 @@ Edge x (0 <= x <= n) joins the labels x and x+1 (label 0 = W_1, label n+1 = W_n)
 E_x = q + e_x for the degree of a crossing of the two labels of edge x.
 
 Checks:
- (a) Prop. 6.2: Delta(v) = sum_x m_x(v) E_x,  m_x(v) = o_x(v) + 2[x <= k-1] + 2[x in C],
+ (a) Thm. 6.3: Delta(v) = sum_x m_x(v) E_x,  m_x(v) = o_x(v) + 2[x <= k-1] + 2[x in C],
      makes every term homogeneous: deg(coefficient) + deg(beta) = Delta(v) - Delta(w);
  (b) Delta - D_cube is constant on each envelope S_k (D_cube = the two-stack cube grading of
      PROOFS.md section 1.3 / Prop. 6);
- (c) Lemma 7.2 (*): |A_v| - |A_w| <= d - 1 + |F(v,w)| for v in S_k, w in S_l, l < k, d = k - l,
+ (c) Lemma 7.1 (*): |A_v| - |A_w| <= d - 1 + |F(v,w)| for v in S_k, w in S_l, l < k, d = k - l,
      and, when hdeg(w) = hdeg(v) - 1, equality holds iff (v, w) is a term of the formula;
- (d) Cor. 7.3: the dot degree N(v,w) = d + |C_v| - |C_w| - |F(v,w)| is negative whenever
+ (d) Cor. 7.2: the dot degree N(v,w) = d + |C_v| - |C_w| - |F(v,w)| is negative whenever
      hdeg(w) = hdeg(v) (no homotopies), and for hdeg(w) = hdeg(v) - 1 it is >= 0 iff (v,w) is a
      formula pair, and then = 0;  also N computed from Delta directly (q-component) agrees.
 """
@@ -181,7 +181,7 @@ def pi_mono(n, y):
 
 
 def check_polynomial_model(n):
-    """Cor. 6.4: with f(k) = prod_{y<=k} pi_y every coefficient * f(k)/f(l) is a polynomial monomial;
+    """Cor. 6.5: with f(k) = prod_{y<=k} pi_y every coefficient * f(k)/f(l) is a polynomial monomial;
     and f is the minimal per-envelope rescaling (longest-path solution with f(0) = 1)."""
     terms = M.all_terms(n)
     bad = 0
@@ -217,3 +217,31 @@ if __name__ == "__main__":
         nt, bad, nm = check_polynomial_model(n)
         print("n=%d: polynomial model f(k) = prod pi_y: %d terms, non-polynomial %d; variables where f is not the"
               " minimal rescaling %d" % (n, nt, bad, nm), flush=True)
+
+
+def check_polynomial_coefficients(n):
+    """Cor. 6.5: after rescaling, the coefficient of a gluing term k -> l is pi_{l+2}...pi_k times
+    pi_{l+1} (i), pi_{k+1} (ii), pi_c (iii, c <= l), pi_{c+1} (iii, c > k)."""
+    bad = tot = 0
+    for t in M.all_terms(n):
+        k, l = t.src[0], t.tgt[0]
+        if k == l:
+            continue
+        tot += 1
+        c = Counter(dict(t.coeff))
+        for y in range(l + 1, k + 1):
+            c.update(pi_mono(n, y))
+        pred = Counter()
+        for y in range(l + 2, k + 1):
+            pred.update(pi_mono(n, y))
+        ex = {"i": l + 1, "ii": k + 1}.get(t.typ) or (t.extra if t.extra <= l else t.extra + 1)
+        pred.update(pi_mono(n, ex))
+        if clean(c) != clean(pred):
+            bad += 1
+    return tot, bad
+
+
+if __name__ == "__main__":
+    for n in range(2, (int(sys.argv[1]) if len(sys.argv) > 1 else 6) + 1):
+        print("n=%d: gluing terms %d, polynomial coefficient differs from pi_{l+2}..pi_k * pi_extra: %d"
+              % ((n,) + check_polynomial_coefficients(n)), flush=True)

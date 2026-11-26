@@ -13,6 +13,10 @@ twice**. Then the tree formula for `w` satisfies `d² = 0`.
 This covers `sl_n` with `ω_1`, `ω_2`, the vector representation of `so_{2n}`, all of `D_4`, and
 every word, minuscule or not, with colour multiplicities `≤ 2`.
 
+**Theorem C (section 9A).** If one colour occurs three times in `w` and every other colour
+at most once, the tree formula satisfies `d² = 0`. (The first case with multiplicity three;
+here dots have to be cancelled by hand, with the four-term identity of Proposition 10.2.)
+
 **Theorem A (section 7).** For an arbitrary word `w'` and a colour `c` not occurring in `w'`:
 the elementary move `X_m` of the new last slot commutes with every dot-free diagram of the
 algebra of `w'`; hence if the tree formula of `w'` satisfies `d'² = 0`, so does that of `w'·c`.
@@ -33,8 +37,8 @@ in the data) are among the components that need not be checked; on the remaining
 product of two tree terms is a single reduced diagram and the cancellation is in pairs
 (section 8).
 
-What is **not** proved here: Conjecture C1′ for words with a colour occurring three times or
-more (target (T2)). Section 10 says exactly which steps use "at most twice", what the data
+What is **not** proved here: Conjecture C1′ for general words with a colour occurring three
+times or more (target (T2)); only the family of Theorem C is done. Section 10 says exactly which steps use "at most twice", what the data
 look like beyond it, and which identities remain.
 
 Method. Before proving anything, every product of two tree terms occurring in `d²` was
@@ -917,6 +921,173 @@ and this property passes to prefixes and reorderings. ∎
 
 ---
 
+## 9A. Theorem C: one colour three times, all other colours once
+
+This is the first case with a colour of multiplicity three. It uses the Reduction Lemma for
+the first occurrence and, for the dots that the Reduction Lemma does not remove, the
+four-term identity (Proposition 10.2 below, whose proof is independent of this section).
+
+**Theorem C.** Let `w` be a word in which one colour `c` occurs three times and every other
+colour at most once. Then the tree formula satisfies `d² = 0`.
+
+*Reduction to one step.* Let `a_1 < a_2 < b` be the slots of colour `c`. The prefix `w_{<b}`
+is a T1 word (Theorem B); the letters after `b` have new colours (Theorem A). So it suffices
+to treat `w = w'·c` with `m = b` the last slot. Notation: `A_1, A_2, M` are the strands of
+`a_1, a_2, m`; all other black strands have pairwise different colours `≠ c`. So
+
+> (∗∗) two black strands of the same colour are two of `A_1, A_2, M`.
+
+*The terms.* A pair has colour `c`, a configuration contains at most one pair (two pairs of
+colour `c` are not disjoint), and a pair must be linked to the mover. Hence the terms are:
+
+* in `d'`: `m_j`; and `P_j = (j; (a_1,a_2))` (`a_1 < j < a_2`, `c(j) ∼ c`), from vertices with
+  `a_1 ∉`, `a_2 ∈`, to vertices containing `a_1`;
+* in `F`: `X`; `G^1_j = (j; (a_1, m))` (`a_1 < j < m`, `c(j) ∼ c`, source `∌ a_1`, target
+  `∋ a_1`); `G^2_j = (j; (a_2, m))` (`a_2 < j < m`, `c(j) ∼ c`, source `∌ a_2`, target
+  `∋ a_2`).
+
+A mover `a_1` or `a_2` has no pair (a pair has the colour `c`, and a link needs adjacent
+colours). The diagrams of `X` and of the `m_j` are moves of a single strand and have a
+unique reduced word. Every reduced word of `P_j`, `G^1_j`, `G^2_j` satisfies (S2): by (∗∗) and
+Lemma 6.1 two strands of the same colour cross only in `G^1_j`, namely `M` with `A_2` (if
+`a_2` is on the right) or `A_1` with `A_2` (if `a_2` is on the left); a black strand of
+colour `∼ c` crossing `A_2` is the mover `j` (unaffected strands do not cross each other),
+and `j` crosses neither `A_1` nor `M` (Lemma 6.1 (c)); the red strand does not cross `A_2`.
+So the elements `β(·)` are well defined (Lemma 1.2).
+
+By Proposition 3.3 and the Reduction Lemma 4.5 with `a = a_1` we have to show
+`E_{I',K'} = 0` for `a_1 ∉ K'`. As in (8.1), with `I = I' ∪ m`,
+
+    E_{I',K'} = Σ_{t'} coef'(t') ( ι_R(β(t')) X_{K'} − X_{I'} ι_L(β(t')) )  −  Σ_{(t_1,t_2)} coef(t_1) coef(t_2) β(t_1) β(t_2),        (9A.1)
+
+where `t'` runs through the terms of `d'` from `I'` to `K'` and `(t_1, t_2)` through the
+pairs of consecutive terms of `d` (for `w`, with their coefficients for `w`) from `I` to
+`K'` in which exactly one of the two is of kind (γ) and none is `X` (for the products
+`ι_R(d') F_1` this uses `coef = −coef'`, Lemma 3.2).
+
+*Which contributions exist for `a_1 ∉ K'`.* The terms `P_j` and `G^1_j` start at vertices
+without `a_1` and put `a_1` to the right; the only term that removes `a_1` from the right is
+`m_{a_1}`; `G^2_j` and the `m_{j'}`, `j' ≠ a_1`, do not move `a_1`.
+
+* First sum: `t'` is `m_j` or `P_j`; `P_j` ends at a vertex containing `a_1`. So `t' = m_j`,
+  `K' = I' ∖ j`, and either `j ∈ \{a_1, a_2\}` — **(C1)** — or `j ∉ \{a_1,a_2\}`, `a_1 ∉ I'`
+  — part of **(C3)**.
+* Products containing `P_j`: after `P_j` the slot `a_1` is on the right, and the other
+  factor, of kind (γ), does not remove it. None.
+* Products containing `G^1_j`: it must be followed by `m_{a_1}`: `G^1_j · m_{a_1}`, from
+  `I' ∌ a_1` to `K' = I' ∖ j` — part of **(C3)**.
+* Products of `G^2_j` and `m_{j'}`, in either order:
+  `j' = a_1` (then `a_1 ∈ I'`, `a_2 ∉ I'`, `K' = (I' ∖ \{a_1, j\}) ∪ a_2`) — **(C2)**;
+  `j' = a_2` (then `a_1 ∉ I'`; the order is `m_{a_2} · G^2_j` if `a_2 ∈ I'` and
+  `G^2_j · m_{a_2}` if `a_2 ∉ I'`; `K' = I' ∖ j`) — part of **(C3)**;
+  `j' ∉ \{a_1, a_2\}` (then `a_1, a_2 ∉ I'`, `K' = (I' ∖ \{j, j'\}) ∪ a_2`) — **(C4)**; the
+  same vertex `K'` is reached by `G^2_{j'}` and `m_j` if `G^2_{j'}` exists.
+
+The three kinds of target vertices are different (`K' = I' ∖ j` contains `a_2` iff `I'`
+does; in (C2) `a_1 ∈ I'`; in (C4) `a_1, a_2 ∉ I'` and `a_2 ∈ K'`), so (9A.1) splits into:
+
+* **(C1)** `K' = I' ∖ a_i`: only the term `t' = m_{a_i}` of the first sum;
+* **(C2)** `a_1 ∈ I'`, `a_2 ∉ I'`: the two products `m_{a_1} · G^2_j` and `G^2_j · m_{a_1}`;
+* **(C3)** `a_1 ∉ I'`, `j ∉ \{a_1,a_2\}`, `K' = I' ∖ j`: `t' = m_j` in the first sum, and the
+  products `G^1_j · m_{a_1}` (if `a_1 < j`, `c(j) ∼ c`); `G^2_j · m_{a_2}` (if `a_2 ∉ I'`) or
+  `m_{a_2} · G^2_j` (if `a_2 ∈ I'`) (if `a_2 < j`, `c(j) ∼ c`);
+* **(C4)** `a_1, a_2 ∉ I'`, `K' = (I' ∖ \{j, j'\}) ∪ a_2`: the products `G^2_j · m_{j'}`,
+  `m_{j'} · G^2_j`, and, if also `a_2 < j' < m` and `c(j') ∼ c`, `G^2_{j'} · m_j`,
+  `m_j · G^2_{j'}`.
+
+(The script `05_F3_check.py` verifies independently that this list is complete.)
+
+**(C1).** In a reduced word of `m_{a_i}` the mover is the right strand of all its letters;
+the only black strand of colour `c` that is a left strand is `A_1`, in its crossing with the
+mover `A_2`, whose colour is not adjacent to `c`. No bad letter: the difference vanishes
+(Lemma 2.2).
+
+**(C2).** In `m_{a_1} · G^2_j` and in `G^2_j · m_{a_1}` the strands moved are `A_1` (crossing
+the red strand and the slots `< a_1`), and `j`, `A_2` (from `−a_2` to `−m`), `M` (from `+m` to
+`+a_2`). By Lemma 6.1, `A_1` and `j` cross once (`a_1 < j`), and `A_1` crosses neither `A_2`
+nor `M` (their slots stay `> a_1`). So both words are reduced with the same permutation, no
+two strands of the same colour cross, (S2) is empty, and the two elements are equal (Lemma
+1.2). Coefficients: the monomial is `r_c t_{c,c(j)}` both times, the connector `j` lies in
+the source both times, and by (8.2) the Koszul signs are the coefficients in
+`∂_j s ∂_{a_1} ω_I` and `∂_{a_1} ∂_j s ω_I = −∂_j s ∂_{a_1} ω_I` (`s = s_{(a_2,m)}`). The two
+products cancel.
+
+**(C3).** The reduced word of `m_j` is unique: `j` crosses the right strands of slots `< j`
+(from the largest to the smallest), the red strand, and the left strands of slots `< j` (from
+the smallest to the largest). Its bad letters are the crossings `χ_i` with `A_i`, for `i`
+with `a_i < j`, if `c(j) ∼ c` (the left strand must have colour `c`, and `A_i` is the left
+strand of its crossing with `j`); `γ = r_c t_{c,c(j)}`. If `c(j) ≁ c` there is no bad letter
+and no product. We show `ψ_{E_{χ_i}} = ` (the corresponding product), in three cases.
+
+*`i = 1`.* In `E_{χ_1}`: `j` crosses what it crosses in `m_j` except `A_1`; `M` crosses all
+right strands except `j`, the red strand and the left strands of slots `< a_1`; `A_1` crosses
+the left strands of slots `> a_1`; `M` ends at `−a_1`, `A_1` at `−m`. In `G^1_j · m_{a_1}`:
+`j` crosses the same strands (Lemma 6.1 (b), (c)); `M` crosses the right slots in `(a_1, m)`
+other than `j`, and then, as the mover `a_1`, the right slots `< a_1`, the red strand and the
+left slots `< a_1`; `A_1` crosses the left slots in `(a_1, m)`. Both words are reduced with
+the same permutation. (S2): the crossings of two strands of colour `c` are `(M, A_2)` if
+`a_2 ∈ I'`, and `(A_1, A_2)` if `a_2 ∉ I'`; a black strand of colour `∼ c` crossing `A_2` is
+`j`, which crosses neither `M` nor `A_1` in either word; the red strand does not cross
+`A_2`. Lemma 1.2 gives equality.
+
+*`i = 2`, `a_2 ∉ I'`.* In `E_{χ_2}`: `j` crosses what it crosses in `m_j` except `A_2`; `M`
+crosses all right strands except `j`, the red strand and the left slots `< a_2` (among them
+`A_1`); `A_2` crosses the left slots `> a_2`. In `G^2_j · m_{a_2}`: the same crossings (`M`:
+right slots in `(a_2,m)` other than `j`, then right slots `< a_2`, red, left slots `< a_2`;
+`A_2`: left slots in `(a_2, m)`). Both reduced, same permutation. (S2): the only crossing of
+two strands of colour `c` is `(M, A_1)`; a black strand of colour `∼ c` crossing `A_1` is `j`,
+which does not cross `M`; the red strand does not cross `A_1`. Equality by Lemma 1.2.
+
+*`i = 2`, `a_2 ∈ I'`.* In `E_{χ_2}`: `j` first crosses the right slots in `(a_2, j)`; then `M`
+crosses the right slots `> a_2` other than `j`; `A_2` crosses the right slots `< a_2`, the red
+strand and all left strands (among them `A_1`); `j` continues with the right slots `< a_2`,
+the red strand, the left slots `< j`. In `m_{a_2} · G^2_j`: `A_2` crosses right slots
+`< a_2`, red, left slots `< a_2`, and then, as `L_{(a_2,m)}`, the left slots in `(a_2, m)`;
+`M` crosses the right slots in `(a_2, m)` other than `j`; `j` crosses the right slots `< j`
+(`a_2` is no longer there), red, the left slots `< j` except `A_2`. Both reduced, same
+permutation (`M ↦ +a_2`, `A_2 ↦ −m`). (S2): the only crossing of two strands of colour `c` is
+`(A_2, A_1)`; `j` crosses `A_1` but not `A_2`; the red strand crosses `A_2` but not `A_1`.
+Equality by Lemma 1.2.
+
+*Coefficients.* For `G^i_j · m_{a_i}` (`a_i ∉ I'`): `coef(t_1) coef(t_2) = coef'(m_j) γ` by
+the computation in the proof of Lemma 8.7 (case `𝒯 = ∅`, `F' = ∅`, with `a = a_i`; it uses
+only (8.2)). For `m_{a_2} · G^2_j` (`a_2 ∈ I'`): by (8.2) the Koszul sign is the coefficient in
+`∂_j s_{(a_2,m)} ∂_{a_2} (ω_{I'} ∧ e_m)`. Now `∂_{a_2}(ω_{I'} ∧ e_m) = −(∂_{a_2} ω_{I'}) ∧ e_m`,
+`s_{(a_2,m)}` turns this into `−(∂_{a_2} ω_{I'}) ∧ e_{a_2} = −ω_{I'}` (removing `e_{a_2}` with
+the sign of the entries to its right and appending it at the end restores `ω_{I'}`), and
+`∂_j` gives `−κ'(I'; j, ∅) ω_{K'}`. With the factor `−1` of the connector `j` (which lies in
+the source `I ∖ a_2`): `coef(t_1) coef(t_2) = coef'(m_j) γ`. So in (9A.1) the contributions of
+(C3) cancel: `coef'(m_j) γ (ψ_{E_{χ_1}} + ψ_{E_{χ_2}})` against the two products.
+
+**(C4).** If `j'` satisfies `a_2 < j' < m`, `c(j') ∼ c`: the four products are those of
+Proposition 10.2 for `(a, b) = (a_2, m)`; (H1) holds because no slot between `a_2` and `m` has
+the colour `c`, (H2) because the colours of `j`, `j'` occur once. Their sum with the
+coefficients of the tree formula is zero.
+Otherwise there are two products. The strands moved are `j, A_2, M` in `G^2_j` and `j'` in
+`m_{j'}`. By Lemma 6.1, in both orders: `j, j'` cross once; `A_1` is not crossed by `A_2` or
+`M`; `j'` and `M` cross twice in `G^2_j · m_{j'}` iff `a_2 < j'` (`M` passes the right slot
+`j'`, then `j'` passes the slot `a_2`), `j'` and `A_2` cross twice in `m_{j'} · G^2_j` iff
+`a_2 < j'`, and there are no other double crossings. If `a_2 < j'` then `c(j') ≁ c` (we are
+in the case "otherwise") and `c(j') ≠ c`, so (S1) holds. No two strands of the same colour
+cross, so (S2) is empty. The permutations agree, so the two elements are equal (Lemma 1.2).
+The monomials agree, the connector `j` lies in the source both times, and the Koszul signs
+are the coefficients in `∂_{j'} ∂_j s ω_I` and `∂_j s ∂_{j'} ω_I = −∂_{j'} ∂_j s ω_I`. The two
+products cancel.
+
+So `E_{I',K'} = 0` whenever `a_1 ∉ K'`, and Theorem C follows from Propositions 4.5 and 3.3. ∎
+
+*Check.* `05_F3_check.py A 3 2 13`, `… D 4 2 134`, `… A 4 2 134` (all words of the three
+families, red colour varying): the list (C1)–(C4) is complete; every sliding error word is
+reduced, satisfies (S2) and equals the stated product, with the stated coefficient (2496
+cases); (C2): 416 cases; (C4): 244 two-term and 82 four-term cases; `d² = 0` in all 13 024
+components with `m ∈ I`, `m ∉ K`.
+
+*Remark.* The proof of (C2)–(C4) uses "all other colours once" only through (∗∗) and through
+the list of terms. With other colours occurring twice the trees become larger and (R1)-type
+arguments are needed; this is not done.
+
+---
+
 ## 10. Beyond colour multiplicity two (target (T2)): what carries over, what the data say, what remains
 
 Notation: `w = w'·c` is an arbitrary word without cyclic configurations, the colour `c` occurs
@@ -1164,7 +1335,7 @@ implied by the verification of `d² = 0` in `PROOFS.md` section 3 and `general_w
 
 ## 11. Status
 
-### Proved completely (human-checkable, using only (R1)–(R4), (F1) incl. its right-module form, (F2) is not needed, (F3))
+### Proved completely (human-checkable; inputs: (R1)–(R4) with the signs of the README, (F1) in its left and right module forms, (F3))
 
 | statement | generality | checked by |
 |---|---|---|
@@ -1178,6 +1349,7 @@ implied by the verification of `d² = 0` in `PROOFS.md` section 3 and `general_w
 | Lemmas 8.1–8.7, Proposition 8.8, **Theorem B** (`d² = 0` if every colour occurs at most twice) | T1 words, any `Γ` that is a forest, any red colour | `05_T1_check.py` |
 | Corollary 9.1 (one repeated colour), 9.2 (`sl_n` `ω_1, ω_2`; `so_{2n}` vector; `D_4`) | | |
 | Proposition 10.2 (four-term bigon identity under (H1), (H2)) | arbitrary words | `05_fourterm.py` |
+| **Theorem C** (one colour three times, all others at most once), section 9A | | `05_F3_check.py` |
 
 Inputs taken from elsewhere: the list of relations with signs (README, `alg.py`); Lemma 6.1 =
 items 1–6 of the proof of Proposition 3 of `PROOFS.md`; (F1) in both forms (free left and free
@@ -1208,8 +1380,8 @@ see the list at the end of this section (filled in from the final runs).
 
 ### Not proved
 
-* Conjecture C1′ for words in which some colour occurs at least three times. Precisely: the
-  items 1–3 of 10.5.
+* Conjecture C1′ for words in which some colour occurs at least three times, beyond the
+  family of Theorem C. Precisely: the items 1–3 of 10.5.
 * (R1).
 * The four-term identity when (H2) fails (twin movers, or a mover crossing a strand of its
   own colour) or for larger trees.
@@ -1222,10 +1394,6 @@ See 10.6.
 
 * README, "Cone structure": correct, with the signs of Lemma 3.2 (`−d'` on `C_R`, `+1` for
   `X_m`).
-* The sketch "first-order cancellation" in `PROOFS.md` §4 (C1) says that the red strand is
-  never the middle strand "because both moving strands start on its right"; the precise
-  statement is Remark (1) after Lemma 2.2 (a bad letter needs a black strand of colour `c` as
-  its **left** strand; a mover is always the right strand of its crossings).
 * For general words a tree diagram can violate (S2) (warning after Lemma 6.2); this does not
   contradict the observed independence of the reduced word, but the strong Straightening
   Lemma 1.2 does not prove it.

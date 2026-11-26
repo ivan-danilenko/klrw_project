@@ -1,0 +1,21 @@
+$ sage -python 05_T1_check.py D 4 all 7 8 60 1
+length 7: 60 words done [44s]
+length 8: 60 words done [187s]
+T1 checks passed for 120 words of type ['D', 4]
+   (I1) exact slides                             6161
+   E = product, with coefficient                 4984
+   E diagrams with 0 double crossings            4597
+   E diagrams with 1 double crossings            373
+   E diagrams with 2 double crossings            14
+   [9] m_a m_a^* = P                             5408
+   chain map components                          49289
+   families with k = 0                           4984
+   families with k = 1                           292
+   families with k = 2                           11
+   frozen terms without bad letter               11720
+   new colour: exact slides                      2338
+   products with 0 double crossings              5485
+   products with 1 double crossings              122
+   products with 2 double crossings              5
+   tree terms                                    100621
+exit code 0

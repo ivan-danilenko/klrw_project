@@ -1,0 +1,3 @@
+$ sage -python 05_closure.py D 4 2 25 7 dots-a1 6
+type ['D', 4], N = 2, mode dots-a1: 25 words; 102 hard components, 0 of them not deducible; 0 words with a remainder
+exit code 0

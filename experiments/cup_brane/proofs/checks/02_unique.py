@@ -1,11 +1,11 @@
 """
-Uniqueness of the gluing maps (proofs/02_omega1_ibrane.md, Theorem 7.5), checked by linear
+Uniqueness of the gluing maps (proofs/02_omega1_ibrane.md, Theorem 7.3), checked by linear
 algebra in the R-model, pure Python.
 
     python3 proofs/checks/02_unique.py N_MAX
 
 For every k = 1..n: unknown integers c_t, one for every gluing term t of the formula out of the
-envelope S_k (all target envelopes l < k).  By Corollary 7.3 every homogeneous map S_k -> C_{k-1}
+envelope S_k (all target envelopes l < k).  By Corollary 7.2 every homogeneous map S_k -> C_{k-1}
 of the degree of the differential is  sum_t c_t * t  (and there are no homotopies).  It is a chain
 map  S_k -> C_{k-1}  (C_{k-1} = the formula on S_0 .. S_{k-1}) iff the components out of S_k of
 (delta_{<k} + d_k + sum_t c_t t)^2 vanish.  We solve this linear system over Q in the R-model with

@@ -1,0 +1,4 @@
+$ sage -python 05_closure.py D 4 2 25 7 dots 6
+   1422332 : hard 16 , not deducible 16 , e.g. [([5, 6], [3]), ([5, 6], [4])]
+type ['D', 4], N = 2, mode dots: 25 words; 110 hard components, 16 of them not deducible; 1 words with a remainder
+exit code 0

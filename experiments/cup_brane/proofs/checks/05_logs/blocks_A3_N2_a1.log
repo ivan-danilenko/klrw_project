@@ -1,1 +1,29 @@
 $ sage -python 05_blocks_general.py A 3 2 80 8 3 a1
+type ['A', 3], N = 2, 80 non-cyclic words of length <= 8: equation (*) holds in all components
+   (statistics restricted to the components with a_1 not in K')
+   E: 0                                          109
+   E: 1 diagram                                  2894
+   E: >1 diagrams                                36
+   cancellation groups of size 2                 4931
+   cancellation groups of size 4                 160
+   cancellation groups of size 6                 28
+   product F1*d': 0                              288
+   product F1*d': 1 diagram                      4125
+   product F1*d': >1 diagrams                    448
+   product F1*d': coefficient with dots          352
+   product d'*F1: 0                              175
+   product d'*F1: 1 diagram                      1942
+   product d'*F1: >1 diagrams                    287
+   product d'*F1: coefficient with dots          352
+   terms of d' with 0 bad letters                6597
+   terms of d' with 1 bad letters                1419
+   terms of d' with 2 bad letters                810
+   status of a_1..a_N in I' / in K' :  clean components, dirty components
+      ++ / -+ :    102      7
+      +- / -+ :    252    288
+      +- / -- :    102      7
+      -+ / -+ :    966    135
+      -+ / -- :      0    109
+      -- / -+ :    411    199
+      -- / -- :   1006     95
+exit code 0

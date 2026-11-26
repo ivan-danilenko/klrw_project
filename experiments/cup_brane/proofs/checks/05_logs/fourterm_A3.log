@@ -1,1 +1,3 @@
 $ sage -python 05_fourterm.py A 3 40 7 1
+four-term identity (Prop. 10.2), type ['A', 3]: 40 words, 160 cases (40 of them with a further slot of colour c below a), all four products as predicted, sum zero
+exit code 0

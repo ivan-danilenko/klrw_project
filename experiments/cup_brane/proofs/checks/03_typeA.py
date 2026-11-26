@@ -91,7 +91,7 @@ def main(BOX):
         exp = contains(lam, hexa)
         assert cyc == exp, (lam, cyc)
         if not exp:
-            assert max(Counter(col).values(), default=0) <= 3, lam       # Lemma A.1
+            assert max(Counter(col).values(), default=0) <= 3, lam       # Lemma 3.2
         else:
             j, F = prop8_config(lam)
             assert W.is_cyclic_config(j, F), lam

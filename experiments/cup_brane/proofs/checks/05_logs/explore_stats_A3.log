@@ -1,0 +1,16 @@
+$ sage -python 05_explore_stats.py A 3 3 6 T1
+length 3 words 24 [0s]
+length 4 words 54 [1s]
+length 5 words 90 [6s]
+length 6 words 90 [20s]
+(I,K) ok                                           33230
+pattern (2, 2)                                     5404
+pattern (2, 2, 4)                                  34
+pattern (2, 4)                                     418
+pattern (2,)                                       27236
+pattern (4, 8)                                     4
+pattern (4,)                                       134
+products                                           73164
+products with 1 basis terms                        66876
+products with 2 basis terms                        6288
+exit code 0
