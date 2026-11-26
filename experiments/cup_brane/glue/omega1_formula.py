@@ -63,7 +63,7 @@ def coefficient(n, v, tag):
     return {key: val for key, val in c.items() if val}
 
 if __name__ == "__main__":
-    for n in (2, 3, 4, 5):
+    for n in (2, 3, 4, 5, 6):
         d, P, V, terms = load(n)
         actual = {(t[0], t[1]): (t[3], {a: b for a, b in t[2].items() if b}) for t in terms}
         bad_sign = bad_coef = 0; count = 0
