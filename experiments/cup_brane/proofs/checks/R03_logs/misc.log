@@ -1,0 +1,12 @@
+(4, 4, 4, 4): 6 cyclic, 6 minimal; minimal not tadpole: 0; tadpole not minimal: 0; (cycle length, tail length): [((4, 0), 2), ((4, 1), 4)]
+(5, 5, 5, 5): 88 cyclic, 32 minimal; minimal not tadpole: 0; tadpole not minimal: 0; (cycle length, tail length): [((4, 0), 8), ((4, 1), 8), ((4, 2), 6), ((4, 3), 2), ((6, 0), 4), ((6, 1), 4)]
+(6, 5, 5, 5): 88 cyclic, 32 minimal; minimal not tadpole: 0; tadpole not minimal: 3; (cycle length, tail length): [((4, 0), 8), ((4, 1), 8), ((4, 2), 6), ((4, 3), 2), ((6, 0), 4), ((6, 1), 4)]
+6-cycle example: analyse = (False, 6, True)  degrees: [2, 2, 2, 2, 2, 2]  tadpole/cycle: (True, (6, 0))
+6x6 box: cyclic 362, with T 362, with B 262, with N 162
+A9 omega_5: 252 weights; Lemma 2.12 violations 0; Lemma 2.14 violations 0; B at a first occurrence 0; Cor 2.13 disagreements 0
+A11 omega_6: 924 weights; Lemma 2.12 violations 0; Lemma 2.14 violations 0; B at a first occurrence 0; Cor 2.13 disagreements 0
+D9 omega_9: 256 weights; Lemma 2.12 violations 0; Lemma 2.14 violations 0; B at a first occurrence 0; Cor 2.13 disagreements 0
+D9 omega_1: 18 weights; Lemma 2.12 violations 0; Lemma 2.14 violations 0; B at a first occurrence 0; Cor 2.13 disagreements 0
+E6 omega_1: 27 weights; Lemma 2.12 violations 0; Lemma 2.14 violations 0; B at a first occurrence 0; Cor 2.13 disagreements 0
+E6 omega_6: 27 weights; Lemma 2.12 violations 0; Lemma 2.14 violations 0; B at a first occurrence 0; Cor 2.13 disagreements 0
+E7 omega_7: 56 weights; Lemma 2.12 violations 0; Lemma 2.14 violations 0; B at a first occurrence 0; Cor 2.13 disagreements 0

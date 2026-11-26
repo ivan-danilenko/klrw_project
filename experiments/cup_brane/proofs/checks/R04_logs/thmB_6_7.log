@@ -1,0 +1,1 @@
+Theorem B (exact, with X_y built from Lemma 4.5; and mod r^2 with my own reduced word): words 66 failures 0 {'components': 9851, 'zero components': 8413, 'bad triples': 2232, 'X_y == my bubble word exactly': 2232, 'nonzero components': 1438} [49s]

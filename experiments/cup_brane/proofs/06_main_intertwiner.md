@@ -21,7 +21,7 @@ same-colour crossings replaced by the intertwiner `φ = (x_1 − x_2)ψ − r_c`
 1. **[proved]** `d_Φ² = 0` for every word, and the moves `Φ_j` are natural (they slide through
    every element of the algebra of the earlier strands, red strand included). Both follow
    from one statement: the generators "`ψ` for different colours, `φ` for equal colours"
-   satisfy the braid relations *exactly* (Lemma 2.2), so products of them depend only on the
+   satisfy the braid relations *exactly* (Lemma 2.3), so products of them depend only on the
    permutation of the *labelled* strands, and double crossings multiply by explicit
    polynomials (the *labelled calculus*, §3).
 2. **[proved]** If a triangular map `G : C_Φ → C` with non-zero polynomials on the diagonal
@@ -60,10 +60,13 @@ same-colour crossings replaced by the intertwiner `φ = (x_1 − x_2)ψ − r_c`
    the true differential exactly**, including the dotted terms, the coefficient 2 and the
    hand-over terms; for red 2 it equals the differential computed independently by the
    first-order front (`04_data/cyclic7_1221122_W2_tree.json`), in all components.
-   *Iterated division* (§8.5) starting from `d_Φ` therefore defines the differential without
-   reference to the tree formula; it was exact on every word tested (cycle-free and
-   cyclic, table in §8.5). What is missing is a proof, and a term-by-term description of
-   the quotient in the cyclic case.
+   The same holds for `2132213` (`A_3`, red 2; there the comparison map is unique outright).
+   *Iterated division* (§8.5) starting from `d_Φ` thus defines the differential without
+   reference to the tree formula, as long as the prefix is cycle-free. **It fails one step
+   later**: for the 8-strand word `12211221`, whose prefix is cyclic, the division at the
+   last step is not exact with the same formula for `h` (18 components). What is missing: a
+   proof; the correction of `h` after a cyclic step; a term-by-term description of the
+   quotient.
 
 Conventions fixed here: `φ = (x_1 − x_2)ψ − r` with the dots *before* the crossing (README);
 consequently the diagonal of `G` is `ζ_I = ∏_{x∈I} ∏_{i<x, c(i)=c(x)} (x_i − x_x)`, which is
@@ -942,20 +945,33 @@ was verified again):
 | `A_2` red 2 `1221122` | yes | exact; `d_m` = the differential `04_data/cyclic7_1221122_W2_tree.json` computed by the first-order front, in all components (`06_compare_04.py`) |
 | `A_2` red 2 `2211221` | yes | exact; `d_m² = 0`; 3 components differ from the tree formula |
 | `A_3` red 1 `1322312` (one step, `06_divide.py`) | yes | exact; `d² = 0`; 3 components differ from the tree formula (§8.6) |
-RESULTS_8_5_MORE
+| `A_3` red 2 `2132213` (the minimal cyclic configuration with two different neighbouring colours: mover 5 and pair `(1,4)` of colour 2, pairs `(2,6)`, `(3,7)` of colours 1, 3; here `H⁺ = H`) | yes | exact; `d_m` = the corrected differential computed by `06_cyclic_true_d.py` (616 terms), in all components. It is the tree formula plus the component `{4,5,6,7} → {1,2,3}`: `r_1r_2r_3t_{12}t_{32}·(t_{12}t_{23}(x_{1,1}+x_{1,2}) + t_{21}t_{23}(x_{2,1}+x_{2,2}+2x_{2,3}) + t_{21}t_{32}(x_{3,1}+x_{3,2}))·[(1 4)(2 6)(3 7)]` and the hand-over term `r_1r_2²r_3t_{12}t_{21}t_{23}t_{32}·[(1 5 4)(2 6)(3 7)]`. For this word the comparison map is unique outright: the space of chain maps `Cone(Φ_7) → (C, d_true)` is 1-dimensional and there are no homotopies (`06_cyclic_homotopy.py`) |
+| `A_2` red 1 `12211221` (8 strands; the prefix `1221122` is already cyclic) | yes | steps 1–7 exact (they are the word `1221122`); **step 8 is not exact: 18 components are not divisible** (17 minutes) |
+| `A_2` red 1 `12211212` (8 strands, cycle-free prefix `1221121`; one step, `06_divide.py … plus`) | yes | not completed (stopped after 27 minutes) |
 
 On cycle-free words the formula `H⁺` passes the same tests as the formula of Conjecture H
 (`06_check_step_formula.py … plus` on the samples `A 3 random 40 7 3 11`,
 `A 2 random 30 7 4 3`, `D 4 random 40 7 3 7`: all cycle-free words hold), so `H⁺` can
 replace `H` in Conjecture H.
 
-**Conjecture H⁺.** For every word, iterated division with the formula `H⁺` is exact. (Then
-`d_m` is a differential on the cube, `d_m = G^{-1}d_ΦG`; for cycle-free words it is the tree
-formula.)
+**Conjecture H⁺.** If the prefix `w′` has no cyclic configuration, then
+`Φ_m − (d′⊗1)h⁺ − h⁺(1⊗d′)` is divisible by `ζ_m` (`d′` the tree differential of `w′`, `h⁺` of
+Definition 8.1), and the quotient `F` completes `d′` to the differential of the cube of `w`
+(by Proposition 5.2 it does give a differential); it is the tree formula iff `w` has no
+cyclic configuration.
 
-The evidence in the cyclic case is the handful of words above; in particular I have no
-example with two independent cycles, and none in which a cyclic configuration needs a
-chain of length 3.
+**This does not extend as it stands to words with a cyclic prefix**: for `12211221` the
+division at step 8, with `d_7` the (true) differential of the cyclic prefix and the same
+formula `h_8⁺`, fails in 18 components. Presumably `h` needs further terms attached to the
+cyclic configurations of the prefix (as `d′` then contains dotted and hand-over terms); I
+did not determine them. So the statement "the true differential is `G^{-1}d_ΦG`" is
+established in the cyclic case only at the first cyclic step, and a formula for `G` beyond
+it is open.
+
+The evidence in the cyclic case is the 7-strand words above (five words; four of them
+with a non-trivial comparison, three of which reproduce an independently computed
+differential exactly). I have no example with two independent cycles and none in
+which a cyclic configuration needs a chain of length 3.
 
 ### 8.6 The example `1322312` (`A_3`, red 1)
 
@@ -974,8 +990,8 @@ three slots, so `H⁺ = H`: the plain formula of Conjecture H is used) — divis
     {4,5,6,7} → {1,2,4}:  (1 6)(2 5)(3 7 4),  − r_1r_2²r_3 t_{12}t_{21}t_{23}t_{32}
 
 again a dotted term with a coefficient 2 and two hand-over terms, of the shape described in
-`NOTES.md` §6 (a different, gauge-equivalent representative of the true differential than
-the solver's).
+`NOTES.md` §6. (The solver's output is another solution of `d² = 0`; I did not construct the
+change of basis relating the two.)
 
 ---
 ## 9. Consequences for the homology
@@ -1075,18 +1091,19 @@ to the statements).
   colour occurring three times (§7.1).
 * Conjecture H (closed form of the one-step maps, any multiplicity): 168 cycle-free words,
   up to 10 strands, including `A_5ω_3` and the spinor of `D_5` (§7.2).
-* Cyclic case (§8): existence and uniqueness up to homotopy of the comparison map for
-  `1221122`; the formula `H⁺`; exactness of the division and equality of the quotient with
-  the true differential (`1221122`), resp. `d² = 0` of the quotient (the other cyclic words
-  of §8.5–8.6).
+* Cyclic case (§8): existence and uniqueness (up to homotopy) of the comparison map for
+  `1221122` and `2132213`; the formula `H⁺`; exactness of the division at the first cyclic
+  step and equality of the quotient with an independently computed true differential
+  (`1221122` red 1 and red 2, `2132213`), resp. `d² = 0` of the quotient (`2211221`, `1322312`).
 
 ### Open
 
 * A proof of Conjecture H (hence of C1′) for words with a colour occurring three or more
   times. §7.3 says what is missing.
-* Whether iterated division with `H⁺` is exact for every word (§8.5 lists what was tested),
-  and a closed formula for the quotient in the cyclic case (the dotted and hand-over terms
-  are *produced* by the division; they are not yet *described* term by term).
+* Conjecture H⁺ (division at the first cyclic step), and the correct `h` after a cyclic
+  step, where `H⁺` is known to be insufficient (`12211221`, §8.5); a closed formula for
+  the quotient in the cyclic case (the dotted and hand-over terms are *produced* by the
+  division; they are not yet *described* term by term).
 * Whether `C` is a resolution over `R` (no `Δ`-torsion in the higher homology), §9.
 * The other-direction map `G′ : C → C_Φ` (diagonal `∏_{x∉I} ζ_x`) was not studied.
 
@@ -1102,7 +1119,8 @@ to the statements).
   maps (the bigon factors differ on the two sides); so `C` is not obtained as a
   symmetrisation of `C_Φ` in an obvious way.
 * The tree-only formula for `h` (Conjecture H) is wrong in the cyclic case (division fails
-  in 21 components for `1221122`); `H⁺` repairs this in the examples tested.
+  in 21 components for `1221122`); `H⁺` repairs this at the first cyclic step in the
+  examples tested, but is itself insufficient at the step after a cyclic one (`12211221`).
 * In the brief, `z = ∏(x_m − x_y)` and `Fz`: with `φ = (x_1−x_2)ψ − r` the correct statement
   is `Φ = ζ_m F + h(1⊗d′) + (d′⊗1)h` with `ζ_m = ∏(x_y − x_m)` on the **source** side of `F`
   (`ζ_m` does not commute with `F`: an exchange of the pair `(a, m)` changes the sign of

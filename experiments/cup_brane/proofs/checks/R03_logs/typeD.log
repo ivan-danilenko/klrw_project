@@ -1,0 +1,15 @@
+D_4 half-spin: full word = words.json D4_w4: True; chain-word heaps unique: True; model hits all 8 weights bijectively: True; {'ideals': 8, 'cyclic': 0, 'disagree': 0, 'pat_disagree': 0, 'not_chain': 0, 'mult_fail': 0, 'heap_mismatch': 0}; order mismatches 0 (0.0s)
+   D_4 vector: 8 weights, max colour multiplicity 2, cyclic 0
+   D_4 omega_3: max multiplicity 2
+   D_4 omega_4: max multiplicity 2
+D_5 half-spin: full word = words.json D5_w5: True; chain-word heaps unique: True; model hits all 16 weights bijectively: True; {'ideals': 16, 'cyclic': 0, 'disagree': 0, 'pat_disagree': 0, 'not_chain': 0, 'mult_fail': 0, 'heap_mismatch': 0}; order mismatches 0 (0.0s)
+   D_5 vector: 10 weights, max colour multiplicity 2, cyclic 0
+D_6 half-spin: full word = words.json D6_w6: True; chain-word heaps unique: True; model hits all 32 weights bijectively: True; {'ideals': 32, 'cyclic': 3, 'disagree': 0, 'pat_disagree': 0, 'not_chain': 0, 'mult_fail': 0, 'heap_mismatch': 0}; order mismatches 0; minimal cyclic ideals [(5, 4, 3, 1)] (|I|=13), mu_c fund=(0, 0, -1, 1, -1, 0) eps=1/2(---+-+), content [1, 2, 3, 3, 2, 2] (0.0s)
+   D_6 vector: 12 weights, max colour multiplicity 2, cyclic 0
+   D_6: ideals cyclic ignoring blocks but not cyclic: [(10, (4, 3, 2, 1)), (11, (5, 3, 2, 1)), (12, (5, 4, 2, 1)), (12, (5, 4, 3))]
+D_7 half-spin: full word = words.json D7_w7: True; chain-word heaps unique: True; model hits all 64 weights bijectively: True; {'ideals': 64, 'cyclic': 16, 'disagree': 0, 'pat_disagree': 0, 'not_chain': 0, 'mult_fail': 0, 'heap_mismatch': 0}; order mismatches 0; minimal cyclic ideals [(5, 4, 3, 1)] (|I|=13), mu_c fund=(1, 0, 0, -1, 1, -1, 0) eps=1/2(+---+-+), content [0, 1, 2, 3, 3, 2, 2] (0.1s)
+   D_7 vector: 14 weights, max colour multiplicity 2, cyclic 0
+D_8 half-spin: full word = words.json D8_w8: True; chain-word heaps unique: True; model hits all 128 weights bijectively: True; {'ideals': 128, 'cyclic': 54, 'disagree': 0, 'pat_disagree': 0, 'not_chain': 0, 'mult_fail': 0, 'heap_mismatch': 0}; order mismatches 0; minimal cyclic ideals [(5, 4, 3, 1)] (|I|=13), mu_c fund=(0, 1, 0, 0, -1, 1, -1, 0) eps=1/2(++---+-+), content [0, 0, 1, 2, 3, 3, 2, 2] (0.5s)
+   D_8 vector: 16 weights, max colour multiplicity 2, cyclic 0
+D_9 half-spin: full word = words.json D9_w9: None; chain-word heaps unique: True; model hits all 256 weights bijectively: True; {'ideals': 256, 'cyclic': 148, 'disagree': 0, 'pat_disagree': 0, 'not_chain': 0, 'mult_fail': 0, 'heap_mismatch': 0}; order mismatches 0; minimal cyclic ideals [(5, 4, 3, 1)] (|I|=13), mu_c fund=(0, 0, 1, 0, 0, -1, 1, -1, 0) eps=1/2(+++---+-+), content [0, 0, 0, 1, 2, 3, 3, 2, 2] (1.5s)
+   D_9 vector: 18 weights, max colour multiplicity 2, cyclic 0

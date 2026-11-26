@@ -1,0 +1,2 @@
+Theorem C: words 44, words with a failing vertex 0, {'products': 17728, 'vertices': 1235, 'words with delta0^2 != 0 mod r^2': 30} [60s]
+Theorem C (NEGATIVE CONTROL: one-pair signs flipped): words 20, words with a failing vertex 17, {'products': 2623, 'vertices': 200, 'words with delta0^2 != 0 mod r^2': 17} [8s]

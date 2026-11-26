@@ -1,0 +1,7 @@
+A_7 omega_4: 70 weights; non-Deodhar ideal sizes [15, 16]; cyclic ideal sizes [15, 16]; weights where the two differ: []  (2.2s)
+A_7 omega_3: 56 weights; non-Deodhar ideal sizes []; cyclic ideal sizes []; weights where the two differ: []  (1.3s)
+D_6 half-spin: 32 weights; non-Deodhar ideal sizes [13, 14, 15]; cyclic ideal sizes [13, 14, 15]; weights where the two differ: []  (0.8s)
+D_6 vector: 12 weights; non-Deodhar ideal sizes []; cyclic ideal sizes []; weights where the two differ: []  (0.1s)
+E_6 omega_1: 27 weights; non-Deodhar ideal sizes [13, 14, 15, 16]; cyclic ideal sizes [14, 15, 16]; weights where the two differ: [(13, '1342543165423', 'non-Deodhar', 'not cyclic')]  (1.2s)
+D_7 half-spin: 64 weights; non-Deodhar ideal sizes [13, 14, 14, 15, 15, 15, 16, 16, 16, 17, 17, 18, 18, 19, 20, 21]; cyclic ideal sizes [13, 14, 14, 15, 15, 15, 16, 16, 16, 17, 17, 18, 18, 19, 20, 21]; weights where the two differ: []  (17.4s)
+E_7 omega_7: 56 weights; non-Deodhar ideal sizes [14, 15, 15, 16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 25, 26, 27]; cyclic ideal sizes [15, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 25, 26, 27]; weights where the two differ: [(14, '76542314354265', 'non-Deodhar', 'not cyclic'), (15, '765423143542657', 'non-Deodhar', 'not cyclic'), (16, '7654231435426576', 'non-Deodhar', 'not cyclic')]  (119.7s)

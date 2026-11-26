@@ -1,0 +1,26 @@
+RESULT reduction (T1 words, maxlen 7, seed 7) [393s]
+   coboundary: perturbations                                                        120
+   control: (E != 0, non-first slot)                                                852
+   control: all non-zero components have the non-first slot in K'                   30
+   drop all of F_1: (E != 0, first-occurrence slot) violation seen with a notin K'  80
+   drop all of F_1: E != 0                                                          26
+   drop all of F_1: perturbations                                                   26
+   drop: (E != 0, first-occurrence slot) violation seen with a notin K'             334
+   drop: E != 0                                                                     98
+   drop: perturbations                                                              98
+   flip: (E != 0, first-occurrence slot) violation seen with a notin K'             334
+   flip: E != 0                                                                     98
+   flip: perturbations                                                              98
+   random-1: (E != 0, first-occurrence slot) violation seen with a notin K'         698
+   random-1: E != 0                                                                 235
+   random-1: E = 0                                                                  5
+   random-1: perturbations                                                          240
+   random-a: (E != 0, first-occurrence slot) violation seen with a notin K'         1128
+   random-a: E != 0                                                                 354
+   random-a: perturbations                                                          354
+   swap-t: (E != 0, first-occurrence slot) violation seen with a notin K'           334
+   swap-t: E != 0                                                                   98
+   swap-t: perturbations                                                            98
+   unperturbed: E = 0                                                               40
+   unperturbed: perturbations                                                       40
+   words                                                                            40

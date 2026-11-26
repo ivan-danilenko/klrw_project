@@ -1,0 +1,3 @@
+straighten {'1.2 cases': 1310, '1.2 non-reduced': 624, '1.3 cases': 703, '1.4 cases': 771, 'hyp. violated': 2690, "hyp. violated and psi_D != psi_D'": 2603}
+sliding {'2.2 cases': 4000, 'bad letters': 2280}
+lemma42 {'4.2 cases (first occurrence)': 5018, 'not first occurrence': 2982, 'not first: mu mu^* != P': 2982}

@@ -1,0 +1,17 @@
+  ... 200 / 639 [20s]
+  ... 400 / 639 [42s]
+  ... 600 / 639 [97s]
+RESULT all A3: 639 (word, red) cases, no assertion failed [104s]
+   3.2 vertices                                  13122
+   8.1 cases                                     7185
+   8.3 frozen terms                              12228
+   8.3 with a bad letter                         4164
+   8.4 data with k=0                             4164
+   8.4 data with k=1                             132
+   8.4 pairs (t1,t2)                             4428
+   8.5 products with 0 double crossings          4362
+   8.5 products with 1 double crossings          66
+   8.6 cases                                     4164
+   8.7 (T empty) cases                           4164
+   E components computed                         36135
+   E components with a notin K'                  19545

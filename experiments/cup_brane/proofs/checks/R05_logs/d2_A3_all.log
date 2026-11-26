@@ -1,0 +1,2 @@
+  ... 500 / 801 (word, red) cases, 52944 products, 0 failures [24s]
+RESULT all A3 len 2..6 mult<=2 reds=all: 801 (word, red) cases, 219546 products, 0 FAILURES [85s]

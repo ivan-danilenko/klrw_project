@@ -1,0 +1,27 @@
+RESULT reduction (any words, maxlen 6, seed 8) [179s]
+   coboundary: perturbations                                                        120
+   control: (E != 0, non-first slot)                                                1313
+   control: all non-zero components have the non-first slot in K'                   169
+   drop all of F_1: (E != 0, first-occurrence slot) violation seen with a notin K'  44
+   drop all of F_1: E != 0                                                          18
+   drop all of F_1: perturbations                                                   18
+   drop: (E != 0, first-occurrence slot) violation seen with a notin K'             222
+   drop: E != 0                                                                     89
+   drop: perturbations                                                              89
+   flip: (E != 0, first-occurrence slot) violation seen with a notin K'             222
+   flip: E != 0                                                                     89
+   flip: perturbations                                                              89
+   random-1: (E != 0, first-occurrence slot) violation seen with a notin K'         543
+   random-1: E != 0                                                                 234
+   random-1: E = 0                                                                  6
+   random-1: perturbations                                                          240
+   random-a: (E != 0, first-occurrence slot) violation seen with a notin K'         684
+   random-a: E != 0                                                                 276
+   random-a: perturbations                                                          276
+   swap-t: (E != 0, first-occurrence slot) violation seen with a notin K'           220
+   swap-t: E != 0                                                                   88
+   swap-t: E = 0                                                                    1
+   swap-t: perturbations                                                            89
+   unperturbed: E = 0                                                               40
+   unperturbed: perturbations                                                       40
+   words                                                                            40

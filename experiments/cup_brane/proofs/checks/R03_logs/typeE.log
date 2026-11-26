@@ -1,0 +1,20 @@
+E_6 omega_1: 27 weights (one heap per weight: True); cyclic 3; three methods agree: True; cyclic set = up-set of minimal True; reach-vs-weight-order mismatches 0; max multiplicity of non-cyclic 3  (0.0s)
+   minimal cyclic ideal: 14 slots, word 13425431654234, mu_c (fund. coords) (0, 0, 0, -1, 1, 0), omega-mu_c = [2, 2, 3, 4, 2, 1]
+   I_c: 5 cyclic configurations, 2 inclusion-minimal:
+      mover 6 (c4), pairs [(2, 13, 'c3'), (4, 12, 'c2'), (11, 14, 'c4')] -> {'B'}
+      mover 10 (c5), pairs [(2, 7, 'c3'), (3, 14, 'c4'), (6, 11, 'c4')] -> {'N'}
+   I_c: three-pair cyclic configurations: 2, types [('B',), ('N',)]
+   13-slot ideal (0, -1, -1, 1, 0, 0) word 1342543165423: cyclic False
+   E_6 omega_1: sizes of ideals cyclic ignoring blocks but not cyclic: [11, 12, 13]
+E_6 omega_6: 27 weights (one heap per weight: True); cyclic 3; three methods agree: True; cyclic set = up-set of minimal True; reach-vs-weight-order mismatches 0; max multiplicity of non-cyclic 3  (0.0s)
+   minimal cyclic ideal: 14 slots, word 65423143542654, mu_c (fund. coords) (0, 0, 1, -1, 0, 0), omega-mu_c = [1, 2, 2, 4, 3, 2]
+   I_c: 5 cyclic configurations, 2 inclusion-minimal:
+      mover 7 (c4), pairs [(2, 13, 'c5'), (4, 11, 'c2'), (10, 14, 'c4')] -> {'B'}
+      mover 8 (c3), pairs [(2, 9, 'c5'), (3, 14, 'c4'), (7, 10, 'c4')] -> {'N'}
+   I_c: three-pair cyclic configurations: 2, types [('B',), ('N',)]
+E_7 omega_7: 56 weights (one heap per weight: True); cyclic 22; three methods agree: True; cyclic set = up-set of minimal True; reach-vs-weight-order mismatches 0; max multiplicity of non-cyclic 3  (58.8s)
+   minimal cyclic ideal: 15 slots, word 765423143542654, mu_c (fund. coords) (0, 0, 1, -1, 0, 0, 1), omega-mu_c = [1, 2, 2, 4, 3, 2, 1]
+   I_c: 5 cyclic configurations, 2 inclusion-minimal:
+      mover 8 (c4), pairs [(3, 14, 'c5'), (5, 12, 'c2'), (11, 15, 'c4')] -> {'B'}
+      mover 9 (c3), pairs [(3, 10, 'c5'), (4, 15, 'c4'), (8, 11, 'c4')] -> {'N'}
+   I_c: three-pair cyclic configurations: 2, types [('B',), ('N',)]
