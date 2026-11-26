@@ -182,6 +182,15 @@ So there are three "seeds": `(A_7, ω_4)`, `(D_6, half-spin)`, `(E_6, 27)`; in e
 weights are only the lowest two or three weights of the representation, and every larger
 case contains one of the seeds on a sub-diagram.
 
+**Relation to Deodhar elements.** In types A and D the cyclic weights are exactly the
+weights whose minuscule element is *not* Deodhar (Billey–Warrington's 321-hexagon avoidance;
+Billey–Jones's minimal patterns on `A_7`, `D_6`, `E_6`): the hexagon heap is (4,4,4,3) minus a
+corner. In type E the two notions differ: the 13-slot ideal of `E_6` is non-Deodhar but has
+no cyclic configuration, and there the tree formula is a homogeneous differential with
+`d² = 0` on the full complex (8192 vertices, 86 376 terms, `verify.py E 6 1 min 13`), and
+passes 400 random vertices for the other `E_6` weight **[verified]**. See
+`reports/KLR resolutions trees bigons Demazure.md`.
+
 For `sl_n`, `Λ^k ℂ^n` with basis `e_S`, `S = {s_1 < … < s_k}`: `e_S` is cyclic if and only if
 the Young diagram of `S` contains the shape (4,4,4,3) — the 4×4 square without its corner —
 i.e. `s_{k−2} ≥ k+2` and `s_{k−3} ≥ k` **[verified for all subsets, `sl_8 … sl_10`]**.
