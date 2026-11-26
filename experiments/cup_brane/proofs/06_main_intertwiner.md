@@ -902,6 +902,8 @@ In the example: chain `(2, 3)`, forest `{(1,4), (3,6)}` (resp. `{(1,5), (3,6)}`)
 `(−r_2)²·(x_6 − x_7)·r_1t_{12}·r_2t_{21}` — the four terms of §8.2, with their signs. Such a
 forest contains a pair of the colour of the chain attached, through a pair of an adjacent
 colour, to the chain: three nodes of colours `c, c′, c`.
+`H⁺` differs from `H` only if the colour of the chain has at least four slots
+(`a_{i−1}, a_i, b, m`).
 
 ### 8.4 Division with `H⁺` gives the true differential
 
@@ -963,7 +965,8 @@ of slot 2, colour 3, crosses the red strand of colour 1 and the strand of colour
 degree 0; `06_cyclic_homotopy.py`: all 522 chain maps are null-homotopic), so the stored
 corrected differential (`06_data/A3__W1_1322312.json`, 601 terms, 8 with dots) is far from
 unique and a comparison of individual terms with it is meaningless. But the division is a
-meaningful test: `06_divide.py A 3 1 1322312 plus` — divisible in all 155 components,
+meaningful test: `06_divide.py A 3 1 1322312` (here the colour of the last slot has only
+three slots, so `H⁺ = H`: the plain formula of Conjecture H is used) — divisible in all 155 components,
 `d² = 0`, and the result differs from the tree formula in three components:
 
     {3,5,6,7} → {1,2,4}:  (1 6)(2 5)(4 7),   r_1r_2r_3 t_{12}t_{21}t_{23}t_{32} · ( −x_{2,1} + 2x_{2,2} − x_{2,3} )
