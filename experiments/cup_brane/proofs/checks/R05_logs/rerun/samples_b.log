@@ -23,3 +23,5 @@ RESULT sample D5 6 9 25 522 3 nb: 6 (word, red) cases, 150 vertices, 5235 produc
 RESULT sample D5 6 9 25 523 3 red: 6 (word, red) cases, 150 vertices, 5241 products, 0 FAILURES [4s]
 RESULT sample D5 6 9 25 524 3 twinred: 6 (word, red) cases, 150 vertices, 5062 products, 0 FAILURES [4s]
 RESULT sample D5 6 9 25 525 3 branch: 6 (word, red) cases, 150 vertices, 6001 products, 0 FAILURES [4s]
+RESULT sample D5 6 9 25 526 3 k2: 6 (word, red) cases, 150 vertices, 6403 products, 0 FAILURES [4s]
+RESULT sample D5 6 10 25 527 3: 6 (word, red) cases, 150 vertices, 6123 products, 0 FAILURES [5s]

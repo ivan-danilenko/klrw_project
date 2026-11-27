@@ -256,3 +256,52 @@ RESULT sec8 A5 len 9 pattern 'red': 20 words, no assertion failed [73s]
   D5 red 2 word 143212534: k=2 data 0, E FAIL 0
   D5 red 1 word 353425121: k=2 data 0, E FAIL 0
   D5 red 3 word 544322315: k=2 data 0, E FAIL 0
+  D5 red 1 word 245312143: k=2 data 0, E FAIL 0
+RESULT sec8 D5 len 9 pattern 'twinred': 20 words, no assertion failed [50s]
+   3.2 vertices                                  5120
+   8.1 cases                                     3006
+   8.3 frozen terms                              9910
+   8.3 with a bad letter                         1685
+   8.4 data with k=0                             1685
+   8.4 data with k=1                             152
+   8.4 pairs (t1,t2)                             1989
+   8.5 products with 0 double crossings          1929
+   8.5 products with 1 double crossings          56
+   8.5 products with 2 double crossings          4
+   8.6 cases                                     1685
+   8.7 (T empty) cases                           1685
+   E components computed                         27840
+   E components with a notin K'                  13068
+  A4 red 2 word 33141224: k=2 data 0, E FAIL 0
+  A4 red 4 word 32244131: k=2 data 0, E FAIL 0
+  A4 red 4 word 32131244: k=2 data 0, E FAIL 0
+  A4 red 1 word 33411422: k=2 data 0, E FAIL 0
+  A4 red 4 word 31442231: k=2 data 0, E FAIL 0
+  A4 red 3 word 23341421: k=2 data 0, E FAIL 0
+  A4 red 3 word 34211324: k=2 data 0, E FAIL 0
+  A4 red 2 word 43341221: k=2 data 0, E FAIL 0
+  A4 red 3 word 43231142: k=2 data 0, E FAIL 0
+  A4 red 1 word 44213231: k=2 data 0, E FAIL 0
+  A4 red 3 word 33412241: k=2 data 0, E FAIL 0
+  A4 red 3 word 44132213: k=2 data 0, E FAIL 0
+  A4 red 1 word 43312142: k=2 data 0, E FAIL 0
+  A4 red 4 word 41213324: k=2 data 0, E FAIL 0
+  A4 red 2 word 34132241: k=2 data 0, E FAIL 0
+  A4 red 2 word 42114323: k=2 data 0, E FAIL 0
+  A4 red 3 word 22431143: k=2 data 0, E FAIL 0
+  A4 red 1 word 14143322: k=2 data 0, E FAIL 0
+  A4 red 1 word 44331221: k=2 data 0, E FAIL 0
+  A4 red 3 word 33424112: k=2 data 0, E FAIL 0
+RESULT sec8 A4 len 8 pattern 'nb': 20 words, no assertion failed [13s]
+   3.2 vertices                                  2560
+   8.1 cases                                     1400
+   8.3 frozen terms                              4140
+   8.3 with a bad letter                         928
+   8.4 data with k=0                             928
+   8.4 data with k=1                             16
+   8.4 pairs (t1,t2)                             960
+   8.5 products with 0 double crossings          960
+   8.6 cases                                     928
+   8.7 (T empty) cases                           928
+   E components computed                         11790
+   E components with a notin K'                  5556
