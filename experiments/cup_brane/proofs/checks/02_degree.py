@@ -55,7 +55,12 @@ def edge_of_param(n, name):
         c = int(name[2:])
         if n == 1:
             return Counter({"e0": 2, "d1": -1})   # n = 1: both red strands have colour 1, one u_1
-        return Counter({("e0" if c == 1 else "e%d" % n): 2, "d%d" % c: -1})
+        # eps_{cW} for every colour c (F2, klrw); for c = 1, n it is the symbol of edge 0, resp. n
+        sym = "e0" if c == 1 else ("e%d" % n if c == n else "eW%d" % c)
+        return Counter({sym: 2, "d%d" % c: -1})
+    if name.startswith("r_"):
+        c = int(name[2:])
+        return Counter({"s%d" % c: 1, "d%d" % c: 1})
     _, a, b = name.split("_")
     a, b = int(a), int(b)
     return Counter({"e%d" % min(a, b): 2, "d%d" % a: -1})
@@ -245,3 +250,34 @@ if __name__ == "__main__":
     for n in range(2, (int(sys.argv[1]) if len(sys.argv) > 1 else 6) + 1):
         print("n=%d: gluing terms %d, polynomial coefficient differs from pi_{l+2}..pi_k * pi_extra: %d"
               % ((n,) + check_polynomial_coefficients(n)), flush=True)
+
+
+def check_independence(n):
+    """Cor. 6.4(c): the degrees of ALL parameters of R_pol (r_c, t_{cc'}, u_c for every c) are linearly
+    independent (rank of the integer degree matrix over Q = number of parameters)."""
+    from fractions import Fraction
+    names = ["r_%d" % c for c in range(1, n + 1)] + ["u_%d" % c for c in range(1, n + 1)]
+    names += ["t_%d_%d" % (a, b) for a in range(1, n + 1) for b in (a - 1, a + 1) if 1 <= b <= n]
+    if n == 1:
+        names = ["r_1", "u_1"]
+    rows = [norm(n, edge_of_param(n, nm)) for nm in names]
+    syms = sorted(set(k for r in rows for k in r))
+    mat = [[Fraction(r.get(sy, 0)) for sy in syms] for r in rows]
+    rank = 0
+    cols = len(syms)
+    for col in range(cols):
+        piv = next((i for i in range(rank, len(mat)) if mat[i][col] != 0), None)
+        if piv is None:
+            continue
+        mat[rank], mat[piv] = mat[piv], mat[rank]
+        for i in range(len(mat)):
+            if i != rank and mat[i][col] != 0:
+                f = mat[i][col] / mat[rank][col]
+                mat[i] = [a - f * b for a, b in zip(mat[i], mat[rank])]
+        rank += 1
+    return len(names), rank
+
+
+if __name__ == "__main__":
+    for n in range(1, (int(sys.argv[1]) if len(sys.argv) > 1 else 6) + 2):
+        print("n=%d: parameters %d, rank of their degrees %d" % ((n,) + check_independence(n)), flush=True)

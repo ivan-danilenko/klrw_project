@@ -8,9 +8,9 @@ Checks, for n = 1..N_MAX:
       Lemma 2.3, reference bits b = 1) becomes, after the diagonal change of basis
       f_v = sigma(v) phi(v) e_v, exactly the R-model with q_x = T_x Q_x  (entry by entry, as
       polynomials in the dots with Laurent coefficients);
-  (b) [Theorem 5.1] in the R-model over Z[q_0..q_n] (free variables):  delta^2 = W * H with
+  (b) [Theorem 5.2] in the R-model over Z[q_0..q_n] (free variables):  delta^2 = W * H with
       W = sum_x (-1)^x q_x  and  H = sum_{j<k} (-1)^(j+1) e_j (x) N_{j,k};
-  (c) [Lemmas 5.3, 5.4] the block identities (Psi = 0, Inner = -W_[0,D] N_{0,D}) for D <= N_MAX+2;
+  (c) [Lemmas 5.3, 5.4] the block identities (Inner = -W_[0,D] N_{0,D}: Lemma 5.3; Psi = 0: Lemma 5.4) for D <= N_MAX+2;
   (d) the closed formula for sigma(v) (vertex signs) and phi(v).
 
 R-model: vertex (k, R), 0 <= k <= n, R subset {1..n}  (R = A u C).  Lambda(r_1..r_n), order
@@ -195,7 +195,7 @@ def check_universal(n):
 
 
 def check_blocks(D):
-    """(c): Lemma 5.3 (Psi = 0) and Lemma 5.4 (Inner) on the block colours 1..D, j = 0, k = D."""
+    """(c): Lemma 5.4 (Psi = 0) and Lemma 5.3 (Inner) on the block colours 1..D, j = 0, k = D."""
     n = D
     # Inner: d_0 Z_{0,D} + Z_{0,D} d_D + sum_l Z_{0,l} Z_{l,D}, restricted to colours 1..D, no outer parts
     verts = [(k, frozenset(R)) for k in range(D + 1) for s in range(D + 1)

@@ -1,0 +1,6 @@
+A2 red 1 word 1212: Prop 9.2 identity 0/192 failures; Delta central failures 0/10
+A2 red 2 word 1221: Prop 9.2 identity 0/192 failures; Delta central failures 0/10
+A3 red 1 word 12312: Prop 9.2 identity 0/480 failures; Delta central failures 0/10
+D4 red 2 word 21324: Prop 9.2 identity 0/480 failures; Delta central failures 0/10
+A2 red 1 word 1121: Prop 9.2 identity 0/192 failures; Delta central failures 0/10
+RESULT sec9: 1536 identities, 0 failures

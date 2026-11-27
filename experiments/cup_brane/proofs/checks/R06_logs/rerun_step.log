@@ -1,0 +1,5 @@
+A2 red 1 word 11211: cyclic False, steps OK: YYYYY   [0s]
+A2 red 1 word 12121: cyclic False, steps OK: YYYYY   [0s]
+A2 red 2 word 2112: cyclic False, steps OK: YYYY   [0s]
+sage -python 06_check_step_formula.py A 2 1 11211 1 12121 2 2112 2>&1  2.75s user 0.68s system 59% cpu 5.736 total
+tail -4  0.00s user 0.00s system 0% cpu 5.736 total

@@ -5,3 +5,5 @@
 ... 600 cases, 0 failures [159s]
 ... 700 cases, 0 failures [231s]
 ... 800 cases, 0 failures [331s]
+... 900 cases, 0 failures [462s]
+RESULT all D4 len 1..6 part 6/10: 928 (word, red) cases, 0 failures [486s]

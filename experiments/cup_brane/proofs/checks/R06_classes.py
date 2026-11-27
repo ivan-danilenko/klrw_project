@@ -14,6 +14,8 @@ from collections import defaultdict
 from R06_lib import Setup, perm_sign
 from fast import braid_for, exp_for
 from sample_verify import element
+import os
+MISASSIGN = bool(os.environ.get('R06_MISASSIGN'))   # negative control: swap T1/T2 for resolved parts
 
 
 def run(ct, red, w):
@@ -123,7 +125,7 @@ def run(ct, red, w):
                         resolved = coefz * br1 * scal * rp * res_br
                         nsplit_bad += not (main + resolved - full).is_zero()
                         classes[("T0", j, allF)] += -main
-                        if a in I:
+                        if (a in I) != MISASSIGN:
                             classes[("T1", p, allF)] += -resolved
                         else:
                             classes[("T2", p, allF)] += -resolved

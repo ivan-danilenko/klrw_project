@@ -1,0 +1,6 @@
+RESULT Theorem C A3 maxlen 5: 261 (word, red) cases, no assertion failed [28s]
+   C1 cases                       2196
+   C2 cases                       108
+   C3 sliding errors              648
+   C4 two-term cases              36
+   d2 products                    36504

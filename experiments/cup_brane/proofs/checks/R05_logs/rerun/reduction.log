@@ -1,0 +1,90 @@
+RESULT reduction (T1 words, maxlen 7, seed 31) [265s]
+   coboundary: perturbations                                                        120
+   control: (E != 0, non-first slot)                                                1540
+   control: all non-zero components have the non-first slot in K'                   44
+   drop all of F_1: (E != 0, first-occurrence slot) violation seen with a notin K'  95
+   drop all of F_1: E != 0                                                          29
+   drop all of F_1: perturbations                                                   29
+   drop: (E != 0, first-occurrence slot) violation seen with a notin K'             500
+   drop: E != 0                                                                     145
+   drop: perturbations                                                              145
+   flip: (E != 0, first-occurrence slot) violation seen with a notin K'             500
+   flip: E != 0                                                                     145
+   flip: perturbations                                                              145
+   random-1: (E != 0, first-occurrence slot) violation seen with a notin K'         770
+   random-1: E != 0                                                                 238
+   random-1: E = 0                                                                  2
+   random-1: perturbations                                                          240
+   random-a: (E != 0, first-occurrence slot) violation seen with a notin K'         1317
+   random-a: E != 0                                                                 387
+   random-a: perturbations                                                          387
+   swap-t: (E != 0, first-occurrence slot) violation seen with a notin K'           500
+   swap-t: E != 0                                                                   145
+   swap-t: perturbations                                                            145
+   unperturbed: E = 0                                                               40
+   unperturbed: perturbations                                                       40
+   words                                                                            40
+RESULT reduction (any words, maxlen 6, seed 32) [111s]
+   coboundary: perturbations                                                        120
+   control: (E != 0, non-first slot)                                                1239
+   control: all non-zero components have the non-first slot in K'                   163
+   drop all of F_1: (E != 0, first-occurrence slot) violation seen with a notin K'  52
+   drop all of F_1: E != 0                                                          21
+   drop all of F_1: perturbations                                                   21
+   drop: (E != 0, first-occurrence slot) violation seen with a notin K'             238
+   drop: E != 0                                                                     97
+   drop: perturbations                                                              97
+   flip: (E != 0, first-occurrence slot) violation seen with a notin K'             238
+   flip: E != 0                                                                     97
+   flip: perturbations                                                              97
+   random-1: (E != 0, first-occurrence slot) violation seen with a notin K'         499
+   random-1: E != 0                                                                 227
+   random-1: E = 0                                                                  13
+   random-1: perturbations                                                          240
+   random-a: (E != 0, first-occurrence slot) violation seen with a notin K'         621
+   random-a: E != 0                                                                 261
+   random-a: perturbations                                                          261
+   swap-t: (E != 0, first-occurrence slot) violation seen with a notin K'           232
+   swap-t: E != 0                                                                   94
+   swap-t: E = 0                                                                    3
+   swap-t: perturbations                                                            97
+   unperturbed: E = 0                                                               40
+   unperturbed: perturbations                                                       40
+   words                                                                            40
+A3 red 1 word 31213, dots <= 1: 6144 unknowns, 41898 equations [9s]
+p=32003: rank(E) = 5716 (kernel = cocycles in V: 428)
+   slot 1 (first): rank restricted to a notin K' = 5716
+   slot 2 (first): rank restricted to a notin K' = 5716
+   slot 3 (first): rank restricted to a notin K' = 5716
+   slot 4 (NOT first): rank restricted to a notin K' = 5029  <-- smaller
+   Prop. 4.5 on the ansatz space: CONFIRMED [13s]
+D4 red 2 word 42142, dots <= 1: 6144 unknowns, 37942 equations [7s]
+p=32003: rank(E) = 5771 (kernel = cocycles in V: 373)
+   slot 1 (first): rank restricted to a notin K' = 5771
+   slot 2 (first): rank restricted to a notin K' = 5771
+   slot 3 (first): rank restricted to a notin K' = 5771
+   slot 4 (NOT first): rank restricted to a notin K' = 5015  <-- smaller
+   Prop. 4.5 on the ansatz space: CONFIRMED [11s]
+A2 red 2 word 21221, dots <= 1: 18432 unknowns, 128350 equations [7s]
+p=32003: rank(E) = 17333 (kernel = cocycles in V: 1099)
+   slot 1 (first): rank restricted to a notin K' = 17333
+   slot 2 (first): rank restricted to a notin K' = 17333
+   slot 3 (NOT first): rank restricted to a notin K' = 15507  <-- smaller
+   slot 4 (NOT first): rank restricted to a notin K' = 13545  <-- smaller
+   Prop. 4.5 on the ansatz space: CONFIRMED [32s]
+A3 red 3 word 123213, dots <= 0: 8192 unknowns, 87695 equations [44s]
+p=32003: rank(E) = 7767 (kernel = cocycles in V: 425)
+   slot 1 (first): rank restricted to a notin K' = 7767
+   slot 2 (first): rank restricted to a notin K' = 7767
+   slot 3 (first): rank restricted to a notin K' = 7767
+   slot 4 (NOT first): rank restricted to a notin K' = 7030  <-- smaller
+   slot 5 (NOT first): rank restricted to a notin K' = 6991  <-- smaller
+   Prop. 4.5 on the ansatz space: CONFIRMED [51s]
+D4 red 3 word 312432, dots <= 0: 4096 unknowns, 40587 equations [20s]
+p=32003: rank(E) = 3934 (kernel = cocycles in V: 162)
+   slot 1 (first): rank restricted to a notin K' = 3934
+   slot 2 (first): rank restricted to a notin K' = 3934
+   slot 3 (first): rank restricted to a notin K' = 3934
+   slot 4 (first): rank restricted to a notin K' = 3934
+   slot 5 (NOT first): rank restricted to a notin K' = 3519  <-- smaller
+   Prop. 4.5 on the ansatz space: CONFIRMED [21s]

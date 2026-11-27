@@ -1,5 +1,5 @@
 """
-Case scheme of the proof of Theorem 5.1 (proofs/02_omega1_ibrane.md, section 5), checked on ALL
+Case scheme of the proof of Theorem 5.2 (proofs/02_omega1_ibrane.md, section 5), checked on ALL
 composable pairs of terms of the R-model, pure Python.
 
     python3 proofs/checks/02_cases.py N_MAX
@@ -14,13 +14,13 @@ proof (exactly one label; the labelling uses only the two term tags), and checks
     coefficient  (-1)^(j+1) (-1)^x q_x * (sign of N_{j,k} on the source);
   * no component contains anything else.
 
-Labels (block (j, k], D = k - j, relative colour c' = c - j; see Theorem 5.1 and Lemmas 5.3, 5.4):
+Labels (block (j, k], D = k - j, relative colour c' = c - j; see Theorem 5.2 and Lemmas 5.3, 5.4):
   KOS                      both internal (j = k)
   dO                       an internal move on an outer colour and a gluing term k -> j whose
                            extra colour (if any) is a different colour        partner: other order
   Wsat                     the same, extra colour = the internal colour       (W-path, edge e-1 / e)
-  T1a,T1b,T2a,T2b,AA,...   Lemma 5.4 (inner part)
-  P1,P2,NA,NB,NC,AN,BN,CN  Lemma 5.3 (O-linear part)
+  T1a,T1b,T2a,T2b,AA,...   Lemma 5.3 (inner part)
+  P1,P2,NA,NB,NC,AN,BN,CN  Lemma 5.4 (O-linear part)
   OO                       two gluing steps both with outer extra colours     partner: extras swapped
 """
 import os

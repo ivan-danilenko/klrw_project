@@ -8,8 +8,11 @@
 * **Running (background, logs in `proofs/checks/R05_logs/rerun/`):** `b_d2_D4_le7.log` (all T1 words of
   `D_4` of length ≤ 7, every red colour, basis braid), `sec8_stress.log` (`run_sec8.sh`: section-8
   assertions on k = 2 words etc.), `reduction.log` (`run_red.sh`: perturbed `F`, rank test).
-* **Remains:** collect those logs; sampled 9–11-strand runs of `R05b_d2.py` (A_5, A_6, D_5, D_6, E_6,
-  patterns nb/red/twinred/branch); `R05_thmC.py 102` with a new seed; final verdict section.
+  Also running: `samples_b.log` (`run_samples_b.sh 3`: sampled 9–11-strand words, A_5, A_6, D_5, D_6,
+  E_6, patterns ''/nb/red/twinred/branch/k2).
+* **Done since:** verdicts, problem list and overall judgement written (below); `R05_thmC.py 102`
+  new seed; `R05_reduction.py … T1` new seed; `R05b_lemma43.py`; section-8 k = 2 runs (D_4, D_5).
+* **Remains:** collect the running logs into the table "Results so far"; then close these notes.
 * **New scripts of this referee:** `R05b_d2.py` (d² with `formula.Stack` + klrw basis braid; word
   generators with stress patterns), `R05b_sec8.py` (driver for `R05_sec8.check_word`).
 
@@ -185,9 +188,24 @@ neither `c` nor adjacent to `c` by (L3)), (S2) (if `Y ∈ {A,M}` then `N = j`, `
 bijection with (datum, subset) (Lemma 8.4.3); the frozen terms with a bad letter are in bijection
 with the data with `𝒯 = ∅` (8.4.4); frozen terms without a bad letter contribute 0.
 
-*Verdict on §§5–8 so far (reading):* **Theorem B is proved**, modulo the standing facts (F1)
+*Verdict on §§5–8 (reading):* **Theorem B is proved**, modulo the standing facts (F1)
 (Theorem A.5 of `01_foundations.md`) and (F3). No fatal or repairable error found; cosmetic
 points only (listed at the end).
+
+*Hypothesis bookkeeping for every use of the Straightening Lemma in the proof of Theorem B*
+(the lead asked for this explicitly; all re-done by hand, see above):
+
+| use | word | (S1) | (S2): same-coloured strands that cross | why no middle strand of adjacent colour / red |
+|---|---|---|---|---|
+| Lemma 6.2 (`β` well defined) | any reduced word of a tree term | vacuous (reduced) | only `j, j̃` (mover and its twin, `j̃ < j`) | a strand `∼ c(j)` crossing the mover belongs to a pair with `b_p < j`, but by Lemma 5.3 that pair is linked, `a_p < j < b_p`; red crosses only the mover |
+| Lemma 8.5 (`D(S)`) | reduced `t_1(S)` · reduced `t_2(S)` | double crossings only `(L_q, j)`, `(L_q,L_p)`, `(R_q,R_p)`, non-linked hence non-adjacent, different colours | only `j, j̃` (not `A, M`: never cross; not `L_p, R_p`) | `Y ∼ c(j)` in a pair `p ∈ F'`: `n_1 = n_2 = 0` with `j`; `Y ∈ {A, M}`: `(a,m)` linked to `j`, `a < j < m`, no crossing with `j`; red crosses only `j` and `M` (colours `c(j) ≠ c`) |
+| Lemma 8.6 (`E_t`) | the sliding error word | double crossings `(A,Z)`, `Z ∈ 𝒞_1`, `(M,Z)`, `Z ∈ 𝒞_2`; `Z` belongs to a node `≠ N`, colour neither `c` nor `∼ c` by (L3) | only `j, j̃` (`A, M` never cross) | for `Y ∉ {A,M}` as in Lemma 6.2; for `Y ∈ {A,M}`: `N = j`, `S' = j` and `n(A,j) = n(M,j) = 0`; red crosses `j` and `M` only |
+| Lemma 4.2 (`μμ^*`) | bigon word, via Lemma 1.3 | bigons only `{a, y_i}`, colours `≠ c(a)` (first occurrence) | none | no triple of pairwise crossing strands |
+
+"The same reduced diagram" is in each case justified by: same permutation (checked strand by
+strand) **and** (S1), (S2) for the non-reduced word, so Lemma 1.2 identifies it with every reduced
+word of that permutation; and the reduced words of `σ_U` satisfy (S2) because their crossing sets
+are contained in those of `D(S)`.
 
 ## Section 9
 
@@ -195,13 +213,14 @@ points only (listed at the end).
 **Corollary 9.2.** Correct (multiplicities bounded by the coefficients of `λ − w_0λ`; the
 computations of `ω_1 − w_0ω_1`, `ω_2 − w_0ω_2` for `sl_n` and `2e_1` for `so_{2n}` are right).
 
-## Section 9A (Theorem C) — reading in progress
+## Section 9A (Theorem C)
 
-Checked so far: list of terms; well-definedness of `β(P_j), β(G^1_j), β(G^2_j)` (only `G^1_j`
+Checked: list of terms; well-definedness of `β(P_j), β(G^1_j), β(G^2_j)` (only `G^1_j`
 has a same-colour crossing; (S2) holds); the case split (C1)–(C4) and that the three kinds of
 targets are distinct; (C1); (C2) (equal reduced diagrams, opposite Koszul signs); (C3) for
 `i = 1`, `i = 2` with `a_2 ∉ I'`, `i = 2` with `a_2 ∈ I'` (crossing lists and (S2) re-done;
-coefficient computation for `m_{a_2}·G^2_j` re-done); (C4) "otherwise" case. No error so far.
+coefficient computation for `m_{a_2}·G^2_j` re-done); (C4), both the two-term and the four-term
+case. No error.
 
 Details of the re-derivation (§9A):
 * *Exhaustiveness of (C1)–(C4).* Only `P_j`, `G^1_j` add `a_1`, only `m_{a_1}` removes it. First
@@ -264,6 +283,68 @@ colour `c` standing to the left of a strand of adjacent colour" is therefore com
 *Verdict after reading everything:* no fatal error, one under-argued step (Prop. 10.2 "only
 products"; filled above), several cosmetic points.
 
+## Numbered problems
+
+No **fatal** problem was found.
+
+**Repairable**
+
+1. *Proposition 10.2, "These are the only products of two tree terms from `I` to `K`".* Stated
+   with a one-line justification that presupposes that the two movers are `j, j'`. True; a complete
+   argument (colour count of the movers, (H2) to exclude other movers and pairs ending at `j, j'`,
+   (H1) to exclude the chain `(a,y),(y,b)`) is written out in the Section 10 part of this report.
+   Not used for Theorem C (whose list (C1)–(C4) is derived independently), so Theorem C is not
+   affected. Confirmed numerically (486 cases, `R05_thmC.py 102`).
+
+**Cosmetic**
+
+2. §8 preamble: "`c` is the colour of no node of a configuration of `w'`" is false when `a` is the
+   mover (the parenthesis says so). Restrict to configurations in which `a` is not the mover
+   (frozen terms), which is the only use.
+3. Lemma 1.1 / 1.2: say that strands are identified by their source positions, so that
+   `n_{D*} ≤ n_D` along a sequence of moves is meaningful; and that the moves on a prefix do not
+   change the permutation of the prefix, so the suffix meets the same pairs of strands.
+4. Lemma 4.3: make explicit (a) `𝔪^{N+1}A ∩ e'Ae_0 = 𝔪^{N+1}·e'Ae_0` (multiply by the
+   idempotents; `R` central), (b) that `𝔪^{N+1}R[x]` is decided monomial by monomial because
+   `𝔪^{N+1}` is a monomial ideal of `ℤ[r,t,u,x]`. Cite Theorem A.5(iii) of `01_foundations.md`
+   (right basis) rather than "(F1) as stated in `PROOFS.md`" (whose literature reference is wrong,
+   `01_foundations.md` §F).
+5. §11 Status, "(F1) … used only in Lemmas 3.1 and 4.3": Proposition 4.5 also uses (F1) (the
+   `R`-freeness of `A`, Theorem A.5(ii), for `⋂_N 𝔪^N A = 0`).
+6. Lemma 6.1: the direction statement omits (e) (the outer strand of a nested pair moves left);
+   not used.
+7. Convention after Lemma 3.2: for the klrw basis braids the compatibility with `ι_L`, `ι_R` is a
+   one-line consequence of Definition B.10 (a fixed strand at either end contributes an empty
+   factor), valid for every word; no check script is needed. For T1 words it is anyway automatic
+   (Lemma 6.2).
+8. "Warning" after Lemma 6.2: correct as stated ((S2) fails, Lemma 1.2 does not apply), but it should
+   add that `β` is nevertheless well defined there (only the middle strand of a triple matters for
+   reduced words, `01_foundations.md` Prop. B.5, §B.9), to avoid the impression of a genuine
+   ambiguity.
+
+## Overall judgement
+
+* **Sections 1–4** (Straightening, bigons, vanishing, Sliding Lemma with signs, cone
+  decomposition with signs, cocycle, injectivity modulo `𝔪`, Reduction Lemma, deduction rule):
+  correct and complete for arbitrary words. In particular Lemma 1.1 is the correct Tits argument;
+  the signs of Lemma 3.2/Prop. 3.3 agree with `formula.py`; Lemma 4.3's use of the right basis and
+  the `r`-adic filtration is justified; the induction of Prop. 4.5 closes (`⋂ 𝔪^N A = 0` by
+  `R`-freeness).
+* **Theorem A** (new colour) and Corollary 7.1: proved.
+* **Theorem B** (every colour at most twice, any forest `Γ`, any red colour): **proved**. Every
+  lemma of §§5–8 is correct and complete; the case analysis is exhaustive (every product
+  contributing to `E_{I',K'}` with `a ∉ K'` is counted exactly once via the bijection of
+  Lemma 8.4.3 and the alternating family sums of Lemma 8.7); every use of the Straightening Lemma
+  has (S1), (S2) verified, including the twins `A, M` and the mover's twin `j̃` and the red strand;
+  coefficients (`t_{c(p), c(x_p)}` with the connector as in `formula.py`) and signs (`κ`, connector
+  signs, the sign change on `C_R`) are right by hand, not only by script.
+* **Theorem C** (one colour three times, others once): proved (with Prop. 10.2 for the four-term
+  case).
+* **Proposition 10.2**: proved, after filling the gap of item 1.
+
+Standing inputs: (F1) in the form of Theorem A.5 of `01_foundations.md` (left and right bases, base
+change), (F3) Matsumoto, and the relations with the README signs.
+
 ## Independent checks (in progress)
 
 ### What the scripts are, and why I trust them
@@ -315,3 +396,8 @@ the author); I read every one of them before using it. They do not import `05_li
 | `R05b_sec8.py D 4 60 7 11 3 k2` (words built so that data with **k = 2** components occur: two neighbour colours of `c` straddle `a`, a third neighbour after `a`) | 60 words: all assertions of Lemmas 3.2, 8.1, 8.3–8.7 and `E = 0` in all 19 680 components; data k = 0/1/2: 2880/960/**60**; products with 0/1/2 double crossings: 4438/556/**46** |
 | `R05b_sec8.py D 4 40 8 12 3 k2` | 40 words, all assertions pass; data k = 0/1/2: 4576/1920/**194**; products with 2 double crossings: 168; 34 627 `E`-components, all 0 |
 | `R05b_lemma43.py 1500 7` (new; Lemma 4.3 from its statement: for random `z` with random coefficients containing powers of `r`, the `r`-adic valuation of `zμ` (`μ = ι_L m_a`) resp. `μ'z` (`μ' = ι_R m_a`) equals that of `z`) | first-occurrence slot: 1966 cases, **0 failures**; control, slot not a first occurrence: valuation jumps in 449 of 1034 cases (the hypothesis is needed) |
+| `R05_thmC.py 102 150 8 41` (new seed) | Prop. 10.2: 486 cases (96 with a further slot of colour `c` below `a`, 402 with the red colour among `c, e, e'`): the four products equal the four predicted dotted elements, they are the **only** products from `I` to `K`, and the sum with the formula's coefficients is 0 |
+| `R05_reduction.py 40 7 31 T1` (new seed; perturbed `F`) | 40 T1 words, unperturbed `E = 0` in all. Perturbations with `E(F+G) ≠ 0`: drop 145, sign flip 145, `t_{xy} → t_{yx}` 145, drop all of `F_1` 29, random-1 238, **random-a (perturbation only on components with `a ∈ K'`) 387** — in every one of them and for every first-occurrence slot of `w'` there is a non-zero component with `a ∉ K'` (Prop. 4.5), and Lemma 4.1 holds; 120 coboundary perturbations give `E = 0`. Control: for slots that are not first occurrences, in 44 of 1540 cases **all** non-zero components contain the slot (the hypothesis is needed). The `t`-swap test shows that the order of the indices of `t_{c(p),c(x_p)}` is forced. |
+| `R05_reduction.py 40 6 32 any` (arbitrary words whose last colour is repeated; Prop. 4.5 is claimed for arbitrary words) | 40 words, unperturbed `E = 0`; every perturbation with `E ≠ 0` (drop 97, flip 97, `t`-swap 94, drop all 21, random-1 227, random-a 261) shows a non-zero component with `a ∉ K'` for every first-occurrence slot `a`; Lemma 4.1 always holds; coboundaries give 0 (120). (3 `t`-swaps give `E = 0` because the swapped monomial is symmetric, e.g. `t_{12}t_{21}`, so the perturbation is 0.) Control: for non-first slots, 163 of 1239 cases have all non-zero components containing the slot. |
+| `R05_thmC.py C A 3 5 2` (re-run) | all 261 (word, red) cases of Theorem C in `A_3`: full `d² = 0` (36 504 products), (C1) 2196, (C2) 108, (C3) 648 sliding errors equal to the predicted products with the predicted coefficients, (C4) two-term 36 — identical to the old log `thmC_A3.log` |
+| `R05_redlin.py` on 5 new words (`A_3` 31213, `D_4` 42142, `A_2` 21221, `A_3` 123213, `D_4` 312432; ansatz spaces of 4096–18432 families, dots ≤ 1 resp. 0) | Prop. 4.5 as linear algebra **confirmed** for every first-occurrence slot: the rank of `G ↦ E(G)` restricted to the components with `a ∉ K'` equals the full rank (e.g. 17 333 = 17 333 for `21221`). For every slot that is not a first occurrence the restricted rank is strictly smaller (e.g. 15 507 and 13 545 < 17 333), i.e. there are families whose defect vanishes on all components with that slot absent but is non-zero — the hypothesis "first occurrence" cannot be dropped (Remark (2) after Prop. 4.5 is confirmed). |
