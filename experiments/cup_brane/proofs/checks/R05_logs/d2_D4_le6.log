@@ -14,3 +14,6 @@
   ... 7000 / 9280 (word, red) cases, 2363456 products, 0 failures [904s]
   ... 7500 / 9280 (word, red) cases, 2633776 products, 0 failures [1030s]
   ... 8000 / 9280 (word, red) cases, 2901568 products, 0 failures [1230s]
+  ... 8500 / 9280 (word, red) cases, 3172880 products, 0 failures [1336s]
+  ... 9000 / 9280 (word, red) cases, 3450048 products, 0 failures [1440s]
+RESULT all D4 len 2..6 mult<=2 reds=all: 9280 (word, red) cases, 3591008 products, 0 FAILURES [1549s]

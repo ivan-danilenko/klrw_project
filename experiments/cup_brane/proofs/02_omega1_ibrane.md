@@ -1,5 +1,16 @@
 # 02 — The ω₁ I-brane of sl_{n+1}: d² = 0, degrees, uniqueness, homology
 
+> **REVISION NOTES** (response to `proofs/R02_referee.md`; updated as points are applied)
+> * Applied: — (none yet; the text below is the refereed draft).
+> * New data point recorded: the real gluing for `n = 6` (`glue/data/A6_w1.json`) agrees with the
+>   formula term by term (2688 terms, signs up to the gauge `(−1)^{k(k−1)/2+l(l−1)/2}`, coefficients);
+>   re-checked with `02_model.py` against the dump.
+> * To do: (1) grading with `ε_{cW}` for every colour (Def. 1.1, Cor. 6.4(c), Cor. 7.2, Thm. 7.3,
+>   rank one over ℤ; strengthening over `R`); (2) Lemma 4.3 items 5–6 in full; (3) proof of
+>   minimality in Cor. 6.5; (4) cosmetic: Theorem D wording, §0 Theorem C, numbering/forward
+>   references, §10 code caveats, two implicit steps, unproved inputs about `klrw`'s cone convention
+>   and Ext over ℚ; re-run checks; Status.
+
 Front: the closed formula of `GLUING.md` §2 for the cup (I-) brane of `sl_{n+1}` with `ω₁`.
 Scripts: `proofs/checks/02_*.py` (pure Python unless marked *sage*).
 

@@ -18,3 +18,29 @@
   ... 3600 / 6400 [438s]
   ... 3800 / 6400 [468s]
   ... 4000 / 6400 [517s]
+  ... 4200 / 6400 [547s]
+  ... 4400 / 6400 [572s]
+  ... 4600 / 6400 [595s]
+  ... 4800 / 6400 [642s]
+  ... 5000 / 6400 [667s]
+  ... 5200 / 6400 [697s]
+  ... 5400 / 6400 [725s]
+  ... 5600 / 6400 [753s]
+  ... 5800 / 6400 [789s]
+  ... 6000 / 6400 [803s]
+  ... 6200 / 6400 [817s]
+  ... 6400 / 6400 [827s]
+RESULT all D4: 6400 (word, red) cases, no assertion failed [827s]
+   3.2 vertices                                  166688
+   8.1 cases                                     87736
+   8.3 frozen terms                              162528
+   8.3 with a bad letter                         41640
+   8.4 data with k=0                             41640
+   8.4 data with k=1                             1008
+   8.4 pairs (t1,t2)                             43656
+   8.5 products with 0 double crossings          43152
+   8.5 products with 1 double crossings          504
+   8.6 cases                                     41640
+   8.7 (T empty) cases                           41640
+   E components computed                         461056
+   E components with a notin K'                  251272

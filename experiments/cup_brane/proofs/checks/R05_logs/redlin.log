@@ -52,3 +52,19 @@ p=32003: rank(E) = 17174 (kernel = cocycles in V: 1258)
    slot 3 (first): rank restricted to a notin K' = 17174
    slot 4 (NOT first): rank restricted to a notin K' = 14776  <-- smaller
    Prop. 4.5 on the ansatz space: CONFIRMED [97s]
+A3 red 2 word 132213, dots <= 0: 8192 unknowns, 122278 equations [93s]
+p=32003: rank(E) = 7920 (kernel = cocycles in V: 272)
+   slot 1 (first): rank restricted to a notin K' = 7920
+   slot 2 (first): rank restricted to a notin K' = 7920
+   slot 3 (first): rank restricted to a notin K' = 7920
+   slot 4 (NOT first): rank restricted to a notin K' = 6860  <-- smaller
+   slot 5 (NOT first): rank restricted to a notin K' = 7163  <-- smaller
+   Prop. 4.5 on the ansatz space: CONFIRMED [135s]
+D4 red 4 word 213432, dots <= 0: 4096 unknowns, 36720 equations [94s]
+p=32003: rank(E) = 4049 (kernel = cocycles in V: 47)
+   slot 1 (first): rank restricted to a notin K' = 4049
+   slot 2 (first): rank restricted to a notin K' = 4049
+   slot 3 (first): rank restricted to a notin K' = 4049
+   slot 4 (first): rank restricted to a notin K' = 4049
+   slot 5 (NOT first): rank restricted to a notin K' = 3441  <-- smaller
+   Prop. 4.5 on the ansatz space: CONFIRMED [101s]

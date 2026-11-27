@@ -1,5 +1,9 @@
 # 03 — The cyclic condition: combinatorics
 
+> **REVISION NOTES** (response to `proofs/R03_referee.md`). Applied: Issue 1 (§1.5).
+> Remaining: Issue 2 (self-contained Lemmas 3.1(c), 4.2(c), weight order), Issues 3–8
+> (cosmetic), suggestion 9; re-run of the scripts; Status update.
+
 Front: the cyclic condition of `PROOFS.md` Cor. 3.1 / Prop. 7, for arbitrary words and for the
 minuscule stacks of types A, D, E. Purely combinatorial; all scripts are plain `python3`
 (no sage), in `proofs/checks/03_*.py`, shared code in `checks/03_lib.py`.
@@ -115,16 +119,21 @@ configuration of `w` (on the corresponding slots) with the same links and blocks
 non-cyclic words form a class closed under taking subwords — the natural setting for an
 induction on the last letter (README, "cone structure").
 
-**1.5 Patterns.** In the following, `c' ≠ c''` are two distinct neighbours of a colour `c`,
-and `e ∼ d ∼ c` (possibly `e = c`). A word *contains*
+**1.5 Patterns.** A word `w` *contains*
 
-* **pattern T** if there are slots `x_1 < x_2 < x_3` of colour `c` and, for each of `c'`, `c''`,
-  a pair `(y, z)` of that colour with `x_1 < y < x_2` and `x_3 < z`;
-* **pattern B** if there are slots `x_1 < x_2 < x_3` of colour `c` and, for each of `c'`,
-  `c''`, a pair `(y, z)` of that colour with `y < x_1` and `x_2 < z < x_3`;
-* **pattern N** if there are slots `y_1 < y_2 < j < z_2 < z_1` with `c(y_i) = c(z_i) = d`,
-  `c(j) = c`, and a pair `p = (a, b)` of colour `e`, with `j ∉ {a, b}`, one slot in
+* **pattern T** if there exist a colour `c`, two distinct neighbours `c' ≠ c''` of `c`, slots
+  `x_1 < x_2 < x_3` of colour `c` and, for each `γ ∈ {c', c''}`, a pair `(y_γ, z_γ)` of colour
+  `γ` with `x_1 < y_γ < x_2` and `x_3 < z_γ`;
+* **pattern B** if there exist a colour `c`, two distinct neighbours `c' ≠ c''` of `c`, slots
+  `x_1 < x_2 < x_3` of colour `c` and, for each `γ ∈ {c', c''}`, a pair `(y_γ, z_γ)` of colour
+  `γ` with `y_γ < x_1` and `x_2 < z_γ < x_3`;
+* **pattern N** if there exist colours `c, d, e` with `d ∼ c` and `e ∼ d` (possibly `e = c`),
+  slots `y_1 < y_2 < j < z_2 < z_1` with `c(y_1) = c(y_2) = c(z_2) = c(z_1) = d` and
+  `c(j) = c`, and a pair `p = (a, b)` of colour `e` with `j ∉ {a, b}`, one slot in
   `(y_2, z_2)` and the other outside `[y_1, z_1]`, and, if `e = c`, `j ∉ (a, b)`.
+
+(In T and B the slots are automatically pairwise distinct, the colours `c, c', c''` being
+distinct; in N the slots of `p` differ from the `y_i, z_i` because `e ≠ d`.)
 
 The associated configurations: **T**: mover `x_3`, pairs `(x_1, x_2)` and the two pairs of
 colours `c', c''`; **B**: mover `x_1`, pairs `(x_2, x_3)` and the two pairs; **N**: mover `j`,

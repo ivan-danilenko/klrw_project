@@ -1,0 +1,17 @@
+(c2) full                         rank 4, with (d_T^2)_3: 4
+     solution coefficients on the kernel basis: [1, 0, 0, -1]
+(c2) author (no delta_1.kappa)    rank 4, with (d_T^2)_3: 5
+     kappa* =
+        [4, 6, 7] -> [1, 3] : r_2^2*t_2_1^2*E_(V1, V2, V2, V1, W2, V1, V2, V2)*s1*s2*s1*s3*s7*s6*s5*E_(V2, V2, V1, V1, V2, W2, V1, V2)
+        [4, 6, 7] -> [2, 3] : -r_2^2*t_2_1^2*E_(V1, V2, V2, V1, W2, V1, V2, V2)*s1*s2*s1*s3*s5*s7*E_(V2, V2, V1, V1, V1, W2, V2, V2)
+        [1, 4, 6, 7] -> [1, 2, 3] : -r_2^2*t_2_1^2*E_(V1, V2, V2, W2, V1, V1, V2, V2)*s1*s2*s1*s4*s3*s7*E_(V2, V2, V1, V1, W2, V1, V2, V2)
+        [2, 4, 6, 7] -> [1, 2, 3] : -r_2^2*t_2_1^2*E_(V1, V2, V1, W2, V2, V1, V2, V2)*s1*s2*s4*s3*s2*s1*s7*E_(V2, V2, V1, V1, W2, V1, V2, V2)
+        [4, 5, 6, 7] -> [1, 3, 5] : -r_2^2*t_2_1^2*E_(V2, V2, V1, W2, V1, V1, V2, V2)*s1*s5*s6*s7*s6*s5*s4*E_(V2, V2, V1, V2, W2, V1, V2, V1)
+        [4, 5, 6, 7] -> [2, 3, 5] : r_2^2*t_2_1^2*E_(V2, V2, V1, W2, V1, V1, V2, V2)*s1*s5*s4*s6*s7*s6*E_(V2, V2, V1, V1, W2, V2, V2, V1)
+        [1, 4, 5, 6, 7] -> [1, 2, 3, 5] : r_2^2*t_2_1^2*E_(V2, V2, W2, V1, V1, V1, V2, V2)*s1*s3*s5*s6*s7*s6*E_(V2, V2, V1, W2, V1, V2, V2, V1)
+        [2, 4, 5, 6, 7] -> [1, 2, 3, 5] : r_2^2*t_2_1^2*E_(V2, V1, W2, V2, V1, V1, V2, V2)*s3*s2*s1*s5*s6*s7*s6*E_(V2, V2, V1, W2, V1, V2, V2, V1)
+     d = d_T + kappa* + (dot-free corrections up to r^2): d^2 coefficients by r-degree {4: 18}
+     order r^4: 7 dot-free candidates, rank 7, with obstruction 7
+     d = d_T + kappa* + (dot-free corrections up to r^3): d^2 coefficients by r-degree {}
+     ==> DOT-FREE DIFFERENTIAL FOUND (d^2 = 0 exactly)
+   [331s]

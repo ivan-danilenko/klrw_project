@@ -1,0 +1,6 @@
+RESULT Theorem C D4 maxlen 6: 3088 (word, red) cases, no assertion failed [774s]
+   C1 cases                       41152
+   C2 cases                       2328
+   C3 sliding errors              13968
+   C4 two-term cases              1584
+   d2 products                    1216368

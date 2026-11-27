@@ -1,0 +1,4 @@
+RESULT Prop 10.2 [6s]
+   10.2 cases                                                   504
+   10.2 cases with a slot of colour c below a                   75
+   10.2 cases with c = red colour or e/e' = red colour          393
