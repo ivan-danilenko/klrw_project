@@ -1,8 +1,9 @@
 # 03 — The cyclic condition: combinatorics
 
-> **REVISION NOTES** (response to `proofs/R03_referee.md`). Applied: Issue 1 (§1.5).
-> Remaining: Issue 2 (self-contained Lemmas 3.1(c), 4.2(c), weight order), Issues 3–8
-> (cosmetic), suggestion 9; re-run of the scripts; Status update.
+> **REVISION NOTES** (response to `proofs/R03_referee.md`). Applied: Issues 1, 3, 4, 5, 6
+> (Lemma 7.2 and Prop. 7.3 rewritten), 7, 8, suggestion 9 (addendum to Prop. 3.3). Remaining:
+> Issue 2 (Lemmas 3.1(c)(d), 4.2(c)(d), Cor. 3.4(c), 4.4(b), Theorem U; `addable_check` in
+> `03_typeA.py`, `03_typeD.py`). Remaining: re-run of the scripts, Status.
 
 Front: the cyclic condition of `PROOFS.md` Cor. 3.1 / Prop. 7, for arbitrary words and for the
 minuscule stacks of types A, D, E. Purely combinatorial; all scripts are plain `python3`
@@ -26,12 +27,13 @@ tree); "word" means an arbitrary word in the nodes of `Γ` unless "minuscule" is
 | 7 | **Blocks matter**, also for minuscule words: ignoring blocks makes strictly more words "cyclic" (e.g. `A_2` word `1212121`, the 3×5 rectangle of `sl_8, ω_3`, the 13-slot `E_6` ideal — the last two carry verified tree complexes). | Prop. 2.11 |
 | 8 | Minuscule chain words: exactly `1 − δ_{c,k}` neighbour letters before the first `c`, exactly two between consecutive `c`'s; hence pattern B never starts at the first occurrence. Colour multiplicities are bounded by the coefficients of `λ − w_0λ`. | Lemmas 2.12, 2.14, Cor. 2.13 |
 | 9 | **Theorem A.** `sl_n`, `Λ^k ℂ^n`, Young diagram `λ ⊆ k × (n−k)`: the stack is cyclic ⇔ `λ ⊇ (4,4,4,3)` ⇔ `λ_3 ≥ 4` and `λ_4 ≥ 3`. (`(4,4,4,3)` is self-conjugate, so this is already the symmetric statement.) | §3 |
-| 10 | Type A: if all diagonals of `λ` have ≤ 3 boxes (e.g. `λ = (4,4,4,3)`), the minimal cyclic configuration is unique (the one of `PROOFS.md` Prop. 8). | Prop. 3.3 |
+| 10 | Type A: if all diagonals of `λ` have ≤ 3 boxes (e.g. `λ = (4,4,4,3)`), the minimal cyclic configuration is unique (the one of `PROOFS.md` Prop. 8); for `(4,4,4,3)` it is the only cyclic configuration at all. | Prop. 3.3 |
 | 11 | `sl_n` with `ω_1, ω_2, ω_3` (and duals) is never cyclic; the full poset of `Λ^k ℂ^n` is cyclic ⇔ `4 ≤ k ≤ n − 4`. | Cor. 3.4 |
 | 12 | `D_n` vector representation: never cyclic (all `n`). | Prop. 4.1 |
 | 13 | **Theorem D.** `D_n` half-spin, ideal = strict partition `ℓ`: cyclic ⇔ `ℓ_3 ≥ 3` and `ℓ_4 ≥ 1` ⇔ `ℓ ⊇ (5,4,3,1)` (exists iff `n ≥ 6`). | §4 |
 | 14 | In types A and D every non-cyclic minuscule stack has all colour multiplicities ≤ 3 (so blocks between two pairs and factors `r_c²` never occur there). | Lemmas 3.2, 4.3, Cor. 6.1 |
 | 15 | Unique minimal cyclic ideal / weight `μ_c` in types A, D (all ranks), with the explicit `μ_c` of `NOTES.md` §4 confirmed. | Theorem U (§6) |
+| 15a | Models of types A and D: the stacks of `μ` are exactly the linear extensions of one Young diagram / shifted diagram, bijectively with the weights, and the weight order is reverse inclusion (by induction on the chain word; no citation needed). | Lemmas 3.1, 4.2 |
 | 16a | `D_n` half-spin: every cyclic ideal gives a non-Deodhar element (all `n`; input: one exact Hecke computation in `D_6`). | Prop. 7.3 |
 | 16 | Type A: non-cyclic ⇔ Deodhar (⇔ 321-hexagon-avoiding), via Billey–Warrington Thm. 1. | Prop. 7.1 |
 
@@ -47,8 +49,8 @@ methods):**
 ideals), and its failure in type E (`E_6`: the 13-slot ideal is non-Deodhar but not
 cyclic; `E_7`: three such ideals) — `03_deodhar.py`.
 
-**Corrections** (details in §8): the brief's claim that `(4,4,4,3)` is not
-transposition-symmetric is wrong; `NOTES.md` §4 table, row "`sl_n, ω_k` with
+**Corrections** (details in §8): the claim in this front's task statement (not in any project
+file) that `(4,4,4,3)` is not transposition-symmetric is wrong; `NOTES.md` §4 table, row "`sl_n, ω_k` with
 `4 ≤ k ≤ n−3`" should read `4 ≤ k ≤ n−4` (off by one; the second table has it right);
 `NOTES.md` §4 "the minimal cyclic configuration always has the same shape" omits the
 pattern N (which occurs at the `E_6`, `E_7` thresholds) and the coupling of the two
@@ -415,9 +417,9 @@ blocks allowed (they are neither links nor forbidden).
 > (c) `E_6`, `ω_1`: the ideals of 11, 12, 13 slots are cyclic ignoring blocks but not cyclic;
 > `D_6` half-spin: four ideals (10, 11, 12, 12 slots); `sl_{10}`, `ω_5`: 54 versus 42 ideals.
 
-*Proof.* (a) by inspection; non-cyclicity: colour 1 occurs four times, colour 2 three times,
-so only T, B, N could occur; T and B need two distinct neighbours of a colour (only one exists
-in `A_2`); for N with `d = 1`, `y_1 < y_2 < j < z_2 < z_1` forces `y_1, y_2, z_2, z_1 = 1, 3, 5, 7`,
+*Proof.* (a) The configuration: by inspection. Non-cyclicity: by Theorem 2.8 it suffices to
+exclude T, B and N. T and B need two distinct neighbours of a colour, and in `A_2` every colour
+has only one. For N (colour 1 occurs four times, at 1, 3, 5, 7; colour 2 three times) with `d = 1`, `y_1 < y_2 < j < z_2 < z_1` forces `y_1, y_2, z_2, z_1 = 1, 3, 5, 7`,
 `j ∈ {4}`, `e = 2 = c(j)`, and `p ⊂ {2, 4, 6} ∖ {j}` must have a slot in `(3, 5)` — only `4 = j`:
 impossible; `d = 2` needs four slots of colour 2. (b), (c): `03_minuscule.py --blocks` and the
 check in §8 (script `03_minuscule.py`, function `classify(..., allow_blocks=True)`). ∎
@@ -478,40 +480,83 @@ element `w_0 λ`.) ∎
 `(r,s) ≤ (r',s')` iff `r ≤ r'` and `s ≤ s'`. A Young diagram `λ ⊆ R` (an order ideal) has the
 *row-major word*: its boxes row by row, left to right.
 
-> **Lemma 3.1 (model).** Let `λ ⊆ R` be a Young diagram.
-> (a) The heap of the row-major word of `λ` is `λ` with the componentwise order.
-> (b) The row-major word of `λ` is a minuscule chain word for `ω_k`; for `λ = R` it ends at the
-> lowest weight.
-> (c) (standard) Every stack of `V(ω_k)`, i.e. every chain word `ω_k → μ`, is a linear
-> extension of a unique Young diagram `λ(μ) ⊆ R`, and `μ ↦ λ(μ)` is a bijection from the
-> weights onto the Young diagrams in `R`; for `μ = e_S`, `S = {s_1 < … < s_k}`,
-> `λ(μ)_i = s_{k+1−i} − (k+1−i)`.
+> **Lemma 3.1 (model).** For `e ∈ ℤ` let `D_e = {(r, r+e)} ∩ R` (the boxes of colour `k+e`,
+> listed componentwise increasing: `D_e(i) = (i, i+e)` for `e ≥ 0`, `D_e(i) = (i−e, i)` for
+> `e < 0`), and for a Young diagram `λ ⊆ R` let `a_e(λ) = |λ ∩ D_e|`.
+> (a) For every linear extension of `λ`, the heap of its colour word is `λ` with the
+> componentwise order.
+> (b) The row-major word of `λ` is a minuscule chain word for `ω_k`.
+> (c) `λ ∩ D_e` is the initial segment `D_e(1), …, D_e(a_e(λ))`. Hence `λ` is determined by the
+> numbers `a_e(λ)`, and `λ ⊇ λ'` iff `a_e(λ) ≥ a_e(λ')` for all `e`.
+> (d) Every chain word `ω_k → μ` is the colour word of a linear extension of the Young diagram
+> `λ(μ)` with `a_e(λ(μ)) = [ω_k − μ : α_{k+e}]` (the number of letters `k+e`), and every linear
+> extension of a Young diagram is a chain word. Consequently the stacks of `μ` are exactly the
+> linear extensions of `λ(μ)`; `μ ↦ λ(μ)` is a bijection from the weights of `Λ^k ℂ^n` onto
+> the Young diagrams in `R`; `μ ≤ ν` (`ν − μ ∈ ℕ`-span of simple roots) iff `λ(μ) ⊇ λ(ν)`; and
+> for `μ = e_S`, `S = {s_1 < … < s_k}`, `λ(μ)_i = s_{k+1−i} − (k+1−i)`.
 
-*Proof.* (a) Row-major order is a linear extension of the componentwise order. The covering
-relations `(r,s) ⋖ (r,s+1)`, `(r,s) ⋖ (r+1,s)` join adjacent colours, so componentwise ⊆
-heap order. Conversely two boxes of equal or adjacent colours are componentwise comparable:
-equal colours `(r,s)`, `(r+t, s+t)`; colours `c` and `c+1`, boxes `(r,s)` and
-`(r', s−r+1+r')`: if `r ≤ r'` the first is below the second, if `r' ≤ r − 1` the second is
-below the first. So every heap relation (generated by equal/adjacent colours in word order)
-is a componentwise relation.
-(b) By (a) the letters before a box `x = (r,s)` of equal or adjacent colour are exactly the
-boxes below `x` of those colours (they are comparable with `x` and precede it). Count them:
-same colour: `min(r,s) − 1`; colour `c+1`: boxes `(r', s−r+1+r')` with
+*Proof.* (a) A linear extension lists `λ` compatibly with the componentwise order. The covering
+relations `(r,s) ⋖ (r,s+1)`, `(r,s) ⋖ (r+1,s)` join adjacent colours, so componentwise ⊆ heap
+order. Conversely two boxes of equal or adjacent colours are componentwise comparable: equal
+colours `(r,s)`, `(r+t, s+t)`; colours `c` and `c+1`, boxes `(r,s)` and `(r', s−r+1+r')`: if
+`r ≤ r'` the first is below the second, if `r' ≤ r − 1` the second is below the first. So every
+generating relation of the heap (equal or adjacent colours, in word order) is a componentwise
+relation, and so is its transitive closure.
+(b) By (a), in any linear extension the letters before a box `x = (r,s)` of equal or adjacent
+colour are exactly the boxes below `x` of those colours (they are comparable with `x` and
+precede it). Count them: same colour: `min(r,s) − 1`; colour `c+1`: boxes `(r', s−r+1+r')` with
 `max(1, r−s) ≤ r' ≤ r−1`, i.e. `min(r−1, s)`; colour `c−1`: boxes `(r', s−r−1+r')` with
 `max(1, r−s+2) ≤ r' ≤ r`, i.e. `min(r, s−1)` (boxes with colour `0` or `n` would lie outside
 `R`, so no non-existent colour is counted). The pairing is
 `δ_{r,s} + min(r−1,s) + min(r,s−1) − 2(min(r,s) − 1)`, which is `1` in each of the cases
-`r = s`, `r < s`, `r > s`. For `λ = R` the length is `k(n−k) = dim Gr(k,n)`, the length of the
-longest chain, so the chain cannot be prolonged and ends at the lowest weight (Lemma 2.14).
-(c) is Proctor's description of the minuscule poset of `Λ^k ℂ^n` and of its weight lattice
-[Proctor 1984], together with Stembridge's theorem that the chain words `λ → μ` are the
-reduced words of one fully commutative element [Stembridge 2001]. *Checked:* for all `sl_n`,
-`n ≤ 10`, all `k`: `03_minuscule.setup` verifies that the number of chain words `ω_k → μ`
-equals the number of linear extensions of the ideal reached by any one of them (so the chain
-words to `μ` are exactly the linear extensions of one ideal), that ideals and weights
-correspond bijectively, and that `μ ≤ ν` (`ν − μ ∈ ℕ`-span of simple roots) iff
-`I_μ ⊇ I_ν`; `03_typeA.py` checks (a), (b) for `k, n−k ≤ 6`; `03_deodhar.py` checks the
-formula for `λ(e_S)` for `n ≤ 9`. ∎
+`r = s`, `r < s`, `r > s`. This holds for every linear extension, in particular for the
+row-major one.
+(c) If `D_e(i) ∈ λ` and `i ≥ 2`, then `D_e(i−1) ≤ D_e(i)` lies in `λ`.
+(d) *Claim.* Let `λ ⊆ R` be a Young diagram, `μ_λ = ω_k − Σ_e a_e α_{k+e}` (`a_e = a_e(λ)`),
+`c = k + d` a colour, and `y = D_d(a_d + 1)` the next box of `D_d`. Then
+`⟨μ_λ, α_c^∨⟩ = δ_{d,0} + a_{d−1} + a_{d+1} − 2a_d ∈ {−1, 0, 1}`, and it equals `1` iff `y ∈ R`
+and `λ ∪ {y}` is a Young diagram (`y` *addable*). (Diagonals `D_e` that miss `R` have `a_e = 0`;
+they are exactly those of the non-existent colours `k + e ∉ [1, n−1]`.)
+*Proof of the claim*, `d ≥ 1`. The left neighbour of `D_d(i)` is `D_{d−1}(i)`, its upper
+neighbour `D_{d+1}(i−1)`. Since `λ` is a Young diagram: `D_d(a_d) ∈ λ` gives
+`D_{d−1}(a_d) ∈ λ` and (for `a_d ≥ 2`) `D_{d+1}(a_d − 1) ∈ λ`; `D_{d+1}(a_{d+1}) ∈ λ` gives its
+left neighbour `D_d(a_{d+1}) ∈ λ`; `D_{d−1}(a_{d−1}) ∈ λ` gives (for `a_{d−1} ≥ 2`) its upper
+neighbour `D_d(a_{d−1} − 1) ∈ λ`. With (c): `ε_− := a_{d−1} − a_d ∈ {0,1}` and
+`ε_+ := a_d − a_{d+1} ∈ {0,1}`, and the pairing is `ε_− − ε_+`. It is `1` iff `ε_− = 1` and
+`ε_+ = 0`, i.e. iff the left neighbour `D_{d−1}(a_d + 1)` of `y` is in `λ` and either `a_d = 0`
+or the upper neighbour `D_{d+1}(a_d)` of `y` is in `λ`. These are the lower covers of `y`; if they
+are in `λ ⊆ R`, so is the row of `y`, and its column is that of the upper neighbour or, for
+`a_d = 0`, is `1 + d ≤ n − k` (as `c ≤ n − 1`); so this is exactly "`y` addable". `d = 0`: the
+neighbours of `D_0(i) = (i,i)` are `D_{−1}(i−1)` (left) and `D_1(i−1)` (upper), and the same
+reasoning gives `a_{±1} ∈ {a_0 − 1, a_0}`, pairing `1 − (a_0 − a_1) − (a_0 − a_{−1})`, equal to `1`
+iff `a_1 = a_{−1} = a_0`, iff `y = (a_0+1, a_0+1)` is addable. `d ≤ −1`: transposition
+`(r,s) ↦ (s,r)` maps `λ` to `λ'` in `R' = [1,n−k] × [1,k]`, `D_e` to `D_{−e}`, preserves
+addability and the pairing formula; apply the case `−d ≥ 1` to `λ'` (for `Λ^{n−k}`).
+*Induction.* The empty word is the colour word of the empty diagram. If `u` is the colour word of
+a linear extension of `λ`, the weight reached by `u` is `μ_λ` (the letters `k+e` are the boxes of
+`D_e`); if `u·c` is a chain word, the claim gives an addable `y` of colour `c`; `y` is maximal
+in `λ ∪ {y}` (a box above `y` in `λ` would put `y` in `λ`), so `u·c` is the colour word of a linear
+extension of `λ ∪ {y}`. Conversely every linear extension of a Young diagram is a chain word, by
+the proof of (b). *Consequences.* By (c), `λ(μ)` is determined by `μ`, and distinct diagrams give
+distinct weights; every diagram is reached (b). The weights of `Λ^k ℂ^n` are the `e_S`, `C(n,k)` of
+them, as many as Young diagrams in `R`, and the formula for `λ(e_S)` exhibits the bijection:
+adding the box `(r, λ_r + 1)` of colour `c = k + λ_r + 1 − r` subtracts `α_c = ε_c − ε_{c+1}`,
+i.e. replaces `c` by `c + 1` in `S`; starting from `S = {1, …, k}`, the element `s_{k+1−r}` is
+`k + 1 − r + λ_r` throughout. Weight order: `ν − μ ∈ ℕ`-span iff
+`a_e(λ(μ)) ≥ a_e(λ(ν))` for all `e`, iff `λ(μ) ⊇ λ(ν)` by (c). Finally, no box is addable to `R`,
+so by the claim the row-major word of `R` cannot be prolonged: it ends at the lowest weight. ∎
+
+This makes the type A model self-contained. (For the general minuscule theory see
+R. A. Proctor, *Bruhat lattices, plane partition generating functions, and minuscule
+representations*, European J. Combin. 5 (1984) 331–350, and J. R. Stembridge, *Minuscule
+elements of Weyl groups*, J. Algebra 235 (2001) 722–743, where `λ`-minuscule elements are shown
+to be fully commutative; I have not checked theorem numbers, and nothing here depends on them.)
+*Checks:* `03_typeA.py` (`model_check`: row-major words of all rectangles up to 6×6 are chain
+words to the lowest weight with componentwise heap; `addable_check`: the claim for all 10 164
+pairs (diagram in the 6×6 box, diagonal); weight order = reverse inclusion for `sl_n`,
+`n ≤ 10`); `03_minuscule.setup` (for every weight, #chain words = #linear extensions of its
+ideal); `03_deodhar.py` (the formula for `λ(e_S)`, `n ≤ 9`); and the referee's `R03_typeA.py`
+(`A_11 ω_6`, all 924 weights, one commutation class of chain words each).
 
 Since cyclicity depends only on the heap (1.4), **"the stack of `μ` is cyclic" means "the
 row-major word of `λ(μ)` is cyclic"**, and everything below is about Young diagrams.
@@ -532,8 +577,8 @@ row-major word of `λ(μ)` is cyclic"**, and everything below is about Young dia
 
 > **Theorem A.** For a Young diagram `λ ⊆ k × (n−k)`, the stack (any linear extension of
 > `λ`, colours `k + s − r`) is cyclic if and only if `λ ⊇ (4,4,4,3)`, i.e. iff `λ_3 ≥ 4` and
-> `λ_4 ≥ 3`, i.e. iff the boxes `(3,4)` and `(4,3)` belong to `λ`. For `μ = e_S`: iff
-> `s_{k−2} ≥ k+2` and `s_{k−3} ≥ k`.
+> `λ_4 ≥ 3`, i.e. iff the boxes `(3,4)` and `(4,3)` belong to `λ`. For `μ = e_S`,
+> `S = {s_1 < … < s_k}`: if `k ≥ 4`, iff `s_{k−2} ≥ k+2` and `s_{k−3} ≥ k`; if `k ≤ 3`, never.
 
 *Proof.* "⇐" is `PROOFS.md` Prop. 8: the configuration given there is pattern T with
 `c = k`, `x_1, x_2, x_3 = (1,1), (2,2), (3,3)`, pairs `((2,1), (4,3))` and `((1,2), (3,4))`
@@ -549,14 +594,15 @@ so `(3, 4+d) ∈ λ`, whence `(3,4) ∈ λ`; a box `(r, r+d−1)` of `D_{d−1}`
 `d < 0`: `x_3 = (3−d, 3)`; a box of `D_{d+1}` above it is `(r, r+d+1)` with `r ≥ 3−d`, so
 `(3−d, 4) ∈ λ` and, as `3 − d ≥ 4`, `(4,4) ∈ λ`; a box of `D_{d−1}` above it is `(r, r+d−1)`
 with `r ≥ 4−d`, so `(4−d, 3) ∈ λ` and `(4,3) ∈ λ`. In both cases `λ ⊇ (4,4,4,3)`:
-contradiction. The formula in `S` is `λ_3 = s_{k−2} − (k−2)`, `λ_4 = s_{k−3} − (k−3)`. ∎
+contradiction. The formula in `S`: for `k ≥ 4`, `λ_3 = s_{k−2} − (k−2)` and
+`λ_4 = s_{k−3} − (k−3)`; for `k ≤ 3`, `λ` has at most three rows, so `λ_4 = 0`. ∎
 
 *Checks.* `03_typeA.py 7`: all 3432 partitions in the 7×7 box (2116 cyclic, 1316 not): the
 exhaustive search agrees with `λ ⊇ (4,4,4,3)`; Lemma 3.2 holds; the Prop. 8 configuration is
 cyclic in every `λ ⊇ (4,4,4,3)`. `03_minuscule.py` (all ideals of `A_7 ω_4`, `A_8 ω_4`,
 `A_9 ω_4`, `A_9 ω_5`): 2, 9, 25, 42 cyclic ideals, one minimal.
 
-**On the symmetry `k ↔ n − k`.** The brief says `(4,4,4,3)` is not symmetric under
+**On the symmetry `k ↔ n − k`.** The task statement of this front says `(4,4,4,3)` is not symmetric under
 transposition. It is: its rows are `4,4,4,3` and its columns are `4,4,4,3` (column 4 has the
 boxes of rows 1–3 only). Transposition `(r, s) ↦ (s, r)` maps the stack of `λ` for `Λ^k` to
 the stack of `λ'` for `Λ^{n−k}` with colours `c ↦ n − c` (box `(s, r)` of `λ'` has colour
@@ -582,6 +628,14 @@ criterion; the exhaustive computation over the 6×6 and 7×7 boxes confirms it a
 `(r, r−1)` with `r ≥ 4`; as `|D_{−1}| ≤ 3`, this is `(4,3)`. Symmetrically `((1,2),(3,4))`.
 (b) Lemma 2.3 and Theorem A. ∎
 
+*Addendum to (a) (suggested by the referee).* For `λ = (4,4,4,3)` this configuration is the
+**only** cyclic configuration: any cyclic configuration contains it, and the boxes it leaves free
+carry only two further pairs, `((1,3),(2,4))` (colour `k+2`) and `((3,1),(4,2))` (colour `k−2`);
+the first has both slots inside `((1,2),(3,4))` (they lie between `(1,2)` and `(3,4)` in the heap),
+the second both inside `((2,1),(4,3))`, so neither is linked to anything and adding them
+disconnects. For `(5,4,4,3)`, `(4,4,4,3,1)`, `(5,5,4,3)` the same holds by brute force over all
+configurations (`03_typeA.py`, function `all_cyclic_brute`; also the referee's `R03_typeA.py`).
+
 Beyond (a) there is no short list: `03_typeA.py` finds, as (number of minimal cyclic
 configurations; cycle lengths; distances of the mover from the cycle):
 `(4,4,4,4)`: 6; 4; 0–1. `(5,5,5,5)`: 32; 4, 6; 0–3. `5^5`: 414; 4, 6, 8; 0–4. Example of a
@@ -599,9 +653,9 @@ the 6×6 box, 362 are cyclic; all contain T, 262 also B, 162 also N.
 > (`λ(μ_c) = (4,4,4,3)`), whenever `4 ≤ k ≤ n−4`; there are none otherwise.
 
 *Proof.* (a) `λ ⊆ k × (n−k)` has at most `k ≤ 3` rows, so `λ_4 = 0`, or at most `n − k ≤ 3`
-columns, so `λ_3 ≤ 3`. (b) `(4,4,4,3) ⊆ k × (n−k)` iff `k ≥ 4` and `n − k ≥ 4`. (c) Theorem A,
-Lemma 3.1(c) and the formula for `λ(e_S)`; the weight order is reverse inclusion (Lemma 3.1(c),
-checked for `n ≤ 10`; in general [Proctor 1984]). ∎
+columns, so `λ_3 ≤ 3`. (b) `(4,4,4,3) ⊆ k × (n−k)` iff `k ≥ 4` and `n − k ≥ 4`. (c) Theorem A
+and Lemma 3.1(d) (stacks of `μ` = linear extensions of `λ(μ)`, the formula for `λ(e_S)`, and
+weight order = reverse inclusion). ∎
 
 (For `ω_1, ω_2` also Prop. 2.2 with Lemma 2.14 applies: `[ω_k + ω_{n−k} : α_c] = min(c, k, n−k, n−c) ≤ 2`.)
 
@@ -616,8 +670,12 @@ checked for `n ≤ 10`; in general [Proctor 1984]). ∎
 > **Proposition 4.1.** For `D_n`, `ω_1`, every colour occurs at most twice in every stack;
 > hence no stack is cyclic (all `n ≥ 4`).
 
-*Proof.* `ω_1 = ε_1 = α_1 + … + α_{n−2} + ½(α_{n−1} + α_n)` and `w_0 ω_1 = −ε_1`, so
-`ω_1 − w_0 ω_1 = 2α_1 + … + 2α_{n−2} + α_{n−1} + α_n`. Lemma 2.14 and Prop. 2.2. ∎
+*Proof.* `ω_1 = ε_1 = α_1 + … + α_{n−2} + ½(α_{n−1} + α_n)` (`α_i = ε_i − ε_{i+1}`, `i < n`,
+`α_n = ε_{n−1} + ε_n`). A chain step `μ ↦ μ − α_i = s_i μ` keeps `μ` in `{±ε_1, …, ±ε_n}` (the
+`s_i` act by signed permutations), so every stack ends at some `μ = ±ε_i`, and colour `c` occurs
+`[ε_1 − μ : α_c]` times. Since `ε_1 + μ` is `0`, `2ε_1` or a positive root, it lies in the
+`ℕ`-span of the simple roots, so `[ε_1 − μ : α_c] ≤ [2ε_1 : α_c] ∈ {2, 1}`. Prop. 2.2. (This is
+Lemma 2.14 made explicit, without the general facts on minuscule orbits.) ∎
 
 (*Lemma 4.0, for `D_4`:* the three minuscule representations of `D_4` are permuted by
 triality, and for `ω_1` the bound is `(2,2,1,1)`; so all of `D_4` is covered by Prop. 2.2.)
@@ -635,31 +693,75 @@ partitions `ℓ = (ℓ_1 > ℓ_2 > … > ℓ_t > 0)` with `ℓ_u ≤ n − u` (a
 initial segment of length `ℓ_u`, and `(u, u + ℓ_u) ∈ I` forces `(u−1, u + ℓ_u) ∈ I`, i.e.
 `ℓ_{u−1} ≥ ℓ_u + 1`); there are `2^{n−1}` of them.
 
-> **Lemma 4.2 (model).** (a) The heap of the row-major word of `I_ℓ` is `I_ℓ` with the
-> componentwise order. (b) The row-major word of `I_ℓ` is a minuscule chain word for `ω_n`;
-> for `ℓ = (n−1, …, 1)` it ends at the lowest weight. (c) (standard) Every stack of the
-> half-spin representation `V(ω_n)` is a linear extension of a unique `I_ℓ`, and this is a
-> bijection between weights and strict partitions.
+For `1 ≤ r ≤ n−1` let `T_r = {(u, u+r)}`, listed as `T_r(i) = (i, i+r)`, `1 ≤ i ≤ n − r`
+(colour `n − r` for `r ≥ 2`; for `r = 1` colour `n` at odd `i`, `n − 1` at even `i`), and for an
+ideal `I` let `b_r(I) = |I ∩ T_r|`.
+
+> **Lemma 4.2 (model).** (a) For every linear extension of an ideal `I` of `P_n`, the heap of
+> its colour word is `I` with the componentwise order. (b) The row-major word of `I_ℓ` is a
+> minuscule chain word for `ω_n`. (c) `I ∩ T_r` is the initial segment of length `b_r(I)`; the
+> colour content of `I` is: `b_r(I)` letters `n − r` (`r ≥ 2`), `⌈b_1/2⌉` letters `n` and
+> `⌊b_1/2⌋` letters `n − 1`. Hence `I` is determined by its colour content, and `I ⊇ I'` iff the
+> content of `I` is componentwise `≥` that of `I'`. (d) Every chain word `ω_n → μ` is the colour
+> word of a linear extension of the ideal `I(μ)` with content `ω_n − μ`, and every linear
+> extension of an ideal is a chain word. Consequently the stacks of `μ` are exactly the linear
+> extensions of `I(μ)`; `μ ↦ I(μ)` is a bijection from the `2^{n−1}` weights of the half-spin
+> representation onto the strict partitions; and `μ ≤ ν` iff `I(μ) ⊇ I(ν)`.
 
 *Proof.* (a) Covering relations `(u,v) ⋖ (u,v+1)` and `(u,v) ⋖ (u+1,v)` (`u + 1 < v`) join
 adjacent colours: `n−r` and `n−r−1` (`r ≥ 2`) or `n/n−1` and `n−2` (`r = 1`); resp. `n−r`, `n−r+1`
 (`r ≥ 3`) or `n−2` and `n/n−1` (`r = 2`). Equal or adjacent colours are comparable: equal
-colours lie on a "diagonal" `v − u = const` (for `n`, `n−1` on `v = u+1`); for colours `n−r`,
-`n−r−1` (`r ≥ 2`): `(u, u+r) ≤ (u', u'+r+1)` iff `u ≤ u'`, and `(u', u'+r+1) ≤ (u, u+r)` iff
-`u' ≤ u − 1`; for `n−2` and `n` or `n−1`: `(u, u+2) ≤ (u', u'+1)` iff `u ≤ u' − 1`, and
-`(u', u'+1) ≤ (u, u+2)` iff `u' ≤ u`. Conclude as in Lemma 3.1(a).
-(b) As in Lemma 3.1(b), the pairing at `x` is `δ_{c(x), n} + N − 2E` with `N`, `E` the numbers
-of boxes below `x` of adjacent resp. equal colour. `x = (u, u+r)`, `r ≥ 3`: `E = u − 1`,
-`N = (u − 1) + u` (colour `n−r−1`: `(u', u'+r+1)`, `u' ≤ u−1`; colour `n−r+1`: `(u', u'+r−1)`,
-`u' ≤ u`); pairing `1`. `r = 2`: `E = u − 1`, `N = (u−1) + u` (colour `n−3`: `u' ≤ u−1`;
-colours `n−1`, `n`: `(u', u'+1)`, `u' ≤ u`); pairing `1`. `r = 1`: `E = ⌊(u−1)/2⌋` (same parity),
-`N = u − 1` (colour `n−2`: `(u', u'+2)`, `u' ≤ u−1`), `δ = 1` iff `u` odd; pairing
-`1 + (u−1) − (u−1) = 1` (`u` odd) or `(u−1) − (u−2) = 1` (`u` even). For the full staircase the
-length `n(n−1)/2 = dim` of the spinor variety is maximal (Lemma 2.14).
-(c) [Proctor 1984; Stembridge 2001], as in Lemma 3.1(c). *Checked* for `4 ≤ n ≤ 11`:
-`03_typeD.py` (the row-major word of `P_n` is a chain to the lowest weight, its heap order is
-componentwise, `2^{n−1}` ideals) and `03_minuscule.setup` (chains = linear extensions, ideals
-↔ weights; weight order = reverse inclusion for `n ≤ 9`). ∎
+colours lie on one `T_r`; for colours `n−r`, `n−r−1` (`r ≥ 2`): `(u, u+r) ≤ (u', u'+r+1)` iff
+`u ≤ u'`, and `(u', u'+r+1) ≤ (u, u+r)` iff `u' ≤ u − 1`; for `n−2` and `n` or `n−1`:
+`(u, u+2) ≤ (u', u'+1)` iff `u ≤ u' − 1`, and `(u', u'+1) ≤ (u, u+2)` iff `u' ≤ u`. Conclude as in
+Lemma 3.1(a).
+(b) As in Lemma 3.1(b), in any linear extension the pairing at `x` is `δ_{c(x), n} + N − 2E`
+with `N`, `E` the numbers of boxes below `x` of adjacent resp. equal colour.
+`x = (u, u+r)`, `r ≥ 3`: `E = u − 1`, `N = (u − 1) + u` (colour `n−r−1`: `(u', u'+r+1)`,
+`u' ≤ u−1`; colour `n−r+1`: `(u', u'+r−1)`, `u' ≤ u`); pairing `1`. `r = 2`: `E = u − 1`,
+`N = (u−1) + u` (colour `n−3`: `u' ≤ u−1`; colours `n−1`, `n`: `(u', u'+1)`, `u' ≤ u`); pairing `1`.
+`r = 1`: `E = ⌊(u−1)/2⌋` (same parity), `N = u − 1` (colour `n−2`: `(u', u'+2)`, `u' ≤ u−1`),
+`δ = 1` iff `u` odd; pairing `1 + (u−1) − (u−1) = 1` (`u` odd) or `(u−1) − (u−2) = 1` (`u` even).
+(c) If `T_r(i) ∈ I` and `i ≥ 2`, then `T_r(i−1) ≤ T_r(i)` is in `I`. The content is read off; it
+determines all `b_r` (`b_1 = ⌈b_1/2⌉ + ⌊b_1/2⌋`), hence `I`. Inclusion: `I ⊇ I'` iff
+`b_r(I) ≥ b_r(I')` for all `r`; for `r ≥ 2` this is the content of colour `n − r`, and for `r = 1`,
+`b_1 ≥ b'_1` iff `⌈b_1/2⌉ ≥ ⌈b'_1/2⌉` and `⌊b_1/2⌋ ≥ ⌊b'_1/2⌋` (both are non-decreasing in `b_1`,
+and their sum is `b_1`).
+(d) *Claim.* Let `I` be an ideal, `b_r = b_r(I)` (`b_n := 0`), `μ_I = ω_n − content(I)`, `c` a
+colour. (i) If `c = n − r`, `r ≥ 2`: `⟨μ_I, α_c^∨⟩ = b_{r−1} + b_{r+1} − 2b_r ∈ {−1, 0, 1}`, and it
+is `1` iff `y = T_r(b_r + 1)` is *addable* (`y ∈ P_n`, `I ∪ {y}` an ideal). (ii) If `c ∈ {n, n−1}`:
+the pairing lies in `{−1, 0, 1}` and is `1` iff `y = T_1(b_1 + 1)` is addable and has colour `c`.
+*Proof.* The ideal property gives `b_{r+1} ∈ {b_r − 1, b_r}` for `r ≥ 1`: `T_{r+1}(i)` has left
+neighbour `T_r(i)`, so `b_r ≥ b_{r+1}`; `T_r(i)`, `i ≥ 2`, has upper neighbour `T_{r+1}(i−1)`, so
+`b_{r+1} ≥ b_r − 1`. (i) The neighbours of `n − r` are `n − r ± 1`, except that for `r = 2` the
+colours `n−1`, `n` (all of `T_1`, `b_1` boxes) replace `n − r + 1`, and for `r = n − 1` there is
+no `n − r − 1` (`T_n = ∅`). So the pairing is `(b_{r−1} − b_r) − (b_r − b_{r+1})`, a difference of
+two numbers in `{0, 1}`, equal to `1` iff `b_{r−1} = b_r + 1` and `b_{r+1} = b_r`, i.e. iff the
+left neighbour `T_{r−1}(b_r + 1)` of `y` and (if `b_r ≥ 1`) its upper neighbour `T_{r+1}(b_r)` lie
+in `I`; these are the lower covers of `y`, and then `y ∈ P_n` (its row is that of the left
+neighbour; its column `b_r + 1 + r` is that of the upper neighbour, or `1 + r ≤ n` if `b_r = 0`).
+(ii) The only neighbour of `n` and of `n − 1` is `n − 2`. For `c = n` the pairing is
+`1 − 2⌈b_1/2⌉ + b_2`: if `b_1` is even, `1 − (b_1 − b_2) ∈ {0, 1}`, equal to `1` iff `b_2 = b_1`; if
+`b_1` is odd, `−(b_1 − b_2) − 0 ∈ {−1, 0}`. For `c = n − 1` it is `−2⌊b_1/2⌋ + b_2`: if `b_1` is
+odd, `1 − (b_1 − b_2) ∈ {0, 1}`, `= 1` iff `b_2 = b_1`; if even, `−(b_1 − b_2) ∈ {−1, 0}`. The box
+`y = (b_1 + 1, b_1 + 2)` has colour `n` iff `b_1` is even, and its only lower cover is the upper
+neighbour `T_2(b_1)` (if `b_1 ≥ 1`), which lies in `I` iff `b_2 = b_1`; and then `y ∈ P_n`.
+*Induction and consequences* exactly as in Lemma 3.1(d), with (c) in place of 3.1(c): a chain
+word `u·c`, `u` a linear extension of `I`, gives an addable `y` of colour `c`, maximal in
+`I ∪ {y}`; distinct ideals have distinct contents, hence distinct weights; every ideal is reached
+(b); there are `2^{n−1}` strict partitions with parts `≤ n − 1` (subsets of `{1, …, n−1}`; then
+`ℓ_u ≤ n − u` holds automatically) and `2^{n−1}` weights of the half-spin representation
+(`½(±1, …, ±1)` with an even number of minus signs, all of multiplicity one), so all weights are
+reached; weight order: `ν − μ ∈ ℕ`-span iff content`(I(μ)) ≥` content`(I(ν))` iff
+`I(μ) ⊇ I(ν)` by (c). No box is addable to `P_n`, so the row-major word of `P_n` ends at the
+lowest weight. ∎
+
+(The referee's `R03_referee.md` §5.3 gives the equivalent sign-vector description: `I_ℓ` has its
+minus signs at the positions `{n − ℓ_u}`, plus `n` if `ℓ` has an odd number of parts.)
+*Checks* for `4 ≤ n ≤ 11`: `03_typeD.py` (`model_check`: the row-major word of `P_n` is a chain to
+the lowest weight with componentwise heap, `2^{n−1}` ideals; `addable_check`: the claim for every
+ideal and every colour; weight order = reverse inclusion for `n ≤ 9`), `03_minuscule.setup`
+(chain words = linear extensions), and the referee's `R03_typeD.py` (`D_4 … D_9`).
 
 ### 4.3 The criterion
 
@@ -690,8 +792,12 @@ cyclic `I_ℓ` would have a colour `c` with exactly three occurrences `x_1 < x_2
 neighbour letters between `x_1, x_2` of distinct colours `c', c''`, and both occurring after
 `x_3`. Colours `n`, `n−1` occur at most twice (rows `u` odd resp. even, `u ≤ 4`). So
 `c = n − r`, `r ≥ 2`, occurring in rows 1, 2, 3 (rows `≥ 4` have length `≤ 1`):
-`x_u = (u, u+r)`. The boxes strictly between `x_1` and `x_2` are `(1, 2+r)` (colour `n−r−1`)
-and `(2, 1+r)` (colour `n−r+1` if `r ≥ 3`, `n−1` if `r = 2`). If `r ≥ 3`: a box of colour
+`x_u = (u, u+r)`. The boxes of colours adjacent to `c` lying between `x_1` and `x_2` — in the
+heap, equivalently in any linear extension, since such boxes are comparable with `x_1` and
+`x_2` (Lemma 4.2(a)) — are those strictly between them in the componentwise order, namely
+`(1, 2+r)` (colour `n−r−1`) and `(2, 1+r)` (colour `n−r+1` if `r ≥ 3`, `n−1` if `r = 2`); in
+the row-major word further letters (the rest of row 1, the start of row 2) lie between them,
+of non-adjacent colours. If `r ≥ 3`: a box of colour
 `n−r+1` above `x_3 = (3, 3+r)` is `(u, u+r−1)` with `u ≥ 4`; row 4 has length `≤ 1 < r − 1`.
 Impossible. If `r = 2`: colour `n−1` above `(3,5)` is `(u, u+1)` with `u ≥ 4`, so `(4,5) ∈ I_ℓ`,
 `ℓ_4 ≥ 1`; colour `n−3` above `(3,5)` is `(u, u+3)` with `u ≥ 3`, so `(3,6) ∈ I_ℓ`, `ℓ_3 ≥ 3`.
@@ -706,9 +812,12 @@ Contradiction. ∎
 
 *Proof.* (a) `ℓ = (n−1, …, 1)` has `ℓ_3 = n − 3`, `ℓ_4 = n − 4`. (b) Theorem D; the root content
 is read off the 13 boxes (rows `(1,2),…,(1,6)`; `(2,3),…,(2,6)`; `(3,4),(3,5),(3,6)`; `(4,5)`:
-colours `n` twice, `n−1` twice, `n−2`, `n−3` three times, `n−4` twice, `n−5` once); the
-`ε`-coordinates and the `D_6` statement are computed (`03_typeD.py`, `6 ≤ n ≤ 11`). The full staircase minus `I_{(5,4,3,1)}` in `D_6` is
-`{(4,6), (5,6)}`, of colours `4`, `6`. (c) Lemma 4.3. ∎
+colours `n` twice, `n−1` twice, `n−2`, `n−3` three times, `n−4` twice, `n−5` once). With
+`α_i = ε_i − ε_{i+1}` (`i < n`), `α_n = ε_{n−1} + ε_n`, this content is
+`ε_{n−5} + ε_{n−4} + ε_{n−3} + ε_{n−1}` (coefficients `1, 2−1, 3−2, 3−3, 2−3+2, −2+2` at
+`ε_{n−5}, …, ε_n`), so `μ_c = ½(1, …, 1) − (ε_{n−5} + ε_{n−4} + ε_{n−3} + ε_{n−1}) =
+½(+,…,+,−,−,−,+,−,+)` (also checked by `03_typeD.py`, `6 ≤ n ≤ 11`). The full staircase minus
+`I_{(5,4,3,1)}` in `D_6` is `{(4,6), (5,6)}`, of colours `4`, `6`. (c) Lemma 4.3. ∎
 
 *Checks.* `03_typeD.py 11`: for `4 ≤ n ≤ 11`, all `2^{n−1}` strict partitions: exhaustive search
 ⇔ `ℓ_3 ≥ 3 and ℓ_4 ≥ 1`; for the non-cyclic ones multiplicities `≤ 3`, no pattern T/B/N, and
@@ -768,9 +877,14 @@ lists all cyclic configurations of `I_c` with three pairs and all minimal ones
 compares the weight order with inclusion. ∎
 
 **What the computer proof assumes.** (1) The definitions 1.3 as implemented in
-`03_lib.Word.pair_rel`, `mover_rel`, `graph`, `is_cyclic_config` (about 40 lines; checked
-against an independent re-implementation, the pattern detector, on 3000 random words in
-`03_patterns.py`). M3 uses nothing else. (2) For M1: Lemma 2.3; for M2: Theorem 2.8 — both are
+`03_lib.Word.pair_rel`, `mover_rel`, `graph`, `is_cyclic_config` (about 40 lines). My pattern
+detector agrees with them on 3000 random words (`03_patterns.py`), but it is by the same author
+from the same reading, so this is a consistency check only. Genuinely independent checks are
+the referee's: `checks/R03_core.py` (definitions written from `PROOFS.md` Cor. 3.1, brute
+force, connected-growth search, pattern detector), `R03_typeE.py` (Theorem E re-derived, the
+B/N table slot for slot), and `R03_compare_author.py` (agreement with `03_lib` / `03_patterns`
+on 3000 random words, 462 cyclic, 0 disagreements); see `R03_referee.md` §5. M3 uses nothing
+else. (2) For M1: Lemma 2.3; for M2: Theorem 2.8 — both are
 not needed for the conclusion, since M3 alone decides every ideal. (3) The identification of
 stacks with ideals: `P` is the heap of one chain to the lowest weight, its ideals correspond
 to the weights, and every chain word `ω_k → μ` is a linear extension of `I_μ`.
@@ -813,14 +927,15 @@ can be upgraded to "proved".
 > `NOTES.md` §4.
 
 *Proof.* Type A: Theorem A and Corollary 3.4. Type D: Prop. 4.1, Theorem D, Corollary 4.4.
-Type E: Theorem E. The translation "ideal containment ⇔ weight order" is
-[Proctor 1984] in general and checked in every case computed (`03_minuscule.weight_order_check`:
-`sl_n`, `n ≤ 10`; `D_n`, `n ≤ 9`; `E_6`, `E_7` in `03_typeE.py`). (`E_8` has no minuscule
-representation.) ∎
+Type E: Theorem E. The translation "ideal containment ⇔ weight order" (and "stacks of `μ` =
+linear extensions of `I_μ`") is Lemma 3.1(d) for type A and Lemma 4.2(d) for the half-spin
+representations, proved in the models; for the vector representation of `D_n` nothing is needed
+(no cyclic stack); for `E_6`, `E_7` it is checked by `03_typeE.py` / `03_minuscule.setup`.
+(`E_8` has no minuscule representation.) ∎
 
-Equivalently `w ≥ w_c` in the Bruhat order of minimal coset representatives (for minuscule
-`λ` the Bruhat order on `W^J` is the inclusion order of ideals of `P` [Proctor 1984]), i.e. the
-Schubert variety of `μ` contains that of `μ_c`.
+Equivalently (not used, quoted) `w ≥ w_c` in the Bruhat order of minimal coset representatives
+(for minuscule `λ` the Bruhat order on `W^J` is the inclusion order of ideals of `P`, Proctor 1984),
+i.e. the Schubert variety of `μ` contains that of `μ_c`.
 
 > **Corollary 6.1 (non-cyclic minuscule stacks are thin).** In every non-cyclic minuscule
 > stack (types A, D: proved, Lemmas 3.2, 4.3 and Prop. 4.1; type E: computed, Theorem E(d))
@@ -890,29 +1005,59 @@ normalisation; `C'_{s_1} ⋯ C'_{s_l}` is the KL basis element iff all its coeff
 `y ≠ w`, lie in `vℤ[v]`): `A_7 ω_4`, `A_8 ω_4`, `A_8 ω_3`, `A_9 ω_5` — non-Deodhar ⇔ cyclic on
 every ideal (2, 9, 0, 42 ideals).
 
-> **Lemma 7.2 (non-Deodhar is inherited).** Let `W` be a Weyl group, `w = u u'` with
-> `ℓ(w) = ℓ(u) + ℓ(u')`. If `u` (or `u'`) is not Deodhar, neither is `w`. If `W_J ⊆ W` is a
-> standard parabolic subgroup and `u ∈ W_J`, `u` is Deodhar in `W_J` iff it is in `W`.
+> **Lemma 7.2 (non-Deodhar is inherited).** Let `W` be a Weyl group, `a`, `a'` reduced words
+> of `u`, `u'` with `ℓ(uu') = ℓ(u) + ℓ(u')`, and `w = uu'`. Write
+> `Π(a) = C'_{s_1} ⋯ C'_{s_l}`. If `Π(a) ≠ C'_u` (or `Π(a') ≠ C'_{u'}`), then `Π(aa') ≠ C'_w`. If
+> `u` is fully commutative, `Π(a)` does not depend on the reduced word `a` (commutation moves
+> only), so "Deodhar" is a property of `u`. If `W_J ⊆ W` is a standard parabolic subgroup and
+> `a` is a word in `J`, the statement `Π(a) = C'_u` means the same in `H(W_J)` and in `H(W)`.
 
-*Proof.* Write `Π(a) = C'_{s_1} ⋯ C'_{s_l}` for a word `a`. Positivity (Kazhdan–Lusztig;
-for Weyl groups via intersection cohomology): products of KL basis elements are
-`ℕ[v, v^{−1}]`-combinations of KL basis elements. So `Π(a) = C'_u + Σ_{y} m_y C'_y` and
-`Π(a') = C'_{u'} + Σ m'_y C'_y` with `m, m' ∈ ℕ[v^{±1}]`, and `C'_u C'_{u'} = C'_w + (positive)`
-(its `H_w`-coefficient is `1`). Then `Π(a a') − C'_w` is a sum of positive combinations, among
-them `m_y C'_y C'_{u'}`; `C'_y C'_{u'} ≠ 0` (specialise `v ↦ 1`: a product of two non-zero
-elements of `ℤ_{≥0}W`). So if some `m_y ≠ 0`, `Π(a a') ≠ C'_w`. The parabolic statement:
-`H(W_J) ⊆ H(W)` is a subalgebra and contains the KL basis elements `C'_x`, `x ∈ W_J`. ∎
+*Proof.* Soergel's normalisation: `H_s² = 1 + (v^{−1} − v) H_s`, `C'_s = H_s + v`,
+`C'_y = H_y + Σ_{x<y} h_{x,y} H_x` with `h_{x,y} ∈ vℤ[v]` having the coefficients of the KL
+polynomial `P_{x,y}`. The only input is **non-negativity of the coefficients of KL
+polynomials** (Kazhdan–Lusztig, *Schubert varieties and Poincaré duality*, Proc. Symp. Pure
+Math. 36 (1980), for Weyl groups; Elias–Williamson, *The Hodge theory of Soergel bimodules*,
+Ann. of Math. 180 (2014), for all Coxeter groups), together with the multiplication rule
+(Kazhdan–Lusztig, Invent. Math. 53 (1979), (2.3.a,b)):
+`C'_y C'_s = (v + v^{−1}) C'_y` if `ys < y`, and `C'_y C'_s = C'_{ys} + Σ_{z<y, zs<z} μ(z,y) C'_z`
+if `ys > y`, where `μ(z,y) ≥ 0` is the coefficient of `v` in `h_{z,y}`. Multiplying by one
+`C'_s` at a time, `C'_y Π(b)` and `Π(b)` are `ℕ[v^{±1}]`-combinations of KL basis elements, for
+every `y` and every word `b`.
+
+Write `Π(a) = Σ_y m_y C'_y`, `m_y ∈ ℕ[v^{±1}]`. As `a` is reduced, the `H`-expansion of `Π(a)` is
+`H_u` plus terms `H_x` with `ℓ(x) < ℓ(u)`, so `m_u = 1` and `m_y ≠ 0` only for `ℓ(y) < ℓ(u)`.
+Then `Π(aa') = Σ_y m_y C'_y Π(a')`. In `C'_u Π(a')` the `H`-expansion is `H_w` plus terms of
+length `< ℓ(w)` (multiplying by `H_s` or `v` raises the length by at most one, and only the
+product `H_u H_{s'_1} ⋯ H_{s'_r} = H_w` reaches `ℓ(w)`), so by unitriangularity
+`C'_u Π(a') = C'_w + Σ_{z ≠ w} n_z C'_z` with `n_z ∈ ℕ[v^{±1}]`. Hence
+`Π(aa') − C'_w = Σ_{z≠w} n_z C'_z + Σ_{y ≠ u} m_y C'_y Π(a')`, a sum of `ℕ[v^{±1}]`-combinations
+of the basis, which vanishes only if every summand does. But `C'_y Π(a') ≠ 0`: at `v = 1` the
+Hecke algebra becomes `ℤW`, `C'_y ↦ y + Σ_{x<y} h_{x,y}(1) x` and `C'_s ↦ 1 + s`, elements with
+non-negative coefficients, and a product of such non-zero elements is non-zero. So
+`Π(aa') = C'_w` forces `m_y = 0` for `y ≠ u`, i.e. `Π(a) = C'_u`. The case of `a'` is the same
+with left multiplication (apply the anti-involution `H_x ↦ H_{x^{−1}}`). Fully commutative `u`:
+`C'_s C'_t = C'_t C'_s` for commuting `s, t`, and all reduced words of `u` are related by
+commutations. Parabolic: `H(W_J) ⊆ H(W)` is a subalgebra containing the `C'_x`, `x ∈ W_J`
+(KL polynomials of `W_J` are those of `W`). ∎
 
 > **Proposition 7.3 (type D, one direction).** For the half-spin representation of `D_n`,
 > `n ≥ 6`, every `I_ℓ ⊇ I_{(5,4,3,1)}` (i.e. every cyclic ideal) gives a non-Deodhar element.
 > This relies on Lemma 7.2 and on the exact Hecke-algebra computation that the 13-slot
 > element of `D_6` is not Deodhar (`03_deodhar.py`, Tier 2).
 
-*Proof.* `I_{(5,4,3,1)}` uses only colours `n−5, …, n`, which span a `D_6` subdiagram, and its
-word is the `D_6` word relabelled (the colour rule of 4.2 depends only on `n − (v−u)` and the
-parity of `u`). So `w_{(5,4,3,1)}` is the image of the `D_6` element under a parabolic
-embedding, and it is a reduced prefix of `w_ℓ` (a linear extension of `I_ℓ` can start with
-one of `I_{(5,4,3,1)}`). Lemma 7.2. ∎
+*Proof.* Precisely: for every chain word `a = (c(1), …, c(m))` of `I_ℓ`, with
+`w_ℓ := s_{c(1)} ⋯ s_{c(m)}`, we show `Π(a) ≠ C'_{w_ℓ}`. The chain words of
+`I_ℓ` are its linear extensions (Lemma 4.2(d)); any two linear extensions of a finite poset are
+related by exchanging adjacent incomparable letters, which here have distinct non-adjacent
+colours, so commute; hence `Π(a)` does not depend on the chain word and we may take one that
+begins with a chain word `a_0` of `I_{(5,4,3,1)}` (an ideal of `I_ℓ`). Chain words are reduced: with
+`x = s_{c(t−1)} ⋯ s_{c(1)}` and `s = s_{c(t)}`, `⟨xλ, α_s^∨⟩ = 1 > 0` and `λ` dominant give
+`x^{−1}α_s > 0`, so `ℓ(sx) = ℓ(x) + 1`; hence the reversed word, and so `a`, is reduced. `I_{(5,4,3,1)}` uses only
+colours `n−5, …, n`, which span a `D_6` subdiagram, and `a_0` is the `D_6` word relabelled
+(the colour rule of 4.2 depends only on `n − (v−u)` and the parity of `u`); by the computation
+`Π(a_0) ≠ C'` in `D_6`, hence in `D_n` (parabolic part of Lemma 7.2). Lemma 7.2 gives
+`Π(a) ≠ C'_{w_ℓ}`. (That minuscule elements are fully commutative [Stembridge 2001], so that
+this is a property of the element `w_ℓ`, is not needed for the statement as given.) ∎
 
 **Computed only.** Non-Deodhar ⇔ cyclic on every ideal of `D_6, D_7, D_8, D_9` half-spin (3, 16,
 54, 148 ideals), and for `D_6, D_7` vector (none). The missing direction for all `n` (the
@@ -929,9 +1074,11 @@ one that governs the tree formula there.
 
 ---
 
-## 8. Corrections and updates to `NOTES.md`, `PROOFS.md` and the brief
+## 8. Corrections and updates to `NOTES.md`, `PROOFS.md` and the task statement
 
-1. **Brief, task 2:** "`(4,4,4,3)` is not symmetric under transposition" is **wrong**: its
+1. **Task statement of this front, task 2** (the coordinator's prompt; the claim is not in
+   `README_FOR_PROVERS.md` nor in any project `.md` file): "`(4,4,4,3)` is not symmetric under
+   transposition" is **wrong**: its
    conjugate is `(4,4,4,3)`. The criterion `λ ⊇ (4,4,4,3)` is already invariant under
    `k ↔ n−k`, `λ ↔ λ'`, colours reversed (§3.2); exhaustive computation over the 6×6 and 7×7
    boxes confirms it unchanged.
@@ -974,24 +1121,26 @@ one that governs the tree formula there.
 
 ## 9. Status
 
-**Proved completely** (only the definitions of §1 and elementary facts about forests):
+**Proved completely** (only the definitions of §1, elementary facts about forests, and the
+Cartan data of types A, D):
 Lemma 1.1; Lemma 2.1; Prop. 2.2; Lemma 2.3 (structure of minimal cyclic configurations, and
 exhaustiveness of the tree search); Lemmas 2.4, 2.5, Cor. 2.6 (mover on the cycle); Lemma 2.7
 (shortening); **Theorem 2.8** (cyclic ⇔ three-pair configuration ⇔ pattern T, B or N); Cors. 2.9,
 2.10; Prop. 2.11(a); Lemma 2.12, Cor. 2.13 (minuscule chain words; uses only the chain
-condition); Lemma 2.14 (uses two standard facts on minuscule orbits); Lemma 3.2, **Theorem A**,
-Prop. 3.3(a), Cor. 3.4(a)(b); Prop. 4.1; Lemma 4.3, **Theorem D**, Cor. 4.4(a)(c) — the last
-three groups for the stated words (row-major words of Young diagrams, resp. of shifted
-diagrams), whose chain property and heap are proved in Lemmas 3.1(a)(b), 4.2(a)(b).
+condition); **Lemma 3.1** (type A model: heap of every linear extension, chain property,
+stacks of `μ` = linear extensions of `λ(μ)`, bijection with the weights, weight order =
+reverse inclusion — by induction on the chain word, no citation needed); Lemma 3.2,
+**Theorem A**, Prop. 3.3(a) and its addendum for `(4,4,4,3)`, **Cor. 3.4**; Prop. 4.1;
+**Lemma 4.2** (the same for the half-spin model); Lemma 4.3, **Theorem D**, **Cor. 4.4**;
+**Theorem U** for types A and D; Cor. 6.1 for types A, D.
 
-**Proved assuming standard results** (cited, and checked by computer in every case computed):
-the identification of *all* stacks of a weight with linear extensions of one order ideal, the
-bijection ideals ↔ weights, and weight order = reverse inclusion (Lemmas 3.1(c), 4.2(c), used
-in Cor. 3.4(c), Cor. 4.4(b), Theorem U for types A, D) — [Proctor 1984: R. A. Proctor, *Bruhat
-lattices, plane partition generating functions, and minuscule representations*, European J.
-Combin. 5 (1984)]; [Stembridge 2001: J. R. Stembridge, *Minuscule elements of Weyl groups*,
-J. Algebra 235 (2001)]. Prop. 7.1 assumes Billey–Warrington Thm. 1 (quoted verbatim above).
-Lemma 7.2 assumes positivity of the KL structure constants of Weyl groups.
+**Proved assuming standard results:** Lemma 2.14 (the general multiplicity bound; uses that
+weights in the orbit of a minuscule weight pair with every coroot to `−1, 0, 1`, and that the
+orbit has a unique antidominant element; it is no longer used in types A, D). Prop. 7.1 assumes
+Billey–Warrington Thm. 1 (quoted verbatim). Lemma 7.2 assumes the non-negativity of the
+coefficients of KL polynomials and the KL multiplication rule (Kazhdan–Lusztig 1979, 1980).
+The references Proctor 1984 and Stembridge 2001 are kept for orientation only; no argument
+depends on them (§3.1).
 
 **Proved by exact finite computation (Tier 2, pure Python, no bound on configuration
 size):** Theorem E and Theorem E(d) (three independent methods; assumptions listed in §5);
@@ -1001,7 +1150,9 @@ Hecke-algebra cross-check.
 **Verified by computation only:** Deodhar ⇔ non-cyclic for `D_6 … D_9` half-spin (all
 ideals; one direction proved for all `n`, Prop. 7.3) and for `A_7 … A_9` cases (proved in
 general by Prop. 7.1); the type-E mismatch with Deodhar; the census of minimal cyclic
-configurations in type A beyond Prop. 3.3(a).
+configurations in type A beyond Prop. 3.3(a), and the uniqueness of the cyclic configuration
+in `(5,4,4,3)`, `(4,4,4,3,1)`, `(5,5,4,3)` (Prop. 3.3 addendum). All statements of this file
+were re-derived by the referee's independent code (`R03_referee.md` §5).
 
 **Not done / open.** (1) A case-free proof of Theorem U (why the cyclic ideals of a minuscule
 poset form a principal up-set; types A, D are proved case by case, E by computer). (2) The

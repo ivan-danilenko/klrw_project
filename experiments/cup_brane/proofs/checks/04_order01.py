@@ -15,7 +15,7 @@ sample of SAMPLE of them) and every colour of the red strand, and every vertex I
        polynomial t_{c(x)c(p)} x_x + t_{c(p)c(x)} x_{a or b} if a < x < b (0 if c(x) = c(p),
        1 if c(x), c(p) are not adjacent); the concatenated word is reduced unless a < x < b,
        and then exactly the pair (x, strand of a) resp. (x, strand of b) crosses twice
-                                                                      (Lemma 6 / Prop. 7)
+                                                                      (Prop. 5.3 / Cor. 5.4)
  (T3)  (delta_0^2 + delta_0 delta_1 + delta_1 delta_0) e_I has no term of r-degree <= 1
                                                                       (Theorem C)
 """

@@ -13,6 +13,8 @@ Type A (Theorem A of proofs/03_cyclic_combinatorics.md).  Pure Python.
    the proof: lambda not >= (4,4,4,3) => every colour occurs at most 3 times; and the
    explicit configuration of PROOFS.md Prop. 8.
 3. All inclusion-minimal cyclic configurations in some diagrams, classified by shape.
+4. addable_check: the claim in the proof of Lemma 3.1(d) (pairing = 1 iff the next box of the
+   diagonal is addable); all_cyclic_brute: Prop. 3.3(a) addendum (unique cyclic configuration).
 """
 import importlib, os, sys, itertools
 from collections import Counter
@@ -119,7 +121,47 @@ def describe_minimal(lam, show=False):
     return mins
 
 
+def all_cyclic_brute(lam):
+    """Every cyclic configuration of lambda, by brute force over all movers and families."""
+    B, col = word_of(lam)
+    W = L.Word(col, ADJ)
+    out = []
+    for j in range(W.m):
+        for F in L.matchings([p for p in W.pairs if j not in p]):
+            if F and W.is_cyclic_config(j, F):
+                out.append((B[j], [(B[a], B[b]) for a, b in F]))
+    return out
+
+
+def addable_check(BOX):
+    """Lemma 3.1(c), induction step: for every diagram lambda in the box and every diagonal d,
+    the pairing <mu_lambda, alpha_{k+d}^vee> = delta_{d,0} + a_{d-1} + a_{d+1} - 2 a_d lies in
+    {-1, 0, 1}, and equals 1 iff the next box of D_d is addable to lambda."""
+    cnt = 0
+    for lam in partitions_in_box(BOX, BOX):
+        box = set(boxes(lam))
+        a = lambda d: sum(1 for (r, s) in box if s - r == d)
+        for d in range(-BOX + 1, BOX):
+            pairing = (d == 0) + a(d - 1) + a(d + 1) - 2 * a(d)
+            i = a(d) + 1                                   # index of the next box of D_d
+            y = (i, i + d) if d >= 0 else (i - d, i)
+            r, s = y
+            addable = (r <= BOX and s <= BOX and y not in box
+                       and (s == 1 or (r, s - 1) in box) and (r == 1 or (r - 1, s) in box))
+            assert pairing in (-1, 0, 1), (lam, d)
+            assert (pairing == 1) == addable, (lam, d, pairing, addable)
+            cnt += 1
+    print("Lemma 3.1(c) step: pairing in {-1,0,1}, = 1 iff the next box is addable "
+          "(%d diagram/diagonal pairs, %dx%d box, k = n - k = %d)" % (cnt, BOX, BOX, BOX))
+
+
 if __name__ == "__main__":
+    addable_check(6)
+    for lam in [(4, 4, 4, 3), (5, 4, 4, 3), (4, 4, 4, 3, 1), (5, 5, 4, 3)]:
+        allc = all_cyclic_brute(lam)
+        assert len(allc) == 1 and allc[0][0] == (3, 3), (lam, allc)
+    print("Prop. 3.3(a): (4,4,4,3), (5,4,4,3), (4,4,4,3,1), (5,5,4,3) have exactly one cyclic "
+          "configuration (brute force over all configurations)")
     BOX = int(sys.argv[1]) if len(sys.argv) > 1 else 7
     main(BOX)
     describe_minimal((4, 4, 4, 3), show=True)

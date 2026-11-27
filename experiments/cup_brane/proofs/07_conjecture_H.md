@@ -7,15 +7,29 @@
   01 §B.8 (definition of β = klrw basis braid), §E (Theorem E.1).
   Environment check: `sage -python 06_check_step_formula.py A 2 1 1111 1 11111 2 1111` → all
   steps hold (so Conjecture H holds for `c^4, c^5`, red = c and red ≠ c).
-* **Doing right now:** writing `checks/07_lab.py`, a symbolic engine for the labelled
-  calculus over the fraction field (elements = dict labelled target state → rational
-  function in the labelled dots), able to expand any word of crossings (ψ for same colour via
-  `ψ = (x_a − x_b)^{-1}(φ + r)`), and to tabulate every product occurring in (★) by
-  resulting labelled permutation `τ`.
-* **Next steps planned:** (1) tabulate (★) for `c^3, c^4` (stage H1, one colour) and for
-  `c^N` plus single other colours; (2) find the cancellation pattern; (3) prove H1;
-  (4) then H2, H3.
-* **Scripts / logs:** none yet beyond the 06 scripts.
+* **Engine done:** `checks/07_lab.py` (labelled calculus over the fraction field; expands any
+  word, all terms of (★)), `checks/07_star_check.py` ((★) expanded, per class `(I,K,τ)`:
+  zero on `111, 1111, 1211, 12121, 2112`, non-zero on the cyclic `1221122` — consistent with
+  06), `checks/07_tabulate.py` (prints every product in (★) by `τ`), `checks/07_theta.py`
+  (local identity Θ = 0, r ≤ 4).
+* **Found (see §1–§3 below):** (a) *moving-strand expansion*: a word in which one position
+  moves left past strands `y_1, …, y_n` expands as a sum over hand-over sets, coefficient
+  `r^{|S|} ∏ (x_{y_k} − x_{μ_k})^{-1}`; (b) the diagonal component `K = I∖m` of (★) is, for every
+  chain `𝔟`, the identity `∏_{b∈𝔟}(A_b − B_b) = 0`, `A_b = x_b − x_m`, `B_b = x_b − x_{μ_b}`, and
+  `A_{b_1} = B_{b_1}`; (c) **compact form of h** (key): `(x_y − x_m)ψ − r = ψ·(x_y − x_m)^{after}`,
+  hence the sum of the chain terms with a fixed first element `c` is ONE diagram,
+  `H_c = ε(−r) Z_c^{src} β(I;(c)) W_c^{tgt}` (dots of the strands crossed by the left slide moved
+  from the source to the target); (d) with (c), the off-diagonal components `K = (I∖{m,j})∪{a}`
+  vanish: for `a < j` both kinds of product are 0 by 05 Lemma 1.4 (a same-colour pair crosses
+  twice), for `a > j` they cancel in pairs (symmetric polynomial slides through `X_j`).
+* **Doing right now:** writing up the one-colour case (Theorem H1a) completely; then H1 with
+  spectator colours (other colours once): there the new ingredients are bigons and the tree
+  terms of `F` and `d′` (nested pairs of colour `c` around a mover of adjacent colour); the
+  data (`07_tabulate.py A 2 2 1211`) show the bigon divided difference `Q(x_a,y) − Q(x_b,y) =
+  t(x_a − x_b)` of 06 §6 doing the job.
+* **Next steps planned:** H1 with spectators; then H2 (hanging forests: the compact form must
+  be extended to sums over chains *and* forests).
+* **Scripts / logs:** as listed above.
 
 ---
 

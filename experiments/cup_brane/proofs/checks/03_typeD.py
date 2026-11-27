@@ -11,6 +11,7 @@ colour(u, v) = n - (v - u) if v - u >= 2, and n (u odd) / n - 1 (u even) if v = 
  2. For every strict partition: exhaustive search; compare with  l_3 >= 3 and l_4 >= 1;
     for the non-cyclic ones also the literal pattern detector and (n <= 9) the brute force
     over all configurations; check that non-cyclic ideals have colour multiplicities <= 3.
+ 2a. addable_check: the claim in the proof of Lemma 4.2(d), every ideal and colour, D_4..D_NMAX.
  3. Vector representation omega_1: chain 1, 2, ..., n-2, n-1, n, n-2, ..., 1 is a chain to the
     lowest weight; every colour occurs at most twice; no ideal is cyclic.
 """
@@ -62,7 +63,37 @@ def model_check(n):
     return word, less
 
 
+def addable_check(n):
+    """Lemma 4.2(d), claim: for every ideal I and every colour c, the pairing
+    <omega_n - content(I), alpha_c^vee> lies in {-1,0,1} and equals 1 iff the next box of the
+    diagonal of c is addable to I and has colour c."""
+    A = L.cartan("D", n)
+    P = set(elements(n))
+    cnt = 0
+    for lam in strict_partitions(n):
+        E, col = ideal_word(n, lam)
+        I = set(E)
+        mu = [1 if j == n else 0 for j in range(n + 1)]
+        for c in col:
+            for j in range(1, n + 1):
+                mu[j] -= A[c][j]
+        b = lambda r: sum(1 for (u, v) in I if v - u == r)
+        for c in range(1, n + 1):
+            r = n - c if c <= n - 2 else 1
+            y = (b(r) + 1, b(r) + 1 + r)
+            addable = (y in P and y not in I and
+                       all(z in I for z in [(y[0], y[1] - 1), (y[0] - 1, y[1])] if z in P))
+            ok = addable and colour(n, *y) == c
+            assert mu[c] in (-1, 0, 1), (n, lam, c)
+            assert (mu[c] == 1) == ok, (n, lam, c, mu[c], addable)
+            cnt += 1
+    return cnt
+
+
 def main(NMAX):
+    tot = sum(addable_check(n) for n in range(4, NMAX + 1))
+    print("Lemma 4.2(d) claim: pairing in {-1,0,1}, = 1 iff the next box of its diagonal is addable "
+          "and has that colour (%d ideal/colour pairs, D_4..D_%d)" % (tot, NMAX))
     for n in range(4, NMAX + 1):
         model_check(n)
         cnt = Counter()

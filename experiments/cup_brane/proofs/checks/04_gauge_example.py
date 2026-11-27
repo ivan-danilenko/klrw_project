@@ -1,10 +1,10 @@
 """
-Example 8.3 and Remark 8.7 of proofs/04_first_order.md: gauge freedom.
+Example 8.3 and Remark 8.8 of proofs/04_first_order.md: gauge freedom.
 
     sage -python proofs/checks/04_gauge_example.py [WORD] [RED] [ORDER]   default 1212, red 2, ORDER 1
 
 ORDER 1: h runs over the homogeneous elements of r-degree 1 (first-order gauge, Example 8.3);
-ORDER 0: h runs over the homogeneous elements of r-degree 0 containing some t (Remark 8.7:
+ORDER 0: h runs over the homogeneous elements of r-degree 0 containing some t (Remark 8.8:
          an r-free, t-dependent gauge that keeps the geometric part delta_0).
 
 Takes the tree-formula differential d (a differential for this word: checked), the first-order
@@ -80,4 +80,9 @@ if __name__ == "__main__":
             for J2, e2 in row.items():
                 e1 = C.max_r_part(e2, 1)
                 if not e1.is_zero():
-                    print("        first-order change %s -> %s: %s" % (sorted(I2), sorted(J2), e1))
+                    new1 = C.r_part(dp[I2][J2], 1) if J2 in dp.get(I2, {}) else C.K.zero()
+                    old1 = C.r_part(d[I2][J2], 1) if J2 in d.get(I2, {}) else C.K.zero()
+                    print("        first-order change %s -> %s: %s\n            tree formula there: %s\n            d' there: %s%s" % (
+                        sorted(I2), sorted(J2), e1, old1, new1,
+                        "   (monotone: %s)" % all(not any(s_ not in I2 and C.bijection(I2, J2, b)[s_ - 1] in J2 for s_ in range(1, C.m + 1))
+                                                  for b, _, _ in C.terms(new1)) if not new1.is_zero() else ""))

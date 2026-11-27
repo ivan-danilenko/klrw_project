@@ -17,7 +17,7 @@ crosses v_1, ..., v_k, moving to the left) and checks
        of the triangle {z_s, i, j} is (z_s, i, j) left to right; the triangle is bad iff
        z_s is black with c(z_s) = c(j) ~ c(i);
   (S4) the smoothed word X_s is reduced and realises tau = (exchange of the endpoints of
-       z_s and j); X_s = beta(tau) modulo r; we also record whether X_s = beta(tau) exactly;
+       z_s and j); X_s = beta(tau) modulo r; and X_s = beta(tau) exactly (Lemma 4.7: always);
   (S5) m_i(I) m_j(I-i) - m_j(I) m_i(I-j) = sum over bad s of r_{c(j)} t_{c(j)c(i)} X_s, exactly.
 """
 import sys, os, itertools, importlib, time

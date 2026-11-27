@@ -1,5 +1,7 @@
 """
-The true differential of the smallest cyclic word found so far:  A_2, red strand of colour 2,
+Theorem 9.1(d) of proofs/04_first_order.md: the completion of the tree formula KEEPING ITS
+r^2-PART (not "the true differential": a gauge-equivalent dot-free completion also exists,
+Theorem 9.1(e),(f)) for the smallest cyclic word found so far:  A_2, red strand of colour 2,
 word 1221122 (7 strands, 128 vertices).
 
     sage -python proofs/checks/04_cyclic7_solve.py [WORD] [RED] [start]      start = tree | delta0

@@ -1,12 +1,12 @@
 """
 Pure-Python enumeration of ALL homogeneous basis elements (dots allowed) of the components
-of maps on the cube, for proofs/04_first_order.md section 5.
+of maps on the cube, for proofs/04_first_order.md sections 7-8.
 
     python3 proofs/checks/04_degree.py TYPE RANK RED WORD [HDEG]
 
 A basis element of e_I A e_J is  mu * x^alpha * beta_sigma  (F1); it is homogeneous of the
 degree D(I) - D(J) of a component of a map of homological degree HDEG (|J| = |I| + HDEG) iff
-(Proposition 4 and the coefficient comparison of section 5)
+(PROOFS Proposition 4 and Corollary 7.2 of 04_first_order.md)
 
     n_c  = Shat_c  := (D(I)-D(J))_{s,c} - S_c(sigma)          (exponent of r_c)
     m_ab + m_ba = Ehat_ab / 2                                  (exponents of t_ab, t_ba)

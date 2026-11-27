@@ -1,5 +1,5 @@
 """
-Forcedness at first order (proofs/04_first_order.md, section 5): the linear algebra.
+Forcedness at first order (proofs/04_first_order.md, section 8, Computation 8.6): the linear algebra.
 
     sage -python proofs/checks/04_forced.py TYPE RANK RED WORD [WORD ...]
     sage -python proofs/checks/04_forced.py TYPE RANK all MAXLEN [MINLEN]
