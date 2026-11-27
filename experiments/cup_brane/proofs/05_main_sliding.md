@@ -1,27 +1,6 @@
 # 05 — The main theorem by direct diagrammatics (cone induction on the last slot)
 
-> **REVISION NOTES** (revision after `R05_referee.md`; work in progress)
->
-> *Applied:*
-> * 1 (Prop. 10.2, "only products"): full proof, steps 1–4, valid for all configurations; new
->   check `checks/05r_only_products.py` (numbers in §11 still to be filled in).
-> * 2 (§8 preamble): restricted to configurations in which `a` is not the mover; uses named.
-> * 3 (§1.1): strands identified by source positions, effect of a move on the rest of the
->   word; used in the proofs of Lemmas 1.1, 1.2.
-> * 4 (Lemma 4.3): steps (a) truncation by idempotents, (b) coordinates in the right basis,
->   Theorem A.5(iii), (c) monomial ideal, (d) lowest degree; part 2 with A.5(ii); remark: the
->   same by base change, A.5(iv), and Theorem E.1.
-> * 5 (§11): uses of (F1) listed precisely (Lemma 3.1, 4.3, Props. 4.5, 4.6) with the parts of
->   Theorem A.5; referee's checks added (table, new subsection); caveat on (S2) updated.
-> * 6 (Lemma 6.1): direction statement for (e) added (the outer strand moves left; not used).
-> * 7 (Convention after Lemma 3.2): one-line proof from Definition B.10 that the basis braids
->   are compatible with `ι_L`, `ι_R` for every word; table 10.1 updated.
-> * 8 (Warning after Lemma 6.2): `β` is well defined in the example (Prop. B.5 of
->   `01_foundations.md`; both triples have middle strand `L_{(1,5)}`); pointers in 10.1, 10.5.
-> * (F1) references made precise: preamble, Lemma 3.1, Lemma 4.3, Proposition 4.5 (proof of
->   `⋂ 𝔪^N A = 0` written out), Remark (1) after 4.5, Proposition 4.6, table 10.1, §11.
->
-> *Remaining:* re-run of the author's scripts (running) and update of the "Runs" table.
+*Revised after `R05_referee.md`.*
 
 Notation and standing facts are those of `../PROOFS.md` (section 1) and of
 `README_FOR_PROVERS.md`; the tree formula is that of `../NOTES.md` section 2, with the signs of
@@ -1556,9 +1535,10 @@ elements of the formula with the sliding error and within each family); the fina
 in `proofs/checks/05_logs/*.log`, each ending with `exit code 0`. **Re-run for the revision after
 `R05_referee.md`** (2026-11-27, same commands, `zsh 05_logs/rerun_R05.sh`, logs in
 `proofs/checks/05_logs/rerun_R05/`, with wall times; five parallel groups on a shared machine):
-all 34 runs ended with `exit code 0`, and every log is **identical** to the original one apart
-from the timing lines, so all numbers quoted in this file are reproduced. Every run finished in
-under ten minutes (the longest: `05_T1_check.py A 5 all 7 9 40 2`, PLACEHOLDER_LONGEST).
+all 36 runs ended with `exit code 0`, and every log is **identical** to the original one apart
+from the timing lines, so all numbers quoted in this file are reproduced (the totals quoted
+in sections 0, 3, 4, 6, 8, 9A, 10.3, 10.4 were re-added from the individual logs and agree). Every run finished in
+under ten minutes (the longest: `05_T1_check.py A 5 all 7 9 40 2`, 591 s).
 
 | run (`sage -python …`) | result | re-run (wall time) |
 |---|---|---|
@@ -1571,13 +1551,13 @@ under ten minutes (the longest: `05_T1_check.py A 5 all 7 9 40 2`, PLACEHOLDER_L
 | `05_T1_check.py A 4 all 5 6` | 2040 words (all) | identical (413 s) |
 | `05_T1_check.py D 4 all 7 8 60 1` | 120 words | identical (300 s) |
 | `05_T1_check.py A 5 all 7 9 40 2` | 120 words | identical (591 s) |
-| `05_T1_check.py D 5 all 8 9 30 3` | 60 words | PLACEHOLDER_T1_D5_long |
+| `05_T1_check.py D 5 all 8 9 30 3` | 60 words | identical (407 s) |
 | `05_T1_check.py D 4 3421342 1342134 2` | 3 words (`k = 2`) | identical (7 s) |
 | `05_F3_check.py A 3 2 13`, `… D 4 2 134`, `… A 4 2 134` | 132 words (Theorem C) | identical (3 s, 21 s, 21 s) |
 | `05_fourterm.py A 3 40 7 1`, `05_fourterm.py D 4 40 7 2` | 384 cases | identical (6 s, 5 s) |
 | `05_explore_stats.py A 3 3 6 T1` | the numbers of section 0 | identical (32 s) |
 | `05_explore.py A 2 22112 v` | the expansions of 10.4 | identical (5 s) |
-| `05_blocks_general.py A 3 1 80 8 1 [a1]`, `… D 4 1 60 8 2 a1`, `… A 3 2 80 8 3 [a1]` | data of 10.3, 10.4 | PLACEHOLDER_blocks |
+| `05_blocks_general.py A 3 1 80 8 1 [a1]`, `… D 4 1 60 8 2 a1`, `… A 3 2 80 8 3 [a1]` | data of 10.3, 10.4 | identical (14–43 s each) |
 | `05_closure.py …` (11 runs, see `run_all.sh`) | table of 10.4 | identical (7–27 s each) |
 | `python3 05r_only_products.py 3 8 adm A 3` (new, revision) | Prop. 10.2, uniqueness: all words in 3 colours of length 4–8; 3510 quadruples `(a,j,j',b)` with (H1), (H2), 47 322 vertices `I`, 189 288 products (exactly the four each time), 13 428 vertices with a further slot of colour `c` below `a`, 15 774 admissibility checks; controls: without (H1) all 98 388 tested vertices have further products (chains of 2–5 pairs), without (H2) all 211 044 | 325 s (`05r_logs/only_products_3_8_adm_A_3.log`) |
 | `python3 05r_only_products.py 4 7 adm D 4` (new, revision) | the same for all words in 4 colours of length 4–7: 15 120 quadruples, 110 520 vertices, 442 080 products, 20 880 with a further slot of colour `c` below `a`, 27 630 admissibility checks (`D_4`); controls: 92 880 resp. 173 904 vertices, all with further products | 152 s (`05r_logs/only_products_4_7_adm_D_4.log`) |

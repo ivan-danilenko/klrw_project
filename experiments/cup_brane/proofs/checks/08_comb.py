@@ -330,6 +330,20 @@ class WordData:
                 break
         return tuple(word)
 
+    def sigma_from_word(self, I, J, word):
+        """bijection of a braid word (1-based letters, first letter first) from e_I to e_J."""
+        lab = self.labels(I)
+        for p in word:
+            lab[p - 1], lab[p] = lab[p], lab[p - 1]
+        tl = self.labels(J)
+        sig = {}
+        for a, b in zip(lab, tl):
+            if a == "W":
+                assert b == "W"
+                continue
+            sig[a] = b
+        return tuple(sig[s] for s in self.slots)
+
     # ------------------------------------------------------------------ the tree formula
     def tree_terms(self, I):
         return self.stack.terms_from(frozenset(I))
