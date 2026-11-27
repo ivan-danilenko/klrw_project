@@ -16,13 +16,28 @@
   `groups.log` (every group zero, incl. Identity N words), `adjfine.log`, `star_small.log`,
   `star_A2.log` ((★) zero on all H1 words; non-zero on the cyclic control `1221122`),
   `groups_H2.log`, `star_H2.log` (H2 words: (★) holds; groups do not close).
-* **PHASE 2 (coordinator, after commit of §§0–8): hanging forests, target H3 / minuscule.**
-  Plan: (a) structure of the hanging forests: a pair hangs from the root iff `a_p < c_1 < b_p`
-  (then it hangs from the arc containing `b_p`, connector the left end of that arc, `ε_p = +1`);
-  adjacent/colour-`c` pairs above `c_1` must not contain a chain element — so the forest
-  coefficient does not depend on the chain; (b) test a compact form "chains + fixed forest"
-  (§9); (c) enumerate the last steps of minuscule chain words with multiplicities `≤ 3`
-  (03 Lemma 2.12) (§10); (d) compute grouped (★) on `A_5 ω_3`, `D_5 ω_5` prefixes.
+* **PHASE 2 — PAUSED on request of the coordinator (Conjecture H on hold).** Target was H3 /
+  minuscule (hanging forests). State at the pause:
+  * **Done (§9):** Lemma 9.1 [proved]: a relevant pair (colour `c` or adjacent) hangs from the
+    root iff `a_p < c_1 < b_p`; it then hangs from the arc containing `b_p`, with connector the left
+    end of that arc (`ε_p = +1`, monomial `r t_{c_p c}`); a relevant pair above `c_1` must contain no
+    chain element. Hence forest, coefficient and sign do not depend on the chain beyond its first
+    element. Proposition 9.2 (compact form "all chains with first element `c` + fixed forest `F`"
+    = one diagram `H_{c,F}`): coefficient part proved; diagram identity (D) verified by
+    `checks/07_compact_forest.py` on 8 words (434 groups, 98 with forests), not proved.
+  * **Not done:** the enumeration of the last steps of minuscule chain words with multiplicities
+    `≤ 3` (via 03 Lemma 2.12 / Cor. 2.10); the grouped (★) on `A_5 ω_3 = 321432543`,
+    `D_5 ω_5 = 5321432534` and their prefixes; the proof of (★) on forest components
+    (= combination of Prop. 9.2 with the tree lemma 06 Lemma 6.7, as in §5.3); Identity N.
+  * **Next steps planned:** (1) prove (D) (word-independence of the chain-forest diagrams, then
+    the crossing count of §9); (2) regroup (★) for H2 words with `h = Σ H_{c,F}` (the groups of
+    §5.1 fail there, `groups_H2.log`; try grouping by `(mover, c, F)` and by component) and look
+    for the analogue of Prop. 5.3 with the bigon polynomials of linked pairs; (3) the minuscule
+    enumeration and computations listed above.
+  * **No background computation is running.** The run of `07_compact_forest.py` was done in the
+    terminal (results quoted in §9); no log file. Reproduce with
+    `sage -python 07_compact_forest.py A 2 1 12121 2 21212 1 121211 2 2121212`,
+    `… A 3 2 213212 2 1232123 2 2132132`, `… D 4 2 2132423` (a few minutes).
 * **§7 (H2–H4) and §8 (Status) written.** Next steps for a successor: (1) prove Identity N by
   extending Prop. 5.3 to nested families (the configurations `(F,a)` combine by component,
   `07_adjfine.py`); (2) find a compact form for chains *with* hanging forests (§7.2.1) — the key
@@ -674,6 +689,71 @@ result are listed in §8.
 
 ---
 
+## 9. Hanging forests: the compact form (phase 2)
+
+Notation of 06 §7.2: at `I ∋ m` a term of `h` is a chain `𝔠 = (c_1 < ⋯ < c_s) ⊆ Same ∖ I` with arcs
+`(c_1,c_2), …, (c_s, m)` and a hanging forest `F`. Write `c = c_1`, `Λ = Same ∩ L ∩ (c, m)` and call a
+pair *relevant* if its colour is `c` or adjacent to `c`.
+
+**Lemma 9.1 (how the forest depends on the chain) [proved].** Let `F` be a set of pairwise
+disjoint exchange pairs (`a_p ∉ I`, `b_p ∈ I`, `b_p < m`) disjoint from `𝔠`.
+(a) A relevant pair `p` is interlaced with an arc of `𝔠` iff either `a_p < c < b_p` — then it is
+interlaced with exactly one arc, the arc `(c_i, c_{i+1})` (`c_{s+1} := m`) containing `b_p`, and the
+slot of that arc inside `(a_p, b_p)` is `c_i` — or `c < a_p` and some chain element lies in
+`(a_p, b_p)` — then it is interlaced with exactly two arcs.
+(b) `F` is a hanging forest for `𝔠` iff it is one for the one-element chain `(c)` and no chain
+element lies in the interior of a relevant pair `q ∈ F` with `a_q > c`. The chains with first element
+`c` for which `F` is a hanging forest are exactly the `(c) ∪ 𝔠″`, `𝔠″ ⊆ Λ′`, where
+`Λ′ = Λ ∖ (slots of F ∪ ⋃_{q∈F relevant, a_q > c} (a_q, b_q))`.
+(c) The parents, connectors, the factors `ε_p` and the monomial `∏ r_p t_{c_p, c(x_p)} ε_p` are the same
+for `𝔠` and for `(c)`; so is the sign `ε(I; 𝔠, F)`.
+
+*Proof.* The arcs tile `[c, m]` and all chain points and `m` are not slots of `F`. (a) If `b_p < c` no
+arc meets `p`. If `a_p < c < b_p`, `b_p` lies in exactly one open arc and `a_p` in none, so `p` is
+interlaced with that arc only, and its left end `c_i ∈ (a_p, b_p)`, its right end `> b_p`. If
+`c < a_p`, both slots lie in open arcs; if in the same arc, `p` is nested in it and disjoint from the
+others; if in different arcs `(c_i, c_{i+1}) ∌ b_p` and `(c_k, c_{k+1}) ∋ b_p`, `i < k`, `p` is interlaced
+with exactly these two. (b) The conditions of 06 §7.2: (1) no relevant pair of colour `c` interlaced
+with an arc, no two pairs of `F` of equal colour interlaced; (2) the graph with one root edge per
+pair–arc interlacing (colour adjacent to `c`) and the links between pairs is a tree. Pair–pair data
+do not depend on the chain. By (a), for a pair below or straddling `c` the number of interlaced
+arcs (0 resp. 1) is the same for `𝔠` and `(c)`; for a pair above `c` it is `0` for `(c)` and `0` or `2`
+for `𝔠`, and `2` violates (1) (colour `c`) or (2) (two root edges, adjacent colour). (c) By (a), a
+pair hanging from the root has connector `c_i ∈ L` (colour `c`, `ε_p = +1`) for `𝔠` and `c` for `(c)`;
+the connector of a non-root pair is a slot of its parent pair. The sign replaces `m` by `c` and `b_p`
+by `a_p` in `I`. ∎
+
+**Proposition 9.2 (compact form with a forest) [coefficients proved; the diagram identity (D)
+verified by computation].** For `I ∋ m`, `c ∈ Same ∖ I` and a hanging forest `F` of `(c)`:
+
+    Σ_{𝔠 : c_1 = c, F hangs on 𝔠} h_{𝔠,F}(I)  =  ε(I; c, F)(−r_c) κ_F · Z_c W_forb · LS_c · W_{Λ′} · β_F,
+
+`κ_F = ∏_p r_p t_{c_p,c(x_p)} ε_p` (for `(c)`), `Z_c = ∏_{s ∈ Same∖(Λ∪c)} (x_s − x_m)` and
+`W_forb = ∏_{y∈Λ∖Λ′}(x_y − x_m)` read at the source, `W_{Λ′} = ∏_{y∈Λ′}(x_y − x_m)` read after `LS_c` (before
+`m` moves), and `β_F` the basis braid of the remaining permutation (the exchanges of `F` and the
+slide of `m` to `+c`) from the state after `LS_c`.
+
+*Proof of the coefficient part.* By Lemma 9.1 the left side is a sum over `𝔠″ ⊆ Λ′` with the common
+factor `ε(−r)κ_F Z_c W_forb` and the factor `(−r)^{|𝔠″|}∏_{y∈Λ′∖𝔠″}(x_y − x_m)`. As in Proposition 2.6 this is
+the multilinear expansion of `∏_{letters of LS_c}` with the factor `(x_y − x_m)ψ − r = ψ(x_y − x_m)` at the
+letters `y ∈ Λ′` — **provided (D):** for every `𝔠″ ⊆ Λ′`, the element `β(I; σ_{(c)∪𝔠″, F})` equals
+`LS_c^{𝔠″}·β_F`, `LS_c^{𝔠″}` the left slide with the letters of `𝔠″` omitted (the same position word `β_F`
+for all `𝔠″`). ∎
+
+*(D) is checked* (`07_compact_forest.py`): `12121` (red 1), `21212` (red 2), `121211`, `2121212`
+(`A_2`), `213212`, `1232123`, `2132132` (`A_3`), `2132423` (`D_4`): all 434 groups `(c, F)` (98 with
+`F ≠ ∅`), and the chains compatible with `F` are exactly the subsets of `Λ′`. For pairs not containing
+a chain element `LS_c^{𝔠″}β_F` is a reduced word of `σ_{𝔠,F}` (a root pair's left strand crosses exactly
+the chain strands below the arc containing `b_p`); for a pair of a colour not adjacent to `c` with a
+chain element inside, it contains a removable double crossing (`q = 1`); a proof of (D) also needs
+the word-independence of the elements `β(I; σ_{𝔠,F})` (01 §B), which I have not established for chain
+terms.
+
+So for every word, `h(I) = Σ_{c} Σ_{F} H_{c,F}(I)`, one diagram per pair `(c, F)` with `F` a forest of
+the one-element chain `(c)`.
+
+---
+
 ## 8. Status
 
 ### Proved completely (from the relations, (F1), (F3), and the results of 06 §§2–5, §9 and 05 Lemma 3.2)
@@ -697,10 +777,14 @@ mismatch), `07_vanish.py` (Lemmas 4.1, 5.1, 5.4 and the pairwise statements), `0
 (Prop. 2.6), `07_groups.py` (the splitting of §5.1), `07_star_check.py` ((★) itself). Logs in
 `checks/07_logs/`.
 
+* Lemma 9.1 (dependence of the hanging forests on the chain) — every word.
+
 ### Proved assuming
 
 * Theorem H1 without (NN) assuming **Identity N** (§5.5): one colour repeated `N` times, all
   other colours once, arbitrary positions.
+* Proposition 9.2 (compact form of `h` with hanging forests) assuming the diagram identity (D);
+  (D) is verified on 8 words (§9). Not yet used for any (★).
 
 ### Verified only by computation
 
@@ -720,7 +804,9 @@ mismatch), `07_vanish.py` (Lemmas 4.1, 5.1, 5.4 and the pairwise statements), `0
   non-cyclic), **H4** (all non-cyclic words): the hanging forests of `h` are not covered by the
   compact form, and the groups of §5.1 do not close (§7.2: on `12121`, `21212`, `213212`,
   `1232123` the diagonal and the same-colour groups no longer vanish separately; on `12211`,
-  where no forest can hang, they do). §7.4 lists what is needed.
+  where no forest can hang, they do). §7.4 lists what is needed; §9 (written after §8 was first
+  committed, placed before this section) supplies the first of the two missing tools, the
+  compact form with forests, modulo (D). Work on H2–H4 is paused.
 * Identity N.
 
 ### Failed attempts, corrections
@@ -756,6 +842,7 @@ mismatch), `07_vanish.py` (Lemmas 4.1, 5.1, 5.4 and the pairwise statements), `0
 | `07_formulas.py …` | Propositions 3.1 and 5.2, coefficient by coefficient | §3, §5.3 |
 | `07_vanish.py …` | Lemmas 4.1, 5.1, 5.4 and the pairwise statements | §4, §5 |
 | `07_adjfine.py` | splitting of adj(j) by configuration `(F, a)`; prints the configurations that do not vanish alone (nested families) | §5.5 |
+| `07_compact_forest.py …` | Lemma 9.1(b) and Proposition 9.2 (compact form with a fixed hanging forest; diagram identity (D)) | §9 |
 
 Logs (`checks/07_logs/`, all produced after the last edit of the scripts): `formulas.log`,
 `vanish.log`, `compact.log`, `theta.log`, `groups.log`, `adjfine.log` (H1 words); `star_small.log`,

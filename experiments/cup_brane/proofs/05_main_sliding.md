@@ -1550,30 +1550,37 @@ alternation `(−1)^{k−|S|}` (Lemma 8.7; `05_T1_check.py` compares the actual 
 elements of the formula with the sliding error and within each family); the final identity
 `E = 0` in all four blocks (`05_T1_check.py`, "chain map components").
 
-### Runs (all after the last edit of the scripts; every run ended without a failed assertion)
+### Runs (every run ended without a failed assertion)
 
-`zsh 05_logs/run_all.sh` (from `proofs/checks`) reproduces all of them; the outputs are in
-`proofs/checks/05_logs/*.log`, each ending with `exit code 0`.
+`zsh 05_logs/run_all.sh` (from `proofs/checks`) reproduces all of them; the original outputs are
+in `proofs/checks/05_logs/*.log`, each ending with `exit code 0`. **Re-run for the revision after
+`R05_referee.md`** (2026-11-27, same commands, `zsh 05_logs/rerun_R05.sh`, logs in
+`proofs/checks/05_logs/rerun_R05/`, with wall times; five parallel groups on a shared machine):
+all 34 runs ended with `exit code 0`, and every log is **identical** to the original one apart
+from the timing lines, so all numbers quoted in this file are reproduced. Every run finished in
+under ten minutes (the longest: `05_T1_check.py A 5 all 7 9 40 2`, PLACEHOLDER_LONGEST).
 
-| run (`sage -python …`) | result |
-|---|---|
-| `05_straighten.py 3000 1` | Lemma 1.2: 1371 words; 1.3: 868; 1.4: 381; no failure |
-| `05_sliding.py 300 1` | 308 cases, 142 bad letters, 0 failures |
-| `05_cone.py A 3 6 40 1`, `05_cone.py D 4 6 30 2` | 70 words, 5062 terms |
-| `05_reduction.py A 3 40 6 1`, `05_reduction.py D 4 25 6 2` | 2428 + 2148 cases |
-| `05_T1_check.py A 3 all 2 6` | 267 words (all T1 words of length ≤ 6) |
-| `05_T1_check.py D 4 all 2 6` | 2320 words (all) |
-| `05_T1_check.py A 4 all 5 6` | 2040 words (all) |
-| `05_T1_check.py D 4 all 7 8 60 1` | 120 words |
-| `05_T1_check.py A 5 all 7 9 40 2` | 120 words |
-| `05_T1_check.py D 5 all 8 9 30 3` | 60 words |
-| `05_T1_check.py D 4 3421342 1342134 2` | 3 words (`k = 2`) |
-| `05_F3_check.py A 3 2 13`, `… D 4 2 134`, `… A 4 2 134` | 132 words (Theorem C) |
-| `05_fourterm.py A 3 40 7 1`, `05_fourterm.py D 4 40 7 2` | 384 cases |
-| `05_explore_stats.py A 3 3 6 T1` | the numbers of section 0 |
-| `05_explore.py A 2 22112 v` | the expansions of 10.4 |
-| `05_blocks_general.py A 3 1 80 8 1 [a1]`, `… D 4 1 60 8 2 a1`, `… A 3 2 80 8 3 [a1]` | data of 10.3, 10.4 |
-| `05_closure.py …` (11 runs, see `run_all.sh`) | table of 10.4 |
+| run (`sage -python …`) | result | re-run (wall time) |
+|---|---|---|
+| `05_straighten.py 3000 1` | Lemma 1.2: 1371 words; 1.3: 868; 1.4: 381; no failure | identical (14 s) |
+| `05_sliding.py 300 1` | 308 cases, 142 bad letters, 0 failures | identical (5 s) |
+| `05_cone.py A 3 6 40 1`, `05_cone.py D 4 6 30 2` | 70 words, 5062 terms | identical (6 s, 6 s) |
+| `05_reduction.py A 3 40 6 1`, `05_reduction.py D 4 25 6 2` | 2428 + 2148 cases | identical (7 s, 6 s) |
+| `05_T1_check.py A 3 all 2 6` | 267 words (all T1 words of length ≤ 6) | identical (41 s) |
+| `05_T1_check.py D 4 all 2 6` | 2320 words (all) | identical (435 s) |
+| `05_T1_check.py A 4 all 5 6` | 2040 words (all) | identical (413 s) |
+| `05_T1_check.py D 4 all 7 8 60 1` | 120 words | identical (300 s) |
+| `05_T1_check.py A 5 all 7 9 40 2` | 120 words | identical (591 s) |
+| `05_T1_check.py D 5 all 8 9 30 3` | 60 words | PLACEHOLDER_T1_D5_long |
+| `05_T1_check.py D 4 3421342 1342134 2` | 3 words (`k = 2`) | identical (7 s) |
+| `05_F3_check.py A 3 2 13`, `… D 4 2 134`, `… A 4 2 134` | 132 words (Theorem C) | identical (3 s, 21 s, 21 s) |
+| `05_fourterm.py A 3 40 7 1`, `05_fourterm.py D 4 40 7 2` | 384 cases | identical (6 s, 5 s) |
+| `05_explore_stats.py A 3 3 6 T1` | the numbers of section 0 | identical (32 s) |
+| `05_explore.py A 2 22112 v` | the expansions of 10.4 | identical (5 s) |
+| `05_blocks_general.py A 3 1 80 8 1 [a1]`, `… D 4 1 60 8 2 a1`, `… A 3 2 80 8 3 [a1]` | data of 10.3, 10.4 | PLACEHOLDER_blocks |
+| `05_closure.py …` (11 runs, see `run_all.sh`) | table of 10.4 | identical (7–27 s each) |
+| `python3 05r_only_products.py 3 8 adm A 3` (new, revision) | Prop. 10.2, uniqueness: all words in 3 colours of length 4–8; 3510 quadruples `(a,j,j',b)` with (H1), (H2), 47 322 vertices `I`, 189 288 products (exactly the four each time), 13 428 vertices with a further slot of colour `c` below `a`, 15 774 admissibility checks; controls: without (H1) all 98 388 tested vertices have further products (chains of 2–5 pairs), without (H2) all 211 044 | 325 s (`05r_logs/only_products_3_8_adm_A_3.log`) |
+| `python3 05r_only_products.py 4 7 adm D 4` (new, revision) | the same for all words in 4 colours of length 4–7: 15 120 quadruples, 110 520 vertices, 442 080 products, 20 880 with a further slot of colour `c` below `a`, 27 630 admissibility checks (`D_4`); controls: 92 880 resp. 173 904 vertices, all with further products | 152 s (`05r_logs/only_products_4_7_adm_D_4.log`) |
 
 ### Independent checks (referee, `R05_referee.md`)
 

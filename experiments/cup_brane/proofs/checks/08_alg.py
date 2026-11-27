@@ -236,28 +236,73 @@ def sparse_matrix(cols, rowidx):
     return matrix(QQ, nr, max(len(cols), 1), ent, sparse=True)
 
 
-def solve_affine(cols, rhs):
-    """Solve sum_c y_c cols[c] = rhs (dicts key -> int).  Returns (y0, kernel basis) or None.
-    Exact over QQ."""
+def _solve_block(cols, rhs):
     rowidx = {}
     for col in cols:
         for k in col:
             rowidx.setdefault(k, len(rowidx))
     for k in rhs:
         rowidx.setdefault(k, len(rowidx))
-    if not cols:
-        return ([], []) if not any(rhs.values()) else None
     M = sparse_matrix(cols, rowidx)
     b = vector(QQ, max(len(rowidx), 1), {rowidx[k]: v for k, v in rhs.items()}, sparse=True)
     try:
         y0 = M.solve_right(b)
     except ValueError:
         return None
-    ker = M.right_kernel_matrix(basis="echelon") if M.ncols() else None
-    kb = [] if ker is None else [list(r) for r in ker.rows()]
-    if len(cols) == 0:
-        kb = []
-    return list(y0)[:len(cols)], kb
+    ker = M.right_kernel_matrix(basis="echelon")
+    return list(y0)[:len(cols)], [list(r) for r in ker.rows()]
+
+
+def solve_affine(cols, rhs):
+    """Solve sum_c y_c cols[c] = rhs (dicts key -> int).  Returns (y0, kernel basis) or None.
+    Exact over QQ.  The system is split into the connected blocks of its incidence graph
+    (columns sharing a row), which are solved separately."""
+    n = len(cols)
+    if n == 0:
+        return ([], []) if not any(rhs.values()) else None
+    parent = list(range(n))
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    owner = {}
+    for c_, col in enumerate(cols):
+        for k in col:
+            if k in owner:
+                a, b = find(owner[k]), find(c_)
+                if a != b:
+                    parent[a] = b
+            else:
+                owner[k] = c_
+    blocks = defaultdict(list)
+    for c_ in range(n):
+        blocks[find(c_)].append(c_)
+    # rows of the rhs not met by any column must vanish
+    brhs = defaultdict(dict)
+    for k, v in rhs.items():
+        if not v:
+            continue
+        if k not in owner:
+            return None
+        brhs[find(owner[k])][k] = v
+    y0 = [QQ(0)] * n
+    kb = []
+    for root, members in blocks.items():
+        res = _solve_block([cols[c_] for c_ in members], brhs.get(root, {}))
+        if res is None:
+            return None
+        yb, kerb = res
+        for c_, v in zip(members, yb):
+            y0[c_] = v
+        for kv in kerb:
+            full = [QQ(0)] * n
+            for c_, v in zip(members, kv):
+                full[c_] = v
+            kb.append(full)
+    return y0, kb
 
 
 if __name__ == "__main__":
