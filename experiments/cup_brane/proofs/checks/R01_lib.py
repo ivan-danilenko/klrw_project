@@ -90,8 +90,13 @@ class PolyRepR:
         return self.R(1)
 
     def swap(self, f, i):
-        y = self.y
-        return f.subs({y[i]: y[i + 1], y[i + 1]: y[i]})
+        if not hasattr(self, "_sw"):
+            self._sw = {}
+        if i not in self._sw:
+            g = list(self.y)
+            g[i], g[i + 1] = g[i + 1], g[i]
+            self._sw[i] = self.R.hom(g, self.R)
+        return self._sw[i](f)
 
     def psi(self, s, i, f):
         """f . psi_{i,s}, i 0-based (positions i, i+1). Returns (target, poly)."""

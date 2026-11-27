@@ -1,0 +1,7 @@
+A2 red 1 word 111111: 3966 (I,K,tau) classes, 0 nonzero  [24.1s]
+A2 red 2 word 111111: 3966 (I,K,tau) classes, 0 nonzero  [24.6s]
+A2 red 1 word 1211111: 8798 (I,K,tau) classes, 0 nonzero  [67.2s]
+A2 red 2 word 1111121: 8428 (I,K,tau) classes, 0 nonzero  [56.5s]
+A2 red 1 word 1121111: 8996 (I,K,tau) classes, 0 nonzero  [68.1s]
+A2 red 2 word 1112111: 9028 (I,K,tau) classes, 0 nonzero  [76.6s]
+sage -python 07_star_check.py A 2 1 111111 2 111111 1 1211111 2 1111121 1  2   308.05s user 3.75s system 97% cpu 5:21.29 total

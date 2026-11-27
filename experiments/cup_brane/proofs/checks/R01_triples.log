@@ -1,0 +1,13 @@
+lambda3: sl_6, Lambda^3: 19 Young diagrams (one random linear extension each), admissible configurations with a bad triple: 0
+lambda3: sl_7, Lambda^3: 34 Young diagrams (one random linear extension each), admissible configurations with a bad triple: 0
+lambda3: sl_8, Lambda^3: 55 Young diagrams (one random linear extension each), admissible configurations with a bad triple: 0
+lambda3: sl_9, Lambda^3: 83 Young diagrams (one random linear extension each), admissible configurations with a bad triple: 0
+lambda3: sl_10, Lambda^3: 119 Young diagrams (one random linear extension each), admissible configurations with a bad triple: 0
+lambda3: max colour multiplicity over all Lambda^2 C^n ideals, n <= 10: 2
+ALL OK
+mult3: A_3, words of length <= 9 with multiplicities <= 3: 5235 words; 96 words / 160 admissible configurations with a bad triple; all of type B3 in pattern S with the proof's cyclic configuration verified: 160; unexpected: 0
+mult3: D_4, words of length <= 8 with multiplicities <= 3: 52636 words; 48 words / 48 admissible configurations with a bad triple; all of type B3 in pattern S with the proof's cyclic configuration verified: 48; unexpected: 0
+mult3: A_4, words of length <= 9 with multiplicities <= 3: 60000 words; 205 words / 262 admissible configurations with a bad triple; all of type B3 in pattern S with the proof's cyclic configuration verified: 262; unexpected: 0
+mult3: A_3, words of length <= 8 with multiplicities <= 2: 258 words; 0 words / 0 admissible configurations with a bad triple; all of type B3 in pattern S with the proof's cyclic configuration verified: 0; unexpected: 0
+mult3: D_4, words of length <= 8 with multiplicities <= 2: 7344 words; 0 words / 0 admissible configurations with a bad triple; all of type B3 in pattern S with the proof's cyclic configuration verified: 0; unexpected: 0
+ALL OK

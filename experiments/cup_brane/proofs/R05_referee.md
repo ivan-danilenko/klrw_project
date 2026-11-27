@@ -1,24 +1,28 @@
 # R05 — Referee report on `05_main_sliding.md`
 
-## RESUME NOTES (for whoever continues this report)
+*(RESUME NOTES: closed — the report is complete.)*
 
-* **Finished:** reading of all of `05_main_sliding.md` (§§1–11), verdicts below; reading of the old
-  scripts `R05_{lib,basic,tools,d2,reduction,redlin,sec8,thmC}.py` (they test what they say, see
-  "Independent checks"); re-runs `R05_basic.py 80`, `R05_tools.py 3000 21`, new `R05b_d2.py all A 3 2 6`.
-* **Running (background, logs in `proofs/checks/R05_logs/rerun/`):** `b_d2_D4_le7.log` (all T1 words of
-  `D_4` of length ≤ 7, every red colour, basis braid), `sec8_stress.log` (`run_sec8.sh`: section-8
-  assertions on k = 2 words etc.), `reduction.log` (`run_red.sh`: perturbed `F`, rank test).
-  Also running: `samples_b.log` (`run_samples_b.sh 3`: sampled 9–11-strand words, A_5, A_6, D_5, D_6,
-  E_6, patterns ''/nb/red/twinred/branch/k2).
-* **Done since:** verdicts, problem list and overall judgement written (below); `R05_thmC.py 102`
-  new seed; `R05_reduction.py … T1` new seed; `R05b_lemma43.py`; section-8 k = 2 runs (D_4, D_5).
-* **Remains:** collect the running logs into the table "Results so far"; then close these notes.
-* **New scripts of this referee:** `R05b_d2.py` (d² with `formula.Stack` + klrw basis braid; word
-  generators with stress patterns), `R05b_sec8.py` (driver for `R05_sec8.check_word`).
+Status of this report: **final.** Every section of the draft was read line by line and every lemma
+re-derived by hand; the numerical checks are listed at the end, with their scripts and logs
+(`proofs/checks/R05_*.py`, `R05b_*.py`; logs `proofs/checks/R05_logs/` and `R05_logs/rerun/`). A
+previous referee's 15-line preliminary note in this file has been replaced; that referee's
+scripts were used only after I had read them, and were re-run.
 
-Status of this report: **in progress** (written section by section while reading; a previous
-referee's 15-line preliminary note in this file has been replaced — its scripts are re-used
-only after being read and re-run, see the section "Independent checks").
+## Verdict in brief
+
+| statement | verdict |
+|---|---|
+| Lemmas 1.1–1.4, 2.1–2.2, 3.1–3.3, 4.1–4.6 (arbitrary words) | correct and complete |
+| Lemmas 5.1–5.4, 6.1, 6.2 | correct and complete |
+| Theorem A, Corollary 7.1 | correct and complete |
+| Lemmas 8.1–8.7, Corollary 8.2, Proposition 8.8, **Theorem B** | correct and complete: **Theorem B is proved** |
+| Corollaries 9.1, 9.2 | correct |
+| **Theorem C** (§9A) | correct and complete |
+| Proposition 10.2 | correct; one step under-argued (repairable, filled below) |
+| §10.1–10.6, §11 | descriptive, accurate; one cosmetic omission in §11 |
+
+No fatal error. One repairable gap (Prop. 10.2, "only products"), seven cosmetic points; see
+"Numbered problems".
 
 ## Sections 1–4 (general tools, arbitrary words)
 
@@ -108,9 +112,8 @@ distinct because node colours are distinct; the image path avoids `c` because no
 colour `c`; with `c_1 — c — c_2` it closes a cycle of length ≥ 3.)
 
 **Lemma 6.1.** Correct (= Lemma B.2 of `01_foundations.md`). The direction statement ("the
-strand moving towards the left") is right for (a)–(d); for (e) (not stated in the lemma, but
-true and used implicitly nowhere essential): the *outer* strand `L_p` resp. `R_p` of a nested pair
-moves left.
+strand moving towards the left") is right for (a)–(d); for (e) it is not stated (and not used
+in the proofs): there the *outer* strand `L_p` resp. `R_p` of a nested pair moves left.
 
 **Lemma 6.2.** Correct. All twin possibilities are listed (a pair uses both slots of its
 colour, so a strand of a pair is never the twin of an unaffected strand or of the mover).
@@ -345,7 +348,7 @@ No **fatal** problem was found.
 Standing inputs: (F1) in the form of Theorem A.5 of `01_foundations.md` (left and right bases, base
 change), (F3) Matsumoto, and the relations with the README signs.
 
-## Independent checks (in progress)
+## Independent checks
 
 ### What the scripts are, and why I trust them
 
@@ -386,7 +389,7 @@ the author); I read every one of them before using it. They do not import `05_li
   `R05b_sec8.py` (runs `R05_sec8.check_word` on stress words, in particular words producing data
   with `k = 2` components, which no earlier run contained).
 
-### Results so far
+### Results
 
 | run | result |
 |---|---|
@@ -405,3 +408,20 @@ the author); I read every one of them before using it. They do not import `05_li
 | `R05b_sec8.py A 5 20 9 15 3 red`, `… D 5 20 9 16 3 twinred`, `… A 4 20 8 17 3 nb` (a colour's two occurrences around the red colour; the red colour's two occurrences around a neighbour; equal neighbouring letters) | all assertions pass; `E = 0` in 26 996, 27 840, 11 790 components |
 | `run_samples_b.sh 3` → `samples_b.log`: `R05b_d2.py sample` (project formula + basis braid), `A_5` (9, 10 strands), `A_6` (9–11), `D_5` (9, 10), `D_6` (9–11), `E_6` (9–11), random T1 words with patterns uniform / equal neighbours (`nb`) / `c k c` around the red colour `k` (`red`) / `k c k` (`twinred`) / last colour at a branch node (`branch`) / k = 2 families (`k2`) | 68 runs, 408 words, 10 200 random vertices, 420 527 products: **0 failures** |
 | `run_samples_c.sh` → `samples_c.log`: same, 20 words × 40 vertices per run, `A_5` (10 strands), `A_6`, `D_6` (11), `D_5` (10), `E_6` (11 and 12), all patterns | 32 runs, 640 words, 25 600 vertices, 1 330 607 products: **0 failures** |
+| `R05b_d2.py all D 4 2 7 6` | **every** word of `D_4` with colour multiplicities ≤ 2 and length ≤ 7, every red colour: 19 360 (word, red) cases, all 1 610 320 vertices (full complexes), 19 823 744 products, **0 failures**. The product count equals the sum of the earlier runs with the independent implementation and random reduced words (`d2_D4_le6.log` 3 591 008 + `d2_D4_7.log` 16 232 736, both 0 failures), so the two definitions of the terms agree in number and both give `d² = 0`. |
+
+(`A_3` has only three colours, so "length ≤ 7 with multiplicities ≤ 2" is length ≤ 6 there, done
+completely above. `D_4` length 8 was covered by the section-8 run `R05b_sec8.py D 4 40 8 12 3 k2`, which
+computes every component of `E` for 40 words.)
+
+### Summary of the numerical evidence
+
+Nothing failed. Every statement that I tested from its formulation in the text held: the relations
+with signs, Lemmas 1.2–1.4, the Sliding Lemma with its error words and constants, Lemma 4.2, Lemma 4.3,
+Lemma 4.1, Prop. 4.5 (perturbed families and rank test, arbitrary words), Lemma 3.2, Lemmas 8.1,
+8.3–8.7 including families with k = 2, `E = 0`, Theorem C's (C1)–(C4), Prop. 10.2 including the
+"only products" claim, and `d² = 0` on full complexes (all of `A_3`, all of `D_4` up to length 7) and on
+35 800 sampled vertices of 1048 random words with 9–12 strands in `A_5, A_6, D_5, D_6, E_6`. The tests
+also showed that the hypotheses are not vacuous (straightening fails without (S1)/(S2); `μμ^* ≠ P` and
+the Reduction Lemma's conclusion fail for slots that are not first occurrences; reversing the
+index order of `t` breaks `d² = 0`).

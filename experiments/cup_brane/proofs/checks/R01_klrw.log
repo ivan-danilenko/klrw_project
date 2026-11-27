@@ -1,0 +1,17 @@
+assoc: 175 triples, 0 failures
+ALL OK
+embedded: 8064 relation instances (behind a random dotted braid, letter by letter), 0 failures
+ALL OK
+  klrw degrees (A_2, red 1):
+    psi(1,1)   -2*d_{0} + d_{V1,c}
+    psi(1,2)   d_{0} + d_{V1--V2}
+    psi(1,W1)  d_{0} + d_{V1--W1}
+    psi(2,W1)  0
+    x on 1     2*d_{0} + d_{V1,d}
+    x on 2     2*d_{0} + d_{V2,d}
+    r_1        d_{V1,c} + d_{V1,d}
+    t_12       2*d_{V1--V2} - d_{V1,d}
+    t_21       2*d_{V1--V2} - d_{V2,d}
+    u_1        2*d_{V1--W1} - d_{V1,d}
+grading: 120 products, 0 failures
+ALL OK

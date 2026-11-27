@@ -1,0 +1,17 @@
+twisted group algebra K # S_n, Gamma = D_4, red k in {1,2}, 3 total orders:
+  6384 relation identities checked exactly, 0 failures
+  (state, red colour, C) with non-zero cubic constant:
+     ((1, 'W', 1), 1, 'r1*u1')
+     ((1, 2, 1), 1, 'r1*t12')
+     ((1, 2, 1), 2, 'r1*t12')
+     ((2, 'W', 2), 2, 'r2*u2')
+     ((2, 1, 2), 1, 'r2*t21')
+     ((2, 1, 2), 2, 'r2*t21')
+     ((2, 3, 2), 1, 'r2*t23')
+     ((2, 3, 2), 2, 'r2*t23')
+     ((2, 4, 2), 1, 'r2*t24')
+     ((2, 4, 2), 2, 'r2*t24')
+     ((3, 2, 3), 1, 'r3*t32')
+     ((3, 2, 3), 2, 'r3*t32')
+     ((4, 2, 4), 1, 'r4*t42')
+     ((4, 2, 4), 2, 'r4*t42')

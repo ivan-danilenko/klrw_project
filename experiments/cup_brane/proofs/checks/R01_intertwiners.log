@@ -1,0 +1,6 @@
+d1: 60 identities, all hold
+d3: 108 3-strand states, 96 embedded instances: all exact
+d5: 216 identities on all 3-strand states: all hold
+d6 (phi): 720 naturality identities, 0 failures
+d6 (psi, negative control): 240 naturality identities, 63 failures
+ALL OK
