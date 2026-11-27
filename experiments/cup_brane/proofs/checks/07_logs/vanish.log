@@ -1,0 +1,8 @@
+A2 red 2 word 1211: V1 X_j.H_a: 2 ok / 0 fail; V1 h.X_j per chain: 2 ok / 0 fail; V3 pairwise adj: 2 ok / 0 fail; V3 pairwise same: 2 ok / 0 fail
+A2 red 2 word 112111: V1 X_j.H_a: 48 ok / 0 fail; V1 h.X_j per chain: 86 ok / 0 fail; V2 H.P: 4 ok / 0 fail; V2 P.H: 4 ok / 0 fail; V3 pairwise adj: 16 ok / 0 fail; V3 pairwise adj F: 4 ok / 0 fail; V3 pairwise same: 48 ok / 0 fail
+A2 red 1 word 1121111: V1 X_j.H_a: 160 ok / 0 fail; V1 h.X_j per chain: 388 ok / 0 fail; V2 H.P: 24 ok / 0 fail; V2 P.H: 24 ok / 0 fail; V3 pairwise adj: 48 ok / 0 fail; V3 pairwise adj F: 24 ok / 0 fail; V3 pairwise same: 160 ok / 0 fail
+A2 red 2 word 111211: V1 X_j.H_a: 48 ok / 0 fail; V1 h.X_j per chain: 86 ok / 0 fail; V3 pairwise adj: 8 ok / 0 fail; V3 pairwise same: 48 ok / 0 fail
+A3 red 2 word 1121311: V1 X_j.H_a: 96 ok / 0 fail; V1 h.X_j per chain: 172 ok / 0 fail; V2 H.P: 8 ok / 0 fail; V2 P.H: 8 ok / 0 fail; V3 pairwise adj: 32 ok / 0 fail; V3 pairwise adj F: 8 ok / 0 fail; V3 pairwise far: 64 ok / 0 fail; V3 pairwise same: 96 ok / 0 fail
+A3 red 3 word 1213111: V1 X_j.H_a: 96 ok / 0 fail; V1 h.X_j per chain: 172 ok / 0 fail; V2 H.P: 12 ok / 0 fail; V2 P.H: 12 ok / 0 fail; V3 pairwise adj: 48 ok / 0 fail; V3 pairwise adj F: 12 ok / 0 fail; V3 pairwise far: 64 ok / 0 fail; V3 pairwise same: 96 ok / 0 fail
+D4 red 2 word 2132422: V1 X_j.H_a: 48 ok / 0 fail; V1 h.X_j per chain: 64 ok / 0 fail; V2 H.P: 8 ok / 0 fail; V2 P.H: 8 ok / 0 fail; V3 pairwise adj: 80 ok / 0 fail; V3 pairwise adj F: 8 ok / 0 fail; V3 pairwise same: 48 ok / 0 fail
+D4 red 1 word 2213242: V1 X_j.H_a: 48 ok / 0 fail; V1 h.X_j per chain: 64 ok / 0 fail; V3 pairwise adj: 32 ok / 0 fail; V3 pairwise same: 48 ok / 0 fail

@@ -1,0 +1,7 @@
+32 cases
+A2 red 1 word 11122112: cyclic True ['N']; dot-free candidates r>=2: {2: 1566, 4: 60} [4.8s]
+  r^2: kernel in 0, new unknowns 1566, equations 7634, rhs 624 -> kernel out 48  [14s]
+  r^3: {'order': 3, 'kernel_in': 48, 'new_unknowns': 0, 'equations': 476, 'rhs_nonzero': 72, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 1/32 A2 red 1 11122112: NO SOLUTION (inconsistent at r^3), kernel 48, extra None, tree missing None wrong None [20s]
+A2 red 2 word 11122112: cyclic True ['N']; dot-free candidates r>=2: {2: 7702, 3: 318, 4: 262} [7.7s]

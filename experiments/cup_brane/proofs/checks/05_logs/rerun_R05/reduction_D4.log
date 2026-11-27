@@ -1,0 +1,4 @@
+$ sage -python 05_reduction.py D 4 25 6 2
+reduction lemma inputs, type ['D', 4], 25 words: m_a m_a^* = P != 0 in 924 cases (a first occurrence), = 0 mod m in 804 cases (a not a first occurrence); structure of the mover-a block checked in 1728 cases
+exit code 0
+wall time 6 s

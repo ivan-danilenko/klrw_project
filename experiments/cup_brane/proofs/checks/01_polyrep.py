@@ -472,3 +472,54 @@ def twisted_check():
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "twisted":
     twisted_check()
+
+
+# ---------------------------------------------------------------------------------------
+# Degenerate parameters (R01_referee.md, §1.4(iv)): the polynomial representation is NOT
+# faithful at r_c = 0, at t_{cc'} = t_{c'c} = 0, or at u_k = 0 -- the claimed basis acts with
+# smaller rank.  (F1) still holds there, by base change (Theorem A.5(iv)).
+#     sage -python proofs/checks/01_polyrep.py degenerate
+# ---------------------------------------------------------------------------------------
+def degenerate(p=1000003, seed=9, D=1):
+    rng = random.Random(seed)
+    generic = {name: rng.randint(2, p - 2) for name in PARAMS}
+    cases = [("generic", {}), ("r1 = 0", {"r1": 0}), ("t12 = t21 = 0", {"t12": 0, "t21": 0}), ("u1 = 0", {"u1": 0})]
+    for seq in [(1, 1, 2), (1, "W1", 1)]:
+        A = Alg(["A", 3], seqstr(seq))
+        K = A.K
+        n = len(seq)
+        states = sorted(set(itertools.permutations(seq)), key=str)
+        for label, override in cases:
+            values = dict(generic)
+            values.update(override)
+            P = PolyRep(n, base=GF(p), values=values)
+            tot_el = tot_rk = 0
+            for s in states:
+                for t in states:
+                    st, tt = A.state(seqstr(s)), A.state(seqstr(t))
+                    bys = K.KLRWBraid.braids_with_left_state_by_right_state(st)
+                    if tt not in bys:
+                        continue
+                    braids = bys[tt]
+                    blacks = [q for q in range(n) if not is_red(s[q])]
+                    elems = [(m, tuple(b.word())) for b in braids for m in monomials(P, blacks, D)]
+                    tests = monomials(P, blacks, D + 3)
+                    rows = []
+                    for m, w in elems:
+                        vec = {}
+                        for ti, f in enumerate(tests):
+                            _, g = P.word(s, w, m * f)
+                            for mono, c in g.dict().items():
+                                vec[(ti, mono)] = c
+                        rows.append(vec)
+                    cols = sorted(set(k2 for r in rows for k2 in r), key=str)
+                    idx = {c: i for i, c in enumerate(cols)}
+                    M = matrix(GF(p), len(rows), max(1, len(cols)),
+                               {(i, idx[c]): v for i, r in enumerate(rows) for c, v in r.items()}, sparse=True)
+                    tot_el += len(elems)
+                    tot_rk += M.rank()
+            print("   %-10s %-14s: %3d elements, rank in V %3d" % (seqstr(seq), label, tot_el, tot_rk))
+
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "degenerate":
+    degenerate()

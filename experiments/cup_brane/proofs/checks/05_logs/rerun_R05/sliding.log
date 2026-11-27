@@ -1,0 +1,12 @@
+$ sage -python 05_sliding.py 300 1
+['A', 2] ['1', '2'] extra 1 beta (1,) bad letters 1 OK
+['A', 2] ['2', '1'] extra 1 beta (1,) bad letters 0 OK
+['A', 2] ['1', 'W1'] extra 1 beta (1,) bad letters 1 OK
+['A', 2] ['W1', '1'] extra 1 beta (1,) bad letters 0 OK
+['A', 2] ['1', '1'] extra 1 beta (1,) bad letters 0 OK
+['A', 2] ['1', '1'] extra 2 beta (1,) bad letters 0 OK
+['A', 3] ['1', '3'] extra 1 beta (1,) bad letters 0 OK
+['A', 2] ['1', 'W2'] extra 1 beta (1,) bad letters 0 OK
+sliding lemma: 308 cases OK, 0 FAIL, 142 bad letters in total
+exit code 0
+wall time 5 s

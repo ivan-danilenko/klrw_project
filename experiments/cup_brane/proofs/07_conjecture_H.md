@@ -1,4 +1,4 @@
-# 07 — Conjecture H: the one-step homotopy, proved in the chain-only case
+# 07 — Conjecture H (the one-step homotopy): proofs for one repeated colour
 
 ## RESUME NOTES (keep at the top; updated after every result)
 
@@ -11,8 +11,15 @@
   splitting (`07_groups.py`), (★) itself (`07_star_check.py`). Logs in `checks/07_logs/`.
 * **Open:** H1 without (NN) (nested families of pairs around a mover of adjacent colour; the
   identity of §5.5, computed only); H2–H4 (hanging forests; §7 lists what is missing).
-* **Doing right now / next:** runs of `07_star_check.py` on larger words (background); §7
-  (what carries over to H2–H4) and the Status section.
+* **All runs done (logs in `checks/07_logs/`, after the last edit of the scripts):**
+  `formulas.log` (0 mismatches), `vanish.log` (0 failures), `compact.log`, `theta.log`,
+  `groups.log` (every group zero, incl. Identity N words), `adjfine.log`, `star_small.log`,
+  `star_A2.log` ((★) zero on all H1 words; non-zero on the cyclic control `1221122`),
+  `groups_H2.log`, `star_H2.log` (H2 words: (★) holds; groups do not close).
+* **§7 (H2–H4) and §8 (Status) written.** Next steps for a successor: (1) prove Identity N by
+  extending Prop. 5.3 to nested families (the configurations `(F,a)` combine by component,
+  `07_adjfine.py`); (2) find a compact form for chains *with* hanging forests (§7.2.1) — the key
+  to H2; (3) combine it with the tree lemma 06 Lemma 6.7 as in the `F = ∅` case of §5.3.
 
 ---
 
@@ -33,13 +40,11 @@ occur at most once in `w`, and assume
 
 Then (★) holds. (For `N ≤ 2` the condition is empty.)
 
-**Corollary H1 [proved].** For every word in which one colour occurs `N + 1` times, every other
-colour at most once, and (NN) holds for the last two occurrences... more precisely: for every word
-`w` in which one colour `c` occurs `n` times at `s_1 < ⋯ < s_n`, every other colour at most once,
-and no slot of a colour adjacent to `c` lies in `(s_2, s_{n−1})`, the tree formula satisfies
-`d² = 0`. In particular (`n = 3`) **Theorem C of 05 is reproved** by a different argument, and
-it is extended to all `n` under (NN) (e.g. all words `c^n`, all words `c^a e c^b` with
-`e ∼ c`, `a ≤ 1` or `b ≤ 1`, …).
+**Corollary H1 [proved] (§6).** Let `w` be a word in which one colour `c` occurs `n` times, at
+`s_1 < ⋯ < s_n`, every other colour at most once, and no slot of a colour adjacent to `c` lies
+strictly between `s_2` and `s_{n−1}`. Then the tree formula of `w` satisfies `d² = 0`. For
+`n = 3` the condition is empty: **Theorem C of 05 is reproved** by a different argument; for
+`n ≥ 4` this is new (e.g. `c^n`, `e c^n`, `c e c^{n−1}`, `c^{n−1} e c` for `e ∼ c`).
 
 **Tools valid for every word** (§2): the moving-strand expansion (Lemma 2.3), the
 double-crossing lemma (Lemma 2.4), and the **compact form of the chain part of h**
@@ -146,17 +151,20 @@ labels `y_1, …, y_ℓ`. Let `T` be the set of `k` with `y_k` black of the colo
 `S = \{k_1 < ⋯ < k_p\} ⊆ T` put `μ_k = y_{max(S ∩ [1,k))}` (`= μ_0` if `S ∩ [1,k) = ∅`), and let `t_S` be
 `t·D` with the labels `μ_0, y_{k_1}, …, y_{k_p}` cyclically moved: `μ_0` to the final position of
 `y_{k_1}`, `y_{k_i}` to that of `y_{k_{i+1}}`, `y_{k_p}` to the final position of the moving strand.
-Assume that no pair `\{μ_k, y_k\}` (`k ∉ S`) is inverted between `s` and `t`. Then
+Then
 
-    𝒟(s → t)·ψ_D  =  Σ_{S ⊆ T}  r_c^{|S|} ∏_{k∈T} (x_{y_k} − x_{μ_k})^{-1} · 𝒟(s → t_S).
+    𝒟(s → t)·ψ_D  =  Σ_{S ⊆ T}  r_c^{|S|} ∏_{k∈T} (x_{y_k} − x_{μ_k})^{-1} · ∏_{k ∉ S,\ \{μ_k, y_k\} ∈ inv(s,t)} q_{μ_k y_k} · 𝒟(s → t_S).
+
+In particular there is no factor `q` if no pair `\{μ_k, y_k\}` is inverted between `s` and `t`
+(e.g. if `t = s`).
 
 *Proof.* Induction on `ℓ` with Lemma 2.1: at the letter `k` the labels at the two positions are
 `(y_k, μ_k)`; for `k ∈ T` Lemma 2.1(b) gives the two branches `φ` (the label `μ_k` passes, it
 remains the moving label) and `r` (no crossing: the labels stay, and the label at the moving
-position is now `y_k`); for `k ∉ T` Lemma 2.1(a). No factor `q` occurs: the pair at letter `k` is
-not inverted between `s` and `t` by hypothesis, and not by the earlier letters of `D` (the labels
-`μ_k, y_k` meet only at letter `k`: `y_k` is passed only at `k`, and if `y_k` was a moving label
-earlier then `y_k = μ_{k′}` for some `k′ < k`, which would make `y_k = y_{k″}` with `k″ < k`). ∎
+position is now `y_k`); for `k ∉ T` Lemma 2.1(a). In the `φ`-branch and for `k ∉ T` the factor of
+Lemma 2.1(a) is `q_{μ_k y_k}` iff the pair is inverted between `s` and the current state; the earlier
+letters of `D` do not change this, since the labels `μ_k, y_k` meet only at the letter `k` (`y_k` is
+passed only at `k`; if `y_k` had been a moving label earlier, then `y_k = y_{k′}` for some `k′ < k`). ∎
 
 *Words used in this file.* `X_j(V)`: the moving position starts at `+j` and passes the right slots
 `< j` (decreasing), the red strand, the left slots `< j` (increasing) (`PROOFS.md` Lemma 1; unique
@@ -177,16 +185,12 @@ word continues with
 
     W = [B passes A] [B passes y_1] ⋯ [B passes y_r] [A passes y_1] ⋯ [A passes y_r] [A passes B]
 
-(no dots inside `W`). Assume that for every `k` the triple `(y_k, A, B)` is not bad (README: not
-"`y_k, B` black of the same colour and `A` black of an adjacent colour", not "`y_k, B` of the red
-colour `k` and `A` red"). Then
+(no dots inside `W`). Assume that `A` and `B` are black and the colour of `A` is not adjacent to
+that of `B` (equal colours allowed). Then
 
     ψ_W = ψ_{[A passes y_1]⋯[A passes y_r][B passes y_1]⋯[B passes y_r]} · q_{AB},
 
-`q_{AB}` the double-crossing polynomial of `A, B` (`0` for equal colours, `1` for different
-non-adjacent colours, R3). The hypothesis holds whenever `A, B` are black of the same colour,
-and whenever `A` is black of a colour occurring once in the word and not adjacent to the colour
-of `B`.
+with `q_{AB} = 0` if `A, B` have the same colour and `q_{AB} = 1` otherwise (R3).
 
 *Proof.* `W_0 = [B passes A][B passes Y][A passes Y]` and `W_0′ = [A passes Y][B passes Y][B passes A]`
 are reduced words of the same permutation of these `r + 2` strands (`A`, `B` cross once; each `y_k`
@@ -194,12 +198,11 @@ is crossed once by `A` and once by `B`; the `y`'s do not cross each other). The 
 pairwise crossing strands are `\{y_k, A, B\}`; when the three mutual crossings of such a triple
 are consecutive letters of a reduced word, the triple stands in its initial order `(y_k, A, B)`.
 By (F3) `W_0` and `W_0′` are connected by commutation moves (R1) and braid moves on states
-`(y_k, A, B)`, which are exact by hypothesis (README, braid relation). Hence `ψ_W = ψ_{W_0′}ψ_{[A passes B]}`,
-and the last letter of `W_0′` and `[A passes B]` are the same letter on the same two strands:
-`ψ_i² = q_{AB}` (R3). For the last sentence: if `A, B` have the same colour `c`, then either
-`c(y_k) = c` (state `(c,c,c)`, exact) or `y_k, B` have different colours; if `A` has a colour
-occurring once and not adjacent to `c(B)`, then `y_k, B` have equal colour only if … `A` is not
-adjacent to it, and the red strand is not `A`. ∎
+`(y_k, A, B)`. Such a move is exact unless the outer strands `y_k, B` are black of one colour and
+the middle strand `A` is black of an adjacent colour, or `A` is red (README, braid relation);
+both are excluded (`A` is black, and not adjacent to the colour of `B`). Hence
+`ψ_W = ψ_{W_0′}ψ_{[A passes B]}`, and the last letter of `W_0′` and `[A passes B]` are the same letter
+on the same two strands: `ψ_i² = q_{AB}` (R3). ∎
 
 ### 2.3 The compact form of the chain part of h
 
@@ -328,8 +331,9 @@ because `A_{b_1} = B_{b_1}`. ∎
 
 *Check.* `07_formulas.py` compares every coefficient of every diagonal term with Proposition 3.1
 (`1111`, `11111`, `1211`, `112111`, `111211`, `1121111` (`A_2`), `1121311`, `1312131`, `1213111`
-(`A_3`), `2132422`, `2213242` (`D_4`): 28 104 coefficients, no mismatch; log
-`checks/07_logs/formulas.log`). The proposition uses nothing about the colours other than
+(`A_3`; `1312131` is not of the type of §5 — colour 3 occurs twice — and is included because
+Propositions 3.1, 3.2 hold for every word), `2132422`, `2213242` (`D_4`): 28 648 coefficients, no
+mismatch; log `checks/07_logs/formulas.log`). The proposition uses nothing about the colours other than
 that the terms are as listed; in words with hanging forests the diagonal *component* contains
 further terms (§7).
 
@@ -465,9 +469,9 @@ own colour, so `X_j` and the mover part of `P(j;·)` are single brackets.
 strand): the strand of `a` passes `L ∩ (a, m)`; `j` passes the unaffected strands `< j`; the strand
 of `m` passes `R ∩ (a,m) ∖ j`. Lemma 2.3 for the two slides gives `[a,Y,m,Z]` with coefficient
 `r^{|Y|+|Z|}∏B^{-1}∏B′^{-1}`; no bigon (the mover crosses neither strand of the pair). The term
-coefficient is `κ(I;j,(a,m))·(−1)·r t` (connector `j ∈ I`), `κ = σ`, and the sign in (1.1) is `−`.
-`ζ_m = A_a ∏_{Λ_L}A ∏_{Λ_R}A ∏_{s<a}A ∏_{s∈Same, s>m…}` — all slots of `Same` are `< m`; the slots of
-`Same` outside `[a, m)` are those `< a`.
+coefficient is `κ(I;j,(a,m))·(−1)·r t` (connector `j ∈ I`), `κ = σ`, and the sign in (1.1) is `−`;
+so the contribution is `σ r t ζ_m·(…)`, and `ζ_m = A_a ∏_{Λ_L}A ∏_{Λ_R}A ∏_{s∈Same, s<a}A` (every slot
+of `Same` is `< m`).
 
 (i) `X_j(I)`: one bracket; it inverts `j` with every strand it passes, among them `a` and `Y ∩ (a,j)`.
 `H_a(I∖j)` (Prop. 2.6): `LS_a` passes `L ∩ (a, m)` and, between, the strand `j` (now at `−j`);
@@ -523,7 +527,7 @@ difference). The `b ∈ Z ∩ (j,m) = \{z_1 > ⋯ > z_k\}` give `−Σ_b B′_b 
 and the two remaining expressions are equal. ∎
 
 *Check.* `07_formulas.py` (mode "adj0"): every coefficient of (i)–(v) against Proposition 5.2, on
-the words listed in §3 (5 144 coefficients, no mismatch — including words with nested families,
+the words listed in §3 (6 068 coefficients, no mismatch — including words with nested families,
 where this component is still of the form (i)–(v)).
 
 ### 5.4 Adjacent movers: one pair
@@ -592,21 +596,143 @@ Theorem H1 gives (★). `d′² = 0` by induction (the prefix has the same form)
 gives `d² = 0`. ∎
 
 For `n = 3` the hypothesis is empty: this is **Theorem C of `05_main_sliding.md`**, reproved without
-the four-term identities. New cases: all `c^n` (where `d = δ_0`; this part was also elementary),
-and e.g. `A_2`: `1 2 1^k`, `1^k 2 1`, `1 1 2 1 1 1`? — no: `112111` violates (NN) (`s_2 = 2 < 3 < s_5 = 5`);
-`121111`, `111121`, `21111`, `D_4` with `c = 2`: `1 2 3 2 2 2 4 2` (spectators at slots 1, 3 < `s_2` and 7 > `s_{n−1}`).
+the four-term identities of 05 §10. New cases (`n ≥ 4`): all `c^n` (where `d = δ_0` and `d² = 0`
+was elementary; the content here is (★), i.e. the explicit homotopy), and for instance `A_2`
+`2 1^k`, `1 2 1^k`, `1^k 2 1` (the spectator `2` before `s_2` or after `s_{n−1}`), `D_4` with
+`c = 2`: `1 2 3 2 2 2 4 2`. Not covered: `1 1 2 1 1 1` (`s_2 = 2 < 3 < s_4 = 5`), which needs
+Identity N.
 
 ---
 
 ## 7. Beyond H1 (stages H2–H4)
 
-*(to be written)*
+### 7.1 What holds for every word
+
+* Lemma 1.1, Lemma 2.1, Lemma 2.3 (expansion), Lemma 2.4 (double crossing): no hypothesis on
+  the word.
+* Proposition 2.6 (compact form of the **chain part** of `h`): every word.
+* Propositions 3.1, 3.2: the four kinds of diagonal terms **with empty forests** vanish
+  together, for every word (the proof uses only that no two labels meet twice in these
+  composites, which holds always).
+* Lemma 4.1 (a), (b) for the **chain-only** terms of `h`: every word.
+* The coefficient analysis of §5.3 for a mover `j` whose colour occurs once and the terms
+  (i)–(v) with empty forests: every word in which those are the only terms of the component.
+
+### 7.2 Where H2–H4 differ
+
+As soon as a colour `c′ ∼ c` occurs twice in `w′`, `h` has **hanging forests** (06 §7.2). Three
+new phenomena appear, none of which is handled above:
+
+1. *The compact form does not cover forests.* The admissible forests of a chain depend on its arcs
+   (a pair hangs from the arc `(c_i, c_{i+1})` it is interlaced with), so the sum over the chains
+   with first element `c` is not a sum over the hand-overs of one left slide with a fixed
+   forest. A compact form "chains + forests" would have to produce the forest links to inner
+   arcs from the expansion of `LS_c` (a hand-over of `LS_c` at `y` creates the arc ending at `y`);
+   I did not find it.
+2. *The groups of §5.1 no longer close.* Data (`07_groups.py … adjj`, log
+   `07_logs/groups_H2.log`; numbers of components that vanish / do not vanish):
+
+   | word | diag | same, `a<j` | same, `a>j` | far | adj(j) |
+   |---|---|---|---|---|---|
+   | `A_2` red 1 `12121` | 16 / 4 | 5 / 0 | 5 / 4 | – | 10 / 12 |
+   | `A_2` red 2 `21212` | 16 / 4 | 5 / 0 | 5 / 4 | – | 10 / 12 |
+   | `A_2` red 1 `12211` (no forest can hang) | 16 / 0 | 4 / 0 | 4 / 0 | – | 16 / 0 |
+   | `A_3` red 2 `213212` | 32 / 8 | 10 / 0 | 10 / 8 | – | 40 / 24 |
+   | `A_3` red 2 `1232123` | 64 / 36 | – | 0 / 36 | 48 / 8 | 26 / 80 |
+
+   Forest terms enter the diagonal component `K = I∖m` and the components of the movers of
+   colour `c` with `a > j`; (★) itself holds in all these words (`07_logs/star_H2.log`). The
+   case "same, `a < j`" still vanishes by itself.
+3. *Trees of the prefix with pairs of several colours* (links between pairs); this is where the
+   tree lemma of 06 §6.5 (sum over connected subsets) has to be combined with the chain
+   inclusion–exclusion of §3. The `F = ∅` part of §5.3 is the prototype (a bigon divided
+   difference next to a chain telescoping).
+
+### 7.3 Evidence for H2–H4 obtained here
+
+(★) was checked with the independent engine `07_lab` (labelled calculus; it does not use the
+klrw implementation of the algebra) — `07_logs/star_H2.log`; together with the 168 words of 06
+§7.2 (klrw-based) this is the evidence for H2–H4. The words, their colour multiplicities and the
+result are listed in §8.
+
+### 7.4 Remaining identities (precise list)
+
+* **Identity N** (H1 without (NN)): every component of the group adj(j) of §5.1 vanishes.
+  Verified on all components of the words of §5.5.
+* **Identity H** (H2–H4): (★) itself on the components containing forest terms; equivalently, by
+  §7.1, (★) minus the parts proved there. Verified on the words of 06 §7.2 and of `star_H2.log`.
+  A proof along the lines of this file needs (1) a compact form for chains with forests, and (2)
+  the analogue of Proposition 5.3 in which the bigon factor of a single adjacent mover is replaced
+  by the bigon polynomials of the linked pairs (06 Lemma 6.8) and the tree lemma 06 Lemma 6.7.
 
 ---
 
 ## 8. Status
 
-*(to be written)*
+### Proved completely (from the relations, (F1), (F3), and the results of 06 §§2–5, §9 and 05 Lemma 3.2)
+
+* Lemma 1.1 (bracket basis of `e(s)A[Δ^{-1}]e′` with source dots), Lemma 2.1 (expansion rule),
+  Lemma 2.3 (moving-strand expansion), Lemma 2.4 (double-crossing lemma) — every word.
+* **Proposition 2.6 (compact form of the chain part of `h`)** — every word.
+* Propositions 3.1, 3.2 (the diagonal group with empty forests vanishes:
+  `∏_{b∈𝔟}(A_b − B_b) = 0`) — every word.
+* Lemma 4.1 (movers of colour `c`, chain-only terms) — every word.
+* **Theorem H1a**: Conjecture H for `w = c^{N+1}` (all `N`, every type, every red colour).
+* Lemma 5.1, Propositions 5.2, 5.3, Lemma 5.4, and **Theorem H1**: Conjecture H for `w = w′·c`
+  with `c` occurring `N` times in `w′` (any `N`), every other colour at most once, and (NN).
+* **Corollary 6.1**: `d² = 0` for every word with one colour `c` occurring `n` times, all other
+  colours once, and no slot of a colour adjacent to `c` strictly between `s_2` and `s_{n−1}`;
+  contains Theorem C of 05 (`n = 3`).
+
+Every identity used is checked by an exact computation (after the final edit of text and
+scripts): `07_formulas.py` (all coefficients of Props. 3.1, 5.2: 30 000+ coefficients, no
+mismatch), `07_vanish.py` (Lemmas 4.1, 5.1, 5.4 and the pairwise statements), `07_compact.py`
+(Prop. 2.6), `07_groups.py` (the splitting of §5.1), `07_star_check.py` ((★) itself). Logs in
+`checks/07_logs/`.
+
+### Proved assuming
+
+* Theorem H1 without (NN) assuming **Identity N** (§5.5): one colour repeated `N` times, all
+  other colours once, arbitrary positions.
+
+### Verified only by computation
+
+* Identity N: all components of adj(j) for `112111` (red 1, 2), `1121111`, `1112111` (`A_2`),
+  `1121311`, `1213111` (`A_3`), `2132422`, `2213242` (`D_4`) (`07_groups.py … adjj`,
+  `07_logs/groups.log`).
+* (★) with the engine of this file (independent of the klrw implementation):
+  `111`, `1111` (red 1, 2), `111111` (red 1, 2), `1211`, `2112`, `112111` (red 1, 2), `121111`,
+  `1211111`, `1111121`, `1121111`, `1112111` (`A_2`); `1121311` (`A_3`);
+  H2-type: `12121`, `21212`, `12211` (`A_2`), `213212`, `1232123`, `2132132` (`A_3`), `2132423`
+  (`D_4`). No failure; (★) fails on the cyclic word `1221122` (88 classes), as in 06.
+* Conjecture H in general (H2–H4): the 168 words of 06 §7.2 and the words above.
+
+### Not proved
+
+* **H2** (`c` three times, other colours at most twice), **H3** (multiplicities `≤ 3`,
+  non-cyclic), **H4** (all non-cyclic words): the hanging forests of `h` are not covered by the
+  compact form, and the groups of §5.1 do not close (§7.2: on `12121`, `21212`, `213212`,
+  `1232123` the diagonal and the same-colour groups no longer vanish separately; on `12211`,
+  where no forest can hang, they do). §7.4 lists what is needed.
+* Identity N.
+
+### Failed attempts, corrections
+
+* The first version of the compact form read the dot `x_m` of `W_c` at the target; it is wrong
+  as soon as the strand `m` hands over in `Seg_0` (10 of 32 `(I,c)` of `11111`); the correct
+  statement reads it before `Seg_0` (Prop. 2.6).
+* The Reduction Lemma of 05 (idea (iii) of the brief) applies to the defect `E′` only if
+  `d_w² = 0` is already known (then `E′` is a cocycle: `ι_R(d′)E′ − E′ι_L(d′) = −ζ_m·(d_w² defect)`);
+  for the induction it does not help, and it is not used.
+* "Partially intertwined" moves (idea (ii)): the telescoping
+  `Φ_m = ζ_mX_m − r Σ_k ζ_{>k} P_k S_k` (time order of the same-colour crossings of `m`) is exact,
+  but its terms do not match the terms of `[d′, h]` one by one; the inclusion–exclusion of §3 is
+  what organises the matching. Not used.
+* Lemma 1.4 of 05 (vanishing) needs (S2), which fails with adjacent spectators between the two
+  crossings; Lemma 2.4 (only the triples with a fixed middle strand matter) is the version that
+  works here.
+* The groups "adj(j)" do not split by configuration `(F, a)` when nested families occur (§5.5);
+  they split by component.
 
 ---
 
@@ -622,3 +748,9 @@ and e.g. `A_2`: `1 2 1^k`, `1^k 2 1`, `1 1 2 1 1 1`? — no: `112111` violates (
 | `07_groups.py … [adjj]` | splitting of (1.1) into the groups of §5.1 | §5 |
 | `07_formulas.py …` | Propositions 3.1 and 5.2, coefficient by coefficient | §3, §5.3 |
 | `07_vanish.py …` | Lemmas 4.1, 5.1, 5.4 and the pairwise statements | §4, §5 |
+| `07_adjfine.py` | splitting of adj(j) by configuration `(F, a)`; prints the configurations that do not vanish alone (nested families) | §5.5 |
+
+Logs (`checks/07_logs/`, all produced after the last edit of the scripts): `formulas.log`,
+`vanish.log`, `compact.log`, `theta.log`, `groups.log`, `adjfine.log` (H1 words); `star_small.log`,
+`star_A2.log` ((★) for H1 words, and the cyclic control `1221122`); `groups_H2.log`,
+`star_H2.log` (H2-type words).

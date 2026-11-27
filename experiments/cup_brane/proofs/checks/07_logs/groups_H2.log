@@ -1,0 +1,5 @@
+A2 red 1 word 12121: adj-by-j: 10 zero / 12 nonzero; diag: 16 zero / 4 nonzero; same, a<j: 5 zero / 0 nonzero; same, a>j: 5 zero / 4 nonzero
+A2 red 2 word 21212: adj-by-j: 10 zero / 12 nonzero; diag: 16 zero / 4 nonzero; same, a<j: 5 zero / 0 nonzero; same, a>j: 5 zero / 4 nonzero
+A2 red 1 word 12211: adj-by-j: 16 zero / 0 nonzero; diag: 16 zero / 0 nonzero; same, a<j: 4 zero / 0 nonzero; same, a>j: 4 zero / 0 nonzero
+A3 red 2 word 213212: adj-by-j: 40 zero / 24 nonzero; diag: 32 zero / 8 nonzero; same, a<j: 10 zero / 0 nonzero; same, a>j: 10 zero / 8 nonzero
+A3 red 2 word 1232123: adj-by-j: 26 zero / 80 nonzero; diag: 64 zero / 36 nonzero; far, a<j: 24 zero / 4 nonzero; far, a>j: 24 zero / 4 nonzero; same, a>j: 0 zero / 36 nonzero

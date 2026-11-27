@@ -1,0 +1,12 @@
+A2 red 1 word 1111: diag: 194 coefficients compared, 0 mismatches
+A2 red 2 word 11111: diag: 1010 coefficients compared, 0 mismatches
+A2 red 1 word 1211: adj0: 14 coefficients compared, 0 mismatches; diag: 76 coefficients compared, 0 mismatches
+A2 red 2 word 1211: adj0: 14 coefficients compared, 0 mismatches; diag: 76 coefficients compared, 0 mismatches
+A2 red 2 word 112111: adj0: 384 coefficients compared, 0 mismatches; diag: 2020 coefficients compared, 0 mismatches
+A2 red 2 word 111211: adj0: 392 coefficients compared, 0 mismatches; diag: 2020 coefficients compared, 0 mismatches
+A2 red 2 word 1121111: adj0: 1728 coefficients compared, 0 mismatches; diag: 10516 coefficients compared, 0 mismatches
+A3 red 2 word 1121311: adj0: 768 coefficients compared, 0 mismatches; diag: 4040 coefficients compared, 0 mismatches
+A3 red 1 word 1312131: adj0: 336 coefficients compared, 0 mismatches; diag: 1552 coefficients compared, 0 mismatches
+A3 red 3 word 1213111: adj0: 576 coefficients compared, 0 mismatches; diag: 4040 coefficients compared, 0 mismatches
+D4 red 2 word 2132422: adj0: 848 coefficients compared, 0 mismatches; diag: 1552 coefficients compared, 0 mismatches
+D4 red 1 word 2213242: adj0: 1008 coefficients compared, 0 mismatches; diag: 1552 coefficients compared, 0 mismatches

@@ -1,0 +1,22 @@
+$ sage -python 05_T1_check.py A 3 all 2 6
+length 2: 9 words done [0s]
+length 3: 24 words done [0s]
+length 4: 54 words done [2s]
+length 5: 90 words done [10s]
+length 6: 90 words done [33s]
+T1 checks passed for 267 words of type ['A', 3]
+   (I1) exact slides                             2395
+   E = product, with coefficient                 1388
+   E diagrams with 0 double crossings            1344
+   E diagrams with 1 double crossings            44
+   [9] m_a m_a^* = P                             2187
+   chain map components                          12045
+   families with k = 0                           1388
+   families with k = 1                           44
+   frozen terms without bad letter               2688
+   new colour: exact slides                      882
+   products with 0 double crossings              1454
+   products with 1 double crossings              22
+   tree terms                                    29156
+exit code 0
+wall time 41 s

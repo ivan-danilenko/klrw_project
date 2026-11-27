@@ -164,5 +164,61 @@ def main():
                 print("   ", seqstr(s), ":", v)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and not (len(sys.argv) > 1 and sys.argv[1] == "basis"):
     main()
+
+
+# ---------------------------------------------------------------------------------------
+# R1 of R01_referee.md: (c) every klrw basis braid equals the letter-by-letter product of its
+# word (no lower terms), and (d) the klrw degrees of the generators are those of F2 and
+# products of generators are homogeneous of the sum degree.
+#     sage -python proofs/checks/01_relations.py basis
+# ---------------------------------------------------------------------------------------
+def check_basis_words():
+    import random as _r
+    rng = _r.Random(2)
+    n_b = n_deg = 0
+    bad = 0
+    for seq in ["1 2 1 W1", "1 1 W1 2", "2 1 W1 1 2", "1 W2 2 1 2", "1 1 2 W1 1"]:
+        A = Alg(CT, seq)
+        K = A.K
+        toks = seq.split()
+        states = sorted(set(itertools.permutations(toks)))
+        for st in states:
+            S = " ".join(st)
+            for b in K.KLRWBraid._braids_with_left_state_iter_(A.state(S)):
+                el = A.word(S, tuple(b.word())) if b.word() else A.e(S)
+                n_b += 1
+                if el != K.monomial(b):
+                    bad += 1
+                    print("FAIL basis word", S, b.word())
+        # degrees: generators against F2, and random products homogeneous of the sum degree
+        G = K.grading_group
+        for _ in range(20):
+            st = list(rng.choice(states))
+            S = " ".join(st)
+            el = A.e(S)
+            deg = G.zero()
+            for _ in range(rng.randint(1, 6)):
+                if rng.random() < 0.3:
+                    blacks = [q + 1 for q in range(len(st)) if not st[q].startswith("W")]
+                    p = rng.choice(blacks)
+                    g = A.dot(" ".join(st), p)
+                else:
+                    i = rng.randint(1, len(st) - 1)
+                    if st[i - 1].startswith("W") and st[i].startswith("W"):
+                        continue
+                    g = A.x(" ".join(st), i)
+                    st[i - 1], st[i] = st[i], st[i - 1]
+                deg = deg + g.degree(check_if_homogeneous=True)
+                el = el * g
+            n_deg += 1
+            if el != 0 * el and el.degree(check_if_homogeneous=True) != deg:
+                bad += 1
+                print("FAIL degree", seq)
+    print("basis braid = product of its letters: %d braids; random products homogeneous of the sum degree: %d; failures %d"
+          % (n_b, n_deg, bad))
+
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "basis":
+    check_basis_words()

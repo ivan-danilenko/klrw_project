@@ -1,0 +1,437 @@
+28 cases
+A3 red 1 word 1122112: candidates (dots allowed) r>=3: {3: 7, 4: 4}; with dots 7 [0.4s]
+  r^3: kernel in 0, new unknowns 7, equations 28, rhs 12 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 7 (3 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_1          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    2 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_2          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_3          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {3,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 4 7)        W: 3>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 4>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 5 2 6)(4 7)           W: 3>3 | R: 5>2 6>1 7>4 | L: 1>5 2>6 4>7
+    1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 6 2 5)(4 7)           W: 3>3 | R: 5>1 6>2 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(3 7 4)        W: 4>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_1122112_dotted_R3.json
+CASE 1/28 A3 red 1 1122112: solved, kernel 0, extra 7, tree missing 0 wrong None [2s]
+A3 red 2 word 1122112: candidates (dots allowed) r>=3: {3: 27, 4: 4}; with dots 7 [0.4s]
+  r^3: kernel in 0, new unknowns 27, equations 128, rhs 12 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 7 (3 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_1          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    2 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_2          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_3          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {3,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 4 7)        W: 3>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 4>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 5 2 6)(4 7)           W: 3>3 | R: 5>2 6>1 7>4 | L: 1>5 2>6 4>7
+    1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 6 2 5)(4 7)           W: 3>3 | R: 5>1 6>2 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(3 7 4)        W: 4>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_1122112_dotted_R3.json
+CASE 2/28 A3 red 2 1122112: solved, kernel 0, extra 7, tree missing 0 wrong None [2s]
+A3 red 3 word 1122112: candidates (dots allowed) r>=3: {3: 27, 4: 4}; with dots 7 [0.6s]
+  r^3: kernel in 0, new unknowns 27, equations 128, rhs 12 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 7 (3 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_1          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    2 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_2          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_3          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {3,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 4 7)        W: 3>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 4>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 5 2 6)(4 7)           W: 3>3 | R: 5>2 6>1 7>4 | L: 1>5 2>6 4>7
+    1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 6 2 5)(4 7)           W: 3>3 | R: 5>1 6>2 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(3 7 4)        W: 4>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_1122112_dotted_R3.json
+CASE 3/28 A3 red 3 1122112: solved, kernel 0, extra 7, tree missing 0 wrong None [2s]
+A3 red 1 word 1221122: candidates (dots allowed) r>=3: {3: 7, 4: 4}; with dots 7 [0.4s]
+  r^3: kernel in 0, new unknowns 7, equations 28, rhs 28 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 14 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 10 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -2 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)        W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_1221122_dotted_R3.json
+CASE 4/28 A3 red 1 1221122: solved, kernel 0, extra 10, tree missing 0 wrong None [2s]
+A3 red 2 word 1221122: candidates (dots allowed) r>=3: {3: 28, 4: 7}; with dots 28 [0.4s]
+  r^3: kernel in 0, new unknowns 28, equations 126, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 14 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 10 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -2 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)        W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_1221122_dotted_R3.json
+CASE 5/28 A3 red 2 1221122: solved, kernel 0, extra 10, tree missing 0 wrong None [2s]
+A3 red 3 word 1221122: candidates (dots allowed) r>=3: {3: 28, 4: 7}; with dots 28 [0.5s]
+  r^3: kernel in 0, new unknowns 28, equations 126, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 14 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 10 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1^3        dots x_2_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -2 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)        W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_1221122_dotted_R3.json
+CASE 6/28 A3 red 3 1221122: solved, kernel 0, extra 10, tree missing 0 wrong None [2s]
+A3 red 1 word 1221322: candidates (dots allowed) r>=3: {3: 7, 4: 2}; with dots 7 [0.2s]
+  r^3: kernel in 0, new unknowns 7, equations 28, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 10, rhs 10 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 9 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_1221322_dotted_R3.json
+CASE 7/28 A3 red 1 1221322: solved, kernel 0, extra 9, tree missing 0 wrong None [2s]
+A3 red 2 word 1221322: candidates (dots allowed) r>=3: {3: 21, 4: 3}; with dots 21 [0.2s]
+  r^3: kernel in 0, new unknowns 21, equations 98, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 3, equations 16, rhs 10 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 9 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_1221322_dotted_R3.json
+CASE 8/28 A3 red 2 1221322: solved, kernel 0, extra 9, tree missing 0 wrong None [2s]
+A3 red 3 word 1221322: candidates (dots allowed) r>=3: {3: 21, 4: 3}; with dots 21 [0.2s]
+  r^3: kernel in 0, new unknowns 21, equations 98, rhs 28 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 3, equations 16, rhs 10 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 9 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_1221322_dotted_R3.json
+CASE 9/28 A3 red 3 1221322: solved, kernel 0, extra 9, tree missing 0 wrong None [2s]
+D4 red 4 word 1221322: candidates (dots allowed) r>=3: {3: 21, 4: 3}; with dots 21 [0.2s]
+  r^3: kernel in 0, new unknowns 21, equations 98, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 3, equations 16, rhs 10 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 9 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2*t_2_1*t_2_3^2  dots x_2_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/D4_W4_1221322_dotted_R3.json
+CASE 10/28 D4 red 4 1221322: solved, kernel 0, extra 9, tree missing 0 wrong None [2s]
+A3 red 1 word 1322132: candidates (dots allowed) r>=3: {3: 9, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 9, equations 54, rhs 18 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    -2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {3,5,6,7} -> {1,2,3}  sigma (1 5)(2 6)(3 4 7)        W: 3>4 | R: 5>1 6>2 7>3 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(3 7 4)        W: 4>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_1322132_dotted_R3.json
+CASE 11/28 A3 red 1 1322132: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+A3 red 2 word 1322132: candidates (dots allowed) r>=3: {3: 11, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 11, equations 66, rhs 18 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    -2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {3,5,6,7} -> {1,2,3}  sigma (1 5)(2 6)(3 4 7)        W: 3>4 | R: 5>1 6>2 7>3 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(3 7 4)        W: 4>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_1322132_dotted_R3.json
+CASE 12/28 A3 red 2 1322132: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+A3 red 3 word 1322132: candidates (dots allowed) r>=3: {3: 9, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 9, equations 54, rhs 18 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    -2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {3,5,6,7} -> {1,2,3}  sigma (1 5)(2 6)(3 4 7)        W: 3>4 | R: 5>1 6>2 7>3 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(3 7 4)        W: 4>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_1322132_dotted_R3.json
+CASE 13/28 A3 red 3 1322132: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+D4 red 4 word 1322132: candidates (dots allowed) r>=3: {3: 11, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 11, equations 66, rhs 18 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    -2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {3,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(4 7)          W: 3>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {3,5,6,7} -> {1,2,3}  sigma (1 5)(2 6)(3 4 7)        W: 3>4 | R: 5>1 6>2 7>3 | L: 1>5 2>6 4>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,4}  sigma (1 5)(2 6)(3 7 4)        W: 4>3 | R: 5>1 6>2 7>4 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/D4_W4_1322132_dotted_R3.json
+CASE 14/28 D4 red 4 1322132: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+A3 red 1 word 2112211: candidates (dots allowed) r>=3: {3: 28, 4: 7}; with dots 28 [0.4s]
+  r^3: kernel in 0, new unknowns 28, equations 126, rhs 28 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 14 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 10 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -2 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)        W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_2112211_dotted_R3.json
+CASE 15/28 A3 red 1 2112211: solved, kernel 0, extra 10, tree missing 0 wrong None [2s]
+A3 red 2 word 2112211: candidates (dots allowed) r>=3: {3: 7, 4: 4}; with dots 7 [0.4s]
+  r^3: kernel in 0, new unknowns 7, equations 28, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 14 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 10 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -2 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)        W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_2112211_dotted_R3.json
+CASE 16/28 A3 red 2 2112211: solved, kernel 0, extra 10, tree missing 0 wrong None [2s]
+A3 red 3 word 2112211: candidates (dots allowed) r>=3: {3: 28, 4: 7}; with dots 28 [0.5s]
+  r^3: kernel in 0, new unknowns 28, equations 126, rhs 28 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 14 -> kernel out 0  [1s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 10 (7 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -2 r_1^2*r_2*t_1_2^2*t_2_1^2      dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2*t_1_2^3*t_2_1        dots x_1_4          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7)(3 6)          W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>7 3>6
+    1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)           W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1        dots -              {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)           W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)        W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_2112211_dotted_R3.json
+CASE 17/28 A3 red 3 2112211: solved, kernel 0, extra 10, tree missing 0 wrong None [2s]
+A3 red 1 word 2132213: candidates (dots allowed) r>=3: {3: 14, 4: 2}; with dots 14 [0.1s]
+  r^3: kernel in 0, new unknowns 14, equations 84, rhs 42 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 6 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 8 (7 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)        W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_2132213_dotted_R3.json
+CASE 18/28 A3 red 1 2132213: solved, kernel 0, extra 8, tree missing 0 wrong None [2s]
+A3 red 2 word 2132213: candidates (dots allowed) r>=3: {3: 7, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 7, equations 42, rhs 42 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 6 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 8 (7 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)        W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_2132213_dotted_R3.json
+CASE 19/28 A3 red 2 2132213: solved, kernel 0, extra 8, tree missing 0 wrong None [2s]
+A3 red 3 word 2132213: candidates (dots allowed) r>=3: {3: 14, 4: 2}; with dots 14 [0.1s]
+  r^3: kernel in 0, new unknowns 14, equations 84, rhs 42 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 6 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 8 (7 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)        W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_2132213_dotted_R3.json
+CASE 20/28 A3 red 3 2132213: solved, kernel 0, extra 8, tree missing 0 wrong None [2s]
+D4 red 4 word 2132213: candidates (dots allowed) r>=3: {3: 14, 4: 2}; with dots 14 [0.1s]
+  r^3: kernel in 0, new unknowns 14, equations 84, rhs 42 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 6 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 8 (7 dotted); tree terms of r>=3 missing/changed: 0
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_3_2^2 dots x_3_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    2 r_1*r_2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots x_2_3          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2*r_3*t_1_2^2*t_2_3*t_3_2 dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6)(3 7)          W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>6 3>7
+    1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)        W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/D4_W4_2132213_dotted_R3.json
+CASE 21/28 D4 red 4 2132213: solved, kernel 0, extra 8, tree missing 0 wrong None [2s]
+A3 red 1 word 2211221: candidates (dots allowed) r>=3: {3: 27, 4: 4}; with dots 7 [0.4s]
+  r^3: kernel in 0, new unknowns 27, equations 128, rhs 12 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 7 (3 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_1          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    2 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_2          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_3          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {3,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 4 7)        W: 3>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 4>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 5 2 6)(4 7)           W: 3>3 | R: 5>2 6>1 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 6 2 5)(4 7)           W: 3>3 | R: 5>1 6>2 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(3 7 4)        W: 4>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_2211221_dotted_R3.json
+CASE 22/28 A3 red 1 2211221: solved, kernel 0, extra 7, tree missing 0 wrong None [2s]
+A3 red 2 word 2211221: candidates (dots allowed) r>=3: {3: 7, 4: 4}; with dots 7 [0.4s]
+  r^3: kernel in 0, new unknowns 7, equations 28, rhs 12 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [1s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 7 (3 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_1          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    2 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_2          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_3          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {3,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 4 7)        W: 3>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 4>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 5 2 6)(4 7)           W: 3>3 | R: 5>2 6>1 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 6 2 5)(4 7)           W: 3>3 | R: 5>1 6>2 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(3 7 4)        W: 4>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_2211221_dotted_R3.json
+CASE 23/28 A3 red 2 2211221: solved, kernel 0, extra 7, tree missing 0 wrong None [2s]
+A3 red 3 word 2211221: candidates (dots allowed) r>=3: {3: 27, 4: 4}; with dots 7 [0.5s]
+  r^3: kernel in 0, new unknowns 27, equations 128, rhs 12 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 7 (3 dotted); tree terms of r>=3 missing/changed: 0
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_1          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    2 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_2          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_1^2      dots x_1_3          {3,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(4 7)          W: 3>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {3,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 4 7)        W: 3>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 4>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 5 2 6)(4 7)           W: 3>3 | R: 5>2 6>1 7>4 | L: 1>5 2>6 4>7
+    1 r_1*r_2^3*t_1_2*t_2_1^3        dots -              {3,5,6,7} -> {1,2,4}  sigma (1 6 2 5)(4 7)           W: 3>3 | R: 5>1 6>2 7>4 | L: 1>6 2>5 4>7
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2    dots -              {4,5,6,7} -> {1,2,4}  sigma (1 6)(2 5)(3 7 4)        W: 4>3 | R: 5>2 6>1 7>4 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_2211221_dotted_R3.json
+CASE 24/28 A3 red 3 2211221: solved, kernel 0, extra 7, tree missing 0 wrong None [2s]
+A3 red 1 word 2213221: candidates (dots allowed) r>=3: {3: 11, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 11, equations 50, rhs 12 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 10, rhs 10 -> kernel out 0  [2s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 2 6)(3 7)           W: 4>4 | R: 5>2 6>1 7>3 | L: 1>5 2>6 3>7
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 6 2 5)(3 7)           W: 4>4 | R: 5>1 6>2 7>3 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W1_2213221_dotted_R3.json
+CASE 25/28 A3 red 1 2213221: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+A3 red 2 word 2213221: candidates (dots allowed) r>=3: {3: 7, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 7, equations 28, rhs 12 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 2, equations 10, rhs 10 -> kernel out 0  [1s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 2 6)(3 7)           W: 4>4 | R: 5>2 6>1 7>3 | L: 1>5 2>6 3>7
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 6 2 5)(3 7)           W: 4>4 | R: 5>1 6>2 7>3 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W2_2213221_dotted_R3.json
+CASE 26/28 A3 red 2 2213221: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+A3 red 3 word 2213221: candidates (dots allowed) r>=3: {3: 11, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 11, equations 50, rhs 12 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 2, equations 10, rhs 10 -> kernel out 0  [1s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 2 6)(3 7)           W: 4>4 | R: 5>2 6>1 7>3 | L: 1>5 2>6 3>7
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 6 2 5)(3 7)           W: 4>4 | R: 5>1 6>2 7>3 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/A3_W3_2213221_dotted_R3.json
+CASE 27/28 A3 red 3 2213221: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+D4 red 4 word 2213221: candidates (dots allowed) r>=3: {3: 11, 4: 2}; with dots 7 [0.1s]
+  r^3: kernel in 0, new unknowns 11, equations 50, rhs 12 -> kernel out 0  [1s]
+  r^4: kernel in 0, new unknowns 2, equations 10, rhs 10 -> kernel out 0  [1s]
+  status solved, kernel 0 [2s]
+  extra terms (beyond the tree formula): 5 (3 dotted); tree terms of r>=3 missing/changed: 0
+    2 r_1*r_2^2*t_1_2*t_2_1*t_2_3*t_3_2 dots x_3_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_1          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^2*t_1_2^2*t_2_3^2      dots x_1_2          {4,5,6,7} -> {1,2,3}  sigma (1 6)(2 5)(3 7)          W: 4>4 | R: 5>2 6>1 7>3 | L: 1>6 2>5 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 5 2 6)(3 7)           W: 4>4 | R: 5>2 6>1 7>3 | L: 1>5 2>6 3>7
+    1 r_1*r_2^3*t_1_2*t_2_1*t_2_3^2  dots -              {4,5,6,7} -> {1,2,3}  sigma (1 6 2 5)(3 7)           W: 4>4 | R: 5>1 6>2 7>3 | L: 1>6 2>5 3>7
+  saved /Users/marco/Documents/-research/klrw_project/experiments/cup_brane/proofs/checks/08_data/D4_W4_2213221_dotted_R3.json
+CASE 28/28 D4 red 4 2213221: solved, kernel 0, extra 5, tree missing 0 wrong None [2s]
+
+SUMMARY
+  A3 red 1 1122112    N        solved                                   kernel 0   extra 7    dotted 3    tree missing 0   wrong None
+  A3 red 2 1122112    N        solved                                   kernel 0   extra 7    dotted 3    tree missing 0   wrong None
+  A3 red 3 1122112    N        solved                                   kernel 0   extra 7    dotted 3    tree missing 0   wrong None
+  A3 red 1 1221122    N        solved                                   kernel 0   extra 10   dotted 7    tree missing 0   wrong None
+  A3 red 2 1221122    N        solved                                   kernel 0   extra 10   dotted 7    tree missing 0   wrong None
+  A3 red 3 1221122    N        solved                                   kernel 0   extra 10   dotted 7    tree missing 0   wrong None
+  A3 red 1 1221322    N        solved                                   kernel 0   extra 9    dotted 7    tree missing 0   wrong None
+  A3 red 2 1221322    N        solved                                   kernel 0   extra 9    dotted 7    tree missing 0   wrong None
+  A3 red 3 1221322    N        solved                                   kernel 0   extra 9    dotted 7    tree missing 0   wrong None
+  D4 red 4 1221322    N        solved                                   kernel 0   extra 9    dotted 7    tree missing 0   wrong None
+  A3 red 1 1322132    B        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None
+  A3 red 2 1322132    B        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None
+  A3 red 3 1322132    B        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None
+  D4 red 4 1322132    B        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None
+  A3 red 1 2112211    N        solved                                   kernel 0   extra 10   dotted 7    tree missing 0   wrong None
+  A3 red 2 2112211    N        solved                                   kernel 0   extra 10   dotted 7    tree missing 0   wrong None
+  A3 red 3 2112211    N        solved                                   kernel 0   extra 10   dotted 7    tree missing 0   wrong None
+  A3 red 1 2132213    T        solved                                   kernel 0   extra 8    dotted 7    tree missing 0   wrong None
+  A3 red 2 2132213    T        solved                                   kernel 0   extra 8    dotted 7    tree missing 0   wrong None
+  A3 red 3 2132213    T        solved                                   kernel 0   extra 8    dotted 7    tree missing 0   wrong None
+  D4 red 4 2132213    T        solved                                   kernel 0   extra 8    dotted 7    tree missing 0   wrong None
+  A3 red 1 2211221    N        solved                                   kernel 0   extra 7    dotted 3    tree missing 0   wrong None
+  A3 red 2 2211221    N        solved                                   kernel 0   extra 7    dotted 3    tree missing 0   wrong None
+  A3 red 3 2211221    N        solved                                   kernel 0   extra 7    dotted 3    tree missing 0   wrong None
+  A3 red 1 2213221    N        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None
+  A3 red 2 2213221    N        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None
+  A3 red 3 2213221    N        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None
+  D4 red 4 2213221    N        solved                                   kernel 0   extra 5    dotted 3    tree missing 0   wrong None

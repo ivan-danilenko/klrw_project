@@ -6,6 +6,18 @@ Notation is that of `PROOFS.md` §1 and `NOTES.md` §2. Products are read left t
 `a·b` = first `a`, then `b`. The sections are in the order of priority B, D, A, E, C, F;
 section S is the Status.
 
+**REVISION NOTES** (revision after `R01_referee.md`; applied / remaining)
+
+* R1 status of "A.1 = klrw": **applied** (§A.2; Status updated at the end)
+* R2 hand proof of (A6) in the polynomial representation: **applied** (Prop. A.3)
+* R3 algebras without red strand; generality of A.5/E.1; two red strands: **applied** (Def. A.1′,
+  Remark A.5′; §D now argues in the given algebra and needs no (F1))
+* §D without (F1): (c,c,c) case of D.3 by direct computation, D.5 via the flip: **applied**
+* C1 Artin's lemma: **applied**; C2 side of `y` in pattern S: **applied**; C3 Webster Prop. 2.23:
+  **applied**; C4 KL I over ℤ: **applied**; C5 KKK items: **applied**; C6 E.1 in D.5: **applied**
+* Rouquier route (Remark A.5″), non-faithfulness of `V` at `r = 0`, `t = 0`, `u = 0` (A.5(iv)): **applied**
+* re-run checks, update Status: **applied** (Status rewritten; re-runs below)
+
 **Headline results.**
 
 * (B) The element `β(I; j, F)` is **not** in general independent of the reduced word: in
@@ -21,17 +33,19 @@ section S is the Status.
   definition of `β` that is safe everywhere is the **klrw basis braid** (Definition B.10); it
   is what all stored data and all `d² = 0` checks use.
 * (D) All intertwiner identities hold exactly, on every colour pattern including the red
-  strand, with proofs from the relations plus (F1) (Lemma D.1, Theorem D.3, Proposition D.5,
-  Theorem D.6).
-* (A) The presentation of `PROOFS.md` §1.1 is right, with the signs of the README; all
-  relations re-verified on every colour pattern (388 checks), and independently verified for
-  an explicit polynomial representation written from the formulas alone (exact identities in
-  the twisted group algebra). (F1) holds for this presentation over `ℤ[r, t, u]` with
-  polynomial parameters; Webster's theorem does **not** apply literally (it assumes unit
-  leading coefficients), so a proof is given (Theorem A.5).
+  strand, with proofs **from the relations alone** — no basis theorem, no torsion-freeness
+  (Lemma D.1, Theorem D.3, Proposition D.5, Theorem D.6).
+* (A) The presentation of `PROOFS.md` §1.1 is right, with the signs of the README. That it
+  *is* the algebra of `klrw` is verified by computation (§A.2, by me and by the referee), not
+  proved. (F1) holds for this presentation over `ℤ[r, t, u]` with polynomial parameters, for
+  any number of non-crossing red strands, and after every base change (Theorem A.5, Remark
+  A.5′; the polynomial representation is checked by hand, Prop. A.3; a second proof of
+  independence via Rouquier, Remark A.5″). Webster's theorem does **not** apply literally (it
+  assumes unit leading coefficients).
 * (F) Tier 1 of `PROOFS.md` is correct and its proofs are complete; repairs: the (F1)
-  reference ("Prop. 2.23" is wrong, and Webster's theorem needs unit coefficients), the exact
-  form of (R2), and Prop. 4's extension to several red strands needs (F1) for that algebra.
+  reference (Webster's Prop. 2.23 concerns another deformation, and his Thm. 2.8 needs unit
+  coefficients), the exact form of (R2); Prop. 4's extension to several red strands needs (F1)
+  for that algebra, which Remark A.5′ now provides for non-crossing red strands.
 * The draft `05_main_sliding.md`: its Straightening Lemma 1.2 and Lemma 6.2 are correct and
   agree with §B; its condition (S2) is stronger than necessary, and **its "Warning" example
   in §6 is not a failure of well-definedness** (both triples there are good; §B.9).
@@ -222,9 +236,12 @@ closed walk `c', c(v_1), …, c(v_{l−2}), c'` has pairwise different inner ver
 `c(x) = d ∼ c'`, `d ∉ {c, c'}`. This is pattern S.
 
 *Pattern S gives a cyclic configuration.* Admissibility says `q` (colour of the mover) does
-not contain `j`; `p` contains `j` (linked to `M`). If `j < a_q` put `p* = (a_p, y)`, if
-`j > b_q` put `p* = (y, b_p)`; in both cases `p*` is a pair of colour `c` containing `j`. Then
-the configuration with mover `j` and pairs `{q, x, p*}` has the links `M — x`, `x — q`
+not contain `j`; `p` contains `j` (linked to `M`). If `j < a_q` put `p* = (a_p, y)` and
+`I* = I ∪ {y}`; if `j > b_q` put `p* = (y, b_p)` and `I* = I ∖ {y}`. Since `y` is unaffected and
+`a_p ∉ I`, `b_p ∈ I`, the pair `p*` has its first slot outside and its second slot inside `I*`,
+while `j`, `q`, `x` keep their sides; so `(I*; j, {q, x, p*})` is a configuration (and in any
+case cyclicity is a property of the word, not of the vertex). In both cases `p*` is a pair of
+colour `c` containing `j`. This configuration has the links `M — x`, `x — q`
 (unchanged), `q — p*` (`a_p < a_q < y < b_q`, resp. `a_q < y < b_q < b_p`: interlaced,
 `c ∼ c'`), `p* — M` (`j ∈ p*`, `c ∼ c'`); it has no blocks (the three pairs have three
 different colours, `q` does not contain `j`, and `p*`, `x` are not of the mover's colour); it is
@@ -446,96 +463,136 @@ so `φφ = r(x − x')ψ − r((x − x')ψ − r) = r²`. Different colours: (A
 
 ### D.2 The braid relation
 
-**Lemma D.2 (leading terms).** Let `D` be a word of `l` letters from `s`, `g ∈ P(s')` a
-polynomial at its target. Then `ψ_D g = g^{D^{-1}} ψ_D + (a combination of words with fewer
-than `l` letters, polynomial coefficients on the left)`, where `g^{D^{-1}} ∈ P(s)` is `g`
-transported back along the strands. *Proof.* Induction on `l` with (A3), (A4): moving a dot
-to the left through one crossing transports it along its strand, up to a term in which that
-crossing is deleted (the `± r_c e` of (A4)). ∎
+**Lemma D.2.** (a) *(one crossing, exact)* If `s_i = s_{i+1} = c` is black and `f ∈ P(s)`, then
+
+    ψ_i · f  =  (s_i f) · ψ_i  +  r_c ∂_i f,        ∂_i f = (f − s_i f)/(x_i − x_{i+1}),
+
+where on the left `f` is read at the target (`= s`) and on the right `s_i f`, `∂_i f` at the
+source. If `s_i ≠ s_{i+1}`, `ψ_i f = f^{s_i}ψ_i` (dots transported, no correction).
+(b) *(leading terms)* For a word `D` of `l` letters from `s` and `g ∈ P(s')` at its target,
+`ψ_D g = g^{D^{-1}} ψ_D` + (a combination of words with fewer than `l` letters, polynomial
+coefficients on the left), `g^{D^{-1}}` = `g` transported back along the strands.
+
+*Proof.* (a) For `f = x_i`: `ψx_i = x_{i+1}ψ + r_c` (A4), and `s_i x_i = x_{i+1}`,
+`∂_i x_i = 1`. For `f = x_{i+1}`: `ψx_{i+1} = x_iψ − r_c` (A4), `∂_i x_{i+1} = −1`. Dots at other
+positions commute (A3), `∂_i x_p = 0`. If (a) holds for `f` and `g`, then
+`ψfg = ((s_if)ψ + r∂_if)g = (s_if)(s_ig)ψ + r((s_if)∂_ig + (∂_if)g) = s_i(fg)ψ + r∂_i(fg)` by
+the Leibniz rule for `∂_i`; and it holds for constants. Different colours: (A4), (A3).
+(b) Induction on `l` with (a). ∎
 
 **Theorem D.3.** On every state `s` (any colours, at most one red strand) and every `i`,
 
     φ_i φ_{i+1} φ_i  =  φ_{i+1} φ_i φ_{i+1}
 
 exactly (each `φ` taken at the state reached at that moment). Also `φ_iφ_j = φ_jφ_i` for
-`|i − j| ≥ 2`.
+`|i − j| ≥ 2`. **The proof uses only the relations (A0)–(A6)** (no basis theorem), so it holds
+in every algebra satisfying them, over every base ring.
 
-*Proof.* The second statement is (A2), (A3). For the first, by (A2), (A3) we may assume
-`n = 3`, `i = 1`; call the strands at the positions 1, 2, 3 of `s` `A, B, C`. Write
-`φ = h·ψ + c` for each of the six factors, with `h ∈ {x_X − x_Y, 1}` and `c ∈ {−r_*, 0}`.
-Expanding and moving all dots to the left (Lemma D.2),
+*Proof.* The second statement is (A2), (A3). For the first, all elements involved are products
+of generators at the positions `i, i+1, i+2`; write `1, 2, 3` for them and `A, B, C` for the
+strands at these positions of `s` (the strands at other positions are untouched; nothing is
+reduced to a smaller algebra). Dots slide through crossings of different colours without
+correction (A4), which is used tacitly below.
 
-    φ_1φ_2φ_1 = P · ψ_1ψ_2ψ_1 + (words of ≤ 2 letters),    φ_2φ_1φ_2 = P' · ψ_2ψ_1ψ_2 + (words of ≤ 2 letters),
+*Case 0: no two of `A, B, C` are black of the same colour.* All `φ = ψ`, and the cubic constant
+`C` vanishes (it needs equal outer colours): (A6).
 
-where `P` is the product, over the pairs `{X, Y} ⊂ {A, B, C}` of equal black colour, of
-`x_X − x_Y` (`X` the left one at the source), the dots read at the source. Indeed in
-`φ_1φ_2φ_1` the three `h` are `x_1 − x_2` (pair `A,B`), `x_2 − x_3` at the state `(B,A,C)`,
-transported back: `x_1 − x_3` (pair `A, C`), and `x_1 − x_2` at `(B,C,A)`, transported back:
-`x_2 − x_3` (pair `B,C`); in `φ_2φ_1φ_2` one finds the same three differences
-`x_2 − x_3`, `x_1 − x_3`, `x_1 − x_2`. So `P' = P`, and by (A6)
-`P(ψ_1ψ_2ψ_1 − ψ_2ψ_1ψ_2) = P·C e(s)` has no crossing. Hence `Δ := φ_1φ_2φ_1 − φ_2φ_1φ_2`
-is a combination of words with at most two letters, and by the spanning part of (F1)
-(Theorem A.5(i)) `Δ = Σ_v g_v ψ_v` over basis braids `ψ_v` from `s` to `w_0 s` with
-`ℓ(v) ≤ 2`, `g_v ∈ P(s)`.
+*Case 1: `c(A) = c(C) = c`, `B` of another colour `b` (black or red).*
+`φ_1φ_2φ_1 = ψ_1((x_2 − x_3)ψ_2 − r_c)ψ_1 = (x_1 − x_3)ψ_1ψ_2ψ_1 − r_c Q_{cb}(x_1, x_2)` (the
+dots of `A, C` slide back through the crossing of `A` with `B`; `ψ_1ψ_1 = Q_{cb}(x_1,x_2)` on
+`(c,b,c)`), and `φ_2φ_1φ_2 = ψ_2((x_1 − x_2)ψ_1 − r_c)ψ_2 = (x_1 − x_3)ψ_2ψ_1ψ_2 − r_c Q_{bc}(x_2,x_3)`.
+The difference is `(x_1 − x_3)C(c,b,c) − r_c(Q_{cb}(x_1,x_2) − Q_{bc}(x_2,x_3))`:
+for `b ∼ c` black it is `(x_1 − x_3)r_ct_{cb} − r_ct_{cb}(x_1 − x_3) = 0`; for `b = W`, `c = k` it
+is `(x_1 − x_3)r_ku_k − r_k u_k(x_1 − x_3) = 0`; otherwise `0 − r_c(1 − 1) = 0`. So **the bad
+cubic term is exactly cancelled by the bigon of the intertwiner.**
 
-On the other hand, both `φ_1φ_2φ_1` and `φ_2φ_1φ_2` move the strands by `w_0 = s_1s_2s_1`, so
-by Lemma D.1(b) `f Δ = Δ f^{w_0}` for every `f ∈ P(s)`. Suppose `Δ ≠ 0` and let `v` be of
-maximal length with `g_v ≠ 0`. By Lemma D.2, `ψ_v f^{w_0} = f^{v^{-1}w_0}ψ_v` + shorter, where
-`f^{v^{-1}w_0}` is `f` with its variables permuted by the permutation `v^{-1}w_0 ≠ 1`. By the
-uniqueness in (F1) (Theorem A.5(ii)), comparing the coefficients of `ψ_v`:
-`f g_v = g_v f^{v^{-1}w_0}` for all `f`. A non-trivial permutation of three positions moves at
-least two of them, hence at least one black position `p` (there is one red strand at most);
-take `f = x_p`: `g_v (x_p − x_{p'}) = 0` with `p' ≠ p`, so `g_v = 0` because `P(s)` is a
-domain. Contradiction; `Δ = 0`. ∎
+*Case 2: `c(A) = c(B) = c ≠ c(C)` (or `C` red).* `φ_1φ_2φ_1 = ((x_1 − x_2)ψ_1 − r_c)ψ_2ψ_1 =
+(x_1 − x_2)ψ_1ψ_2ψ_1 − r_cψ_2ψ_1`. In `φ_2φ_1φ_2 = ψ_2ψ_1((x_2 − x_3)ψ_2 − r_c)` the dots sit on
+`A, B` at the state `(C, A, B)` and slide back through the crossings with `C`:
+`ψ_2ψ_1(x_2 − x_3) = (x_1 − x_2)ψ_2ψ_1`. So `φ_2φ_1φ_2 = (x_1 − x_2)ψ_2ψ_1ψ_2 − r_cψ_2ψ_1`, and the
+difference is `(x_1 − x_2)C(c,c,c(C))e = 0`.
 
-*Direct computation without (F1), for the record.* If no two of `A, B, C` have the same black
-colour, all `φ = ψ` and the triple is not bad: (A6) with `C = 0`. If `c(A) = c(C) = c` and
-`B` has another colour `b` (black or red):
-`φ_1φ_2φ_1 = ψ_1((x_2 − x_3)ψ_2 − r_c)ψ_1 = (x_1 − x_3)ψ_1ψ_2ψ_1 − r_c Q_{cb}(x_1, x_2)` and
-`φ_2φ_1φ_2 = (x_1 − x_3)ψ_2ψ_1ψ_2 − r_c Q_{bc}(x_2, x_3)`; the difference is
-`(x_1 − x_3) C(c,b,c) − r_c (Q_{cb}(x_1,x_2) − Q_{bc}(x_2,x_3))`, which is
-`(x_1 − x_3) r_c t_{cb} − r_c t_{cb}(x_1 − x_3) = 0` for `b ∼ c`,
-`(x_1 − x_3) r_k u_k − r_k u_k (x_1 − x_3) = 0` for `c = k`, `b = W`, and `0 − 0` otherwise.
-So **the bad cubic term is exactly cancelled by the bigon of the intertwiner.** If
-`c(A) = c(B) ≠ c(C)`: `φ_1φ_2φ_1 = (x_1 − x_2)ψ_1ψ_2ψ_1 − r ψ_2ψ_1` and
-`φ_2φ_1φ_2 = (x_1 − x_2)ψ_2ψ_1ψ_2 − rψ_2ψ_1`, equal by the exact (A6) on `(c, c, b)`;
-`c(B) = c(C) ≠ c(A)` is the mirror image. Only `(c, c, c)` needs the argument above.
+*Case 3: `c(B) = c(C) = c ≠ c(A)` (or `A` red).* `φ_1φ_2φ_1 = ψ_1ψ_2((x_1 − x_2)ψ_1 − r_c)` with
+the dots on `B, C` at the state `(B, C, A)`; `ψ_1ψ_2(x_1 − x_2) = (x_2 − x_3)ψ_1ψ_2`. So
+`φ_1φ_2φ_1 = (x_2 − x_3)ψ_1ψ_2ψ_1 − r_cψ_1ψ_2`, and
+`φ_2φ_1φ_2 = ((x_2 − x_3)ψ_2 − r_c)ψ_1ψ_2 = (x_2 − x_3)ψ_2ψ_1ψ_2 − r_cψ_1ψ_2`; difference
+`(x_2 − x_3)C(c(A),c,c)e = 0`.
 
-*Check:* `01_intertwiners.py` (D4): all 3-strand states over `{1,2,3,Wk}`, `k = 1, 2`.
+*Case 4: `(c, c, c)`.* (This computation is Lemma 2.3, case 5, of `06_main_intertwiner.md`; I
+re-derived every step.) Put `a_1 = x_1 − x_2`, `a_2 = x_2 − x_3`, `b = x_1 − x_3`, `r = r_c`.
+By Lemma D.2(a): `ψ_2a_1 = bψ_2 − r`, `ψ_1(a_2b) = (a_2b)ψ_1` (`a_2b` is symmetric in
+`x_1, x_2`), `ψ_1b = a_2ψ_1 + r`, `ψ_1a_2 = bψ_1 − r`. Hence
+
+    φ_2φ_1 = (a_2ψ_2 − r)(a_1ψ_1 − r) = a_2bψ_2ψ_1 − rbψ_1 − ra_2ψ_2 + r²        (a_1 + a_2 = b),
+    φ_2φ_1ψ_2 = a_2bψ_2ψ_1ψ_2 − rbψ_1ψ_2 + r²ψ_2                                 (ψ_2² = 0),
+    ψ_1φ_2φ_1 = a_2bψ_1ψ_2ψ_1 − r(a_2ψ_1 + r)ψ_1 − r(bψ_1 − r)ψ_2 + r²ψ_1
+              = a_2bψ_1ψ_2ψ_1 − rbψ_1ψ_2 + r²ψ_2                                 (ψ_1² = 0).
+
+Since (A6) is exact on `(c,c,c)`, **`ψ_1φ_2φ_1 = φ_2φ_1ψ_2`** (∗). By Lemma D.1(b),
+`a_1φ_2φ_1 = φ_2φ_1a_2` (the strands `A, B` end at the positions 2, 3), so
+`φ_1φ_2φ_1 = a_1ψ_1φ_2φ_1 − rφ_2φ_1 = a_1φ_2φ_1ψ_2 − rφ_2φ_1 = φ_2φ_1(a_2ψ_2 − r) = φ_2φ_1φ_2`. ∎
+
+*Second proof, using (F1).* Write each factor as `φ = h·ψ + c` (`h ∈ {x_X − x_Y, 1}`,
+`c ∈ {−r_*, 0}`) and expand with Lemma D.2(b):
+`φ_1φ_2φ_1 = Pψ_1ψ_2ψ_1 + (words of ≤ 2 letters)`, `φ_2φ_1φ_2 = Pψ_2ψ_1ψ_2 + (≤ 2 letters)`, with
+the same `P = ∏_{equal-colour pairs X<Y}(x_X − x_Y)` (the three transported `h` are
+`x_1 − x_2, x_1 − x_3, x_2 − x_3` in both words). So `Δ = φ_1φ_2φ_1 − φ_2φ_1φ_2 = Σ_v g_vψ_v`
+over basis braids with `ℓ(v) ≤ 2` (Theorem A.5(i)), and `fΔ = Δf^{w_0}` (Lemma D.1(b)). If
+`v` is of maximal length with `g_v ≠ 0`, comparing coefficients of `ψ_v` in the left basis
+(Theorem A.5(ii)) gives `g_v(f − f^{v^{-1}w_0}) = 0` for all `f`; `v^{-1}w_0 ≠ 1` moves a black
+position `p`, and `f = x_p` gives `g_v = 0`. This argument is valid in the big algebra itself
+(it only uses the positions `i, i+1, i+2`), or in any algebra of Definition A.1′.
+
+*Check:* `01_intertwiners.py` (D4): all 3-strand states over `{1,2,3,Wk}`, `k = 1, 2`;
+`R01_intertwiners.py`: all 108 three-strand states and 96 instances embedded in 5-strand
+states behind a dotted braid.
 
 **Corollary D.4.** For a permutation `w` of the positions with a reduced word
 `w = s_{i_1}⋯s_{i_l}`, the element `φ_w = φ_{i_1}⋯φ_{i_l}` does not depend on the reduced word
 (Matsumoto + Theorem D.3), and `f φ_w = φ_w f^w` (Lemma D.1(b)).
 
 (This is the analogue of Kang–Kashiwara–Kim, *Symmetric quiver Hecke algebras and R-matrices of
-quantum affine algebras*, Invent. Math. 211 (2018), §1.3.1, the lemma on intertwiners (items
-(i)–(v)), stated there for KLR algebras with `φ = (x_{a+1} − x_a)τ_a − 1` and "easily following
-from the polynomial representation" [KL Prop. 2.3, Rouquier Prop. 3.12]. It does not apply
-literally here: our parameters `r_c` are not invertible and our relations carry `r_c`; over
-`ℤ[r^{±1}, …]` and with `ψ = r_c ψ'` one has `φ = r_c·((x_i − x_{i+1})ψ' − 1)`.)
+quantum affine algebras*, Invent. Math. 211 (2018), arXiv:1304.0323, §1.3.1, Lemma 1.3.1,
+items (i)–(vi) — (ii) braid relation, (iii) `φ_w` well defined, (iv) dots, and **(v)**
+`φ_wτ_k = τ_{w(k)}φ_w` if `w(k+1) = w(k)+1`, the analogue of Proposition D.5 / Theorem D.6 —
+stated there for KLR algebras with `φ_a = (x_{a+1} − x_a)τ_a − 1` and "easily following from
+the polynomial representation" [KL Prop. 2.3, Rouquier Prop. 3.12]. It does not apply literally
+here: our `r_c` are not invertible and our relations carry `r_c`; over `ℤ[r^{±1}, …]` and with
+`ψ = r_cψ'` one has `φ = r_c·((x_i − x_{i+1})ψ' − 1)`.)
 
 ### D.3 Mixed relation and naturality
+
+**The flip.** Let `ι` be the anti-automorphism of Theorem A.5(iii) (reflection of diagrams:
+`ι(e(s)) = e(s)`, `ι(x_{p,s}) = x_{p,s}`, `ι(ψ_{i,s}) = ψ_{i,s_is}`; it exists because it maps the
+relations to relations, which is checked there without using any basis). By Lemma D.1(a), for
+equal colours `ι(φ_{i,s}) = ψ_{i,s}(x_i − x_{i+1}) − r_c = −φ_{i,s}`; otherwise `ι(φ_{i,s}) = φ_{i,s_is}`.
 
 **Proposition D.5.** On a state `(A, B, S)` (positions `i, i+1, i+2`)
 
     ψ_i φ_{i+1} φ_i  =  φ_{i+1} φ_i ψ_{i+1},
 
-and on a state `(S, A, B)`:  `φ_i φ_{i+1} ψ_i = ψ_{i+1} φ_i φ_{i+1}`.
+and on a state `(S, A, B)`:  `φ_i φ_{i+1} ψ_i = ψ_{i+1} φ_i φ_{i+1}`. **No basis theorem and
+no torsion-freeness is used.**
 
-*Proof.* If `A, B` are not black of one colour, `ψ = φ` for the crossing of `A` and `B` and
-this is Theorem D.3. Let `c(A) = c(B) = c`, `i = 1`, `D_1 = x_1 − x_2`, `D_2 = x_2 − x_3`.
-First identity: Theorem D.3 on `(A, B, S)` reads
-`(D_1ψ_1 − r)φ_2φ_1 = φ_2φ_1(D_2ψ_2 − r)` (the last factor is the crossing of `A, B` at the
-state `(S, A, B)`). By Lemma D.1(b), `φ_2φ_1 D_2 = D_1 φ_2φ_1` (the strands `A, B` end at the
-positions 2, 3). So `D_1·(ψ_1φ_2φ_1 − φ_2φ_1ψ_2) = 0`. Left multiplication by `D_1 e(s)` is
-injective on `e(s) A e(s')` (Theorem E.1), hence the claim. Second identity: Theorem D.3 on
-`(S, A, B)` reads `φ_1φ_2(D_1ψ_1 − r) = (D_2ψ_2 − r)φ_1φ_2`, and `φ_1φ_2 D_1 = D_2φ_1φ_2`;
-so `D_2·(φ_1φ_2ψ_1 − ψ_2φ_1φ_2) = 0`; Theorem E.1 again. ∎
+*Proof.* First identity. If `A, B` are not black of one colour, the crossing of `A` and `B` is
+`φ = ψ` and this is Theorem D.3. If `c(A) = c(B) = c` and `S` is not black of colour `c`, the
+two crossings of `S` are `ψ`'s and the identity is the exact (A6) on `(c, c, c(S))`. If all three
+have colour `c`, it is (∗) in Case 4 of the proof of Theorem D.3. Second identity: apply `ι` to
+the first identity on the state `(B, A, S)`. `ι` reverses products and maps `ψ ↦ ψ` and each of
+the two crossings of `S` to `±` the corresponding crossing, with the same sign on both sides
+(the sign depends only on the colours of `S` and of the strand it crosses); the signs cancel,
+and the result is `φ_iφ_{i+1}ψ_i = ψ_{i+1}φ_iφ_{i+1}` on `(S, A, B)`. ∎
 
-*Check:* `01_intertwiners.py` (D5), all 3-strand states.
+*Remark (the earlier argument, C6 of the report).* Alternatively, for `c(A) = c(B) = c = c(S)`,
+Theorem D.3 gives `D_1·(ψ_1φ_2φ_1 − φ_2φ_1ψ_2) = 0` with `D_1 = x_1 − x_2`, and Theorem E.1
+cancels `D_1`; this route needs (F1) and is only needed in that one colour pattern. With the
+direct proof above, **no statement of §D uses (F1) or Theorem E.1** (the second proof of D.3 is
+optional).
+
+*Check:* `01_intertwiners.py` (D5), all 3-strand states; `R01_intertwiners.py` (216).
 
 **Setting for naturality.** Let `t` range over the states of a *block* of `n` strands (black
-strands and at most one red strand), and let `S` be one more strand of colour `c` (black, or
+strands and at most one red strand; its algebra is an algebra of Definition A.1′ with `N ≤ 1`), and let `S` be one more strand of colour `c` (black, or
 red if the block has no red strand). Juxtaposition `a ↦ a ⊗ 1` (the block at the positions
 `1, …, n`, `S` straight at `n+1`) and `a ↦ 1 ⊗ a` (`S` at position 1, the block at
 `2, …, n+1`) are well-defined `R`-linear maps from the algebra of the block, multiplicative
@@ -548,7 +605,7 @@ the big algebra (with all positions shifted in the second case). Put
 These words are the unique reduced words of their permutations (one strand moves), so there is
 no choice. `Φ(t)` is the elementary move of `S` with every crossing of `S` with a strand of its
 own colour replaced by the intertwiner; it is homogeneous of degree
-`deg(ψ-word) + N(2q + δ_c)`, `N` = number of strands of colour `c` in the block.
+`deg(ψ-word) + N_c(2q + δ_c)`, `N_c` = number of black strands of colour `c` in the block.
 
 **Theorem D.6 (naturality).** For every element `a ∈ e(t) A_{block} e(t')`:
 
@@ -645,22 +702,55 @@ strands (there is one). (2) The two dot relations of (A4) for equal colours impl
 `ψ(x_i − x_{i+1}) + (x_i − x_{i+1})ψ = 2r_c` (README). (3) `r_c` is central, as is every
 element of `R`.
 
-### A.2 Re-verification in the implementation
+**Definition A.1′ (any number of red strands).** Fix `N ≥ 0` and colours `k_1, …, k_N ∈ Γ` of
+red strands `W_1, …, W_N`. States are the sequences containing every black colour with its
+multiplicity and `W_1, …, W_N` **in this order** (red strands never cross). Generators as in
+A.1, except that there is **no** `ψ_{i,s}` when `s_i, s_{i+1}` are both red. Relations (A0)–(A6)
+as in A.1, where in (A5) a red strand `W_j` plays the role of `W` with `k = k_j`, and (A6) is
+imposed on the states `(s_i, s_{i+1}, s_{i+2})` containing at most one red strand (on the others
+the words are not defined), with `C(k_j, W_j, k_j) = r_{k_j}u_{k_j}`. For `N = 1` this is
+Definition A.1; `N = 0` is the (rescaled) KLR algebra of the word; the block algebras of §D.3
+are of this form with `N ≤ 1`. All relations are local (they involve the positions of the
+generators only), so juxtaposition of states defines algebra maps between these algebras.
 
-`01_relations.py` builds, for **every** sequence of length 2 and 3 over `{1, 2, 3, Wk}` of
-`A_3` (`1 ∼ 2 ∼ 3`, `1 ≁ 3`) with at most one red strand, `k = 1, 2`, the algebra of
-`klrw` (all three scalings, base `ℤ`, polynomial parameters) and checks (A4) (both
-equations, and the two "wrong-strand" versions with `−r_c`), (A5), (A6), (A3), and (A2) on
-sample 4-strand states: **388 checks, 0 failures**. The non-zero cubic values found are
-exactly `C(1,2,1) = r_1t_{12}`, `C(2,1,2) = r_2t_{21}`, `C(2,3,2) = r_2t_{23}`,
-`C(3,2,3) = r_3t_{32}`, `C(1,W1,1) = r_1u_1`, `C(2,W2,2) = r_2u_2`. In particular the README's
-signs are confirmed, including: the braid relation is exact on `(c,c,c')`, `(c',c,c)`,
-`(W,k,k)`, `(k,k,W)`, `(c, W_k, c)` (`c ≠ k`), `(c, c'', c)` (non-adjacent), and on all states
-with three different colours. Every 3-strand colour pattern of any simply-laced `Γ` (with at
-most one red strand) is covered, because the relations on it depend only on which of the
-strands have equal colours and on the relation (adjacent / non-adjacent / red of that colour /
-red of another colour) between the colours involved, and on three different colours the
-braid relation is exact for any adjacencies (§A.3, cocycle argument).
+### A.2 Definition A.1 versus the implementation `klrw` (verified by computation, not proved)
+
+Definition A.1 is a definition; all proofs in this file use it and never the implementation.
+That the algebra of `klrw` (all three scalings on, base `ℤ`, polynomial parameters) **is** `A`
+would follow from three statements about the implementation: **(a)** its generators satisfy
+(A0)–(A6) on *every* state; **(b)** its product is associative; **(c)** for every basis braid
+the letter-by-letter product of its generators is that basis element (no lower terms). Then
+generators ↦ generators is a homomorphism `A → klrw` (by (a), (b)) mapping the spanning set
+`{x^αψ_w}` of Theorem A.5(i) onto the `klrw` basis (by (c)), hence an isomorphism by
+Theorem A.5(ii). A proof of (a)–(c) would be a proof of correctness of the multiplication
+algorithm (`KLRWAlgebra.right_multiply_by_s`, which searches *globally* along the braid for
+intersections), so the local nature of the relations does not reduce (a) to small states.
+**Status: verified by computation**, as follows.
+
+* *By me.* `01_relations.py`: (a) on **every** 2- and 3-strand state over `{1,2,3,Wk}` of
+  `A_3` (`1 ∼ 2 ∼ 3`, `1 ≁ 3`), `k = 1, 2` — (A4) (both equations, and the two "wrong-strand"
+  versions with `−r_c`), (A5), (A6), (A3) — and (A2) on sample 4-strand states: **388 checks,
+  0 failures**; the non-zero cubic values are exactly `C(1,2,1) = r_1t_{12}`,
+  `C(2,1,2) = r_2t_{21}`, `C(2,3,2) = r_2t_{23}`, `C(3,2,3) = r_3t_{32}`, `C(1,W1,1) = r_1u_1`,
+  `C(2,W2,2) = r_2u_2`. `01_relations.py basis`: (c) for all **10 176** basis braids of all
+  states of five 4- and 5-strand configurations (`1 2 1 W1`, `1 1 W1 2`, `2 1 W1 1 2`,
+  `1 W2 2 1 2`, `1 1 2 W1 1`), and 100 random products of generators homogeneous of the sum of
+  the degrees. `01_polyrep.py hom`: `ρ(ab) = ρ(b)∘ρ(a)` for 1 500 random pairs of basis elements
+  on 3–5-strand states, against the polynomial representation of §A.3 written from the formulas
+  alone — this tests (a) and (b) together, since `ρ` is faithful (Theorem A.5(v)).
+* *By the referee* (`R01_klrw.py`, own code, `R01_klrw.log`): (c) for all 40 200 basis braids
+  of seven 4–6-strand configurations (and they are exactly the words of Definition B.10);
+  (a) for 8 064 instances of (A2)–(A6) at every position of 5–6-strand states, placed behind a
+  random dotted braid; (b) for 175 random triples; `ρ(ab) = ρ(b)∘ρ(a)` against the referee's
+  own polynomial representation on 4–6 strands with the red strand anywhere (560 instances;
+  negative controls with a wrong sign / exchanged `t`'s detected, `R01_hom_negative.py`);
+  degrees of `x, ψ, r, t, u` equal to the table F2 and 120 random products homogeneous. And
+  `R01_twisted.py`: Proposition A.3 for `Γ = D_4` (trivalent node), red 1, 2, three different
+  total orders of the colours: 6 384 exact identities.
+
+No failure anywhere. The README's signs are confirmed, including: the braid relation is exact
+on `(c,c,c')`, `(c',c,c)`, `(W,k,k)`, `(k,k,W)`, `(c, W_k, c)` (`c ≠ k`), `(c, c'', c)`
+(non-adjacent), and on all states with three different colours.
 
 Convention of the implementation (`klrw`): an element is `Σ coeff · E_{left} s_{i_1} ⋯`, the
 coefficient a polynomial in the parameters and in the dots of the **left** state
@@ -690,18 +780,75 @@ position; the red position never carries a variable).
 `∂_i^2 = 0` (`∂_i f` is `s_i`-invariant); different colours, if `a = s_i < b = s_{i+1}`,
 `f ↦ s_i f ↦ Q_{ab}(y_i, y_{i+1}) s_i s_i f = Q_{ab}(y_i, y_{i+1}) f`, and if `a > b`,
 `f ↦ Q_{ba}(y_i, y_{i+1}) s_i f ↦ s_i(Q_{ba}(y_i, y_{i+1}) s_i f) = Q_{ba}(y_{i+1}, y_i) f
-= Q_{ab}(y_i, y_{i+1}) f` (by the table, `Q_{ba}(u, v) = Q_{ab}(v, u)`). (A6): write each
-operator as an element `Σ_w c_w w` of the twisted group algebra `K ⋊ S_n`,
-`K = Frac R[y]` (`w` acting by permuting the variables, `(Σ c_w w)(f) = Σ c_w w(f)`):
-`ψ_i ↦ (r_c/(y_i − y_{i+1}))(1 − s_i)`, resp. `s_i`, resp. `Q·s_i`. If the three strands have
-pairwise different colours (or one is red), both sides of (A6) equal
-`(∏ of the three transported factors) · w_0`, because each pair of strands crosses once, with
-the same strand on the left, in both words: the braid relation is exact, `C = 0`. The
-remaining patterns `(c,c,c)`, `(c,c,b)`, `(b,c,c)`, `(c,b,c)` depend only on the relation of `b`
-to `c` (adjacent, non-adjacent, red with `c = k`, red with `c ≠ k`), and for each of them both
-sides were expanded exactly in `K ⋊ S_3` with symbolic parameters (`01_polyrep.py twisted`:
-**276 identities, all exact**, including (A4) and (A5) once more). This is the computation of
-Khovanov–Lauda [KL, Prop. 2.3] with the factor `r_c` on equal-colour crossings. ∎
+= Q_{ab}(y_i, y_{i+1}) f` (by the table, `Q_{ba}(u, v) = Q_{ab}(v, u)`).
+
+(A6). By (A2)–(A3) it suffices to take `n = 3`, `i = 1` (the operators at positions
+`1, 2, 3` do not touch the other variables). Write `f = f(y_1, y_2, y_3)`, `f^{abc}` for
+`f(y_a, y_b, y_c)` (so `s_1 f = f^{213}`, `s_2 f = f^{132}`), `r = r_c`, and apply the four rules
+letter by letter (first letter first; `t` = the state reached).
+
+*Three pairwise different colours* (one of them possibly red): every letter is `g·s_i`, and
+both words give `(g_{AB} g_{AC} g_{BC})·f^{321}`, where `g_{XY}` is the factor of the crossing of
+the strands `X, Y` (`1` or a `Q`) evaluated at the variables of the positions where `X, Y`
+end — each pair crosses once, with the same strand on the left, in both words. So `C = 0`.
+
+*`(c, c, c)`.* Both sides are `r³ ∂_1∂_2∂_1 f` resp. `r³ ∂_2∂_1∂_2 f`; the Demazure operators
+satisfy the braid relation (both equal `Δ^{−1} Σ_{w ∈ S_3} sgn(w)·f^w` with
+`Δ = (y_1 − y_2)(y_1 − y_3)(y_2 − y_3)`). `C = 0`.
+
+*`(c, b, c)`, `b < c`* (`b` black). `ψ_1`: `Q_{bc}(y_1,y_2) f^{213}`; `ψ_2` at `(b,c,c)`:
+`r[Q_{bc}(y_1,y_2) f^{213} − Q_{bc}(y_1,y_3) f^{312}]/(y_2 − y_3)`; `ψ_1` at `(b,c,c)` (`b < c`):
+
+    f·ψ_1ψ_2ψ_1 = r [Q_{bc}(y_2,y_1) f − Q_{bc}(y_2,y_3) f^{321}] / (y_1 − y_3).
+
+`ψ_2` (`b < c`): `f^{132}`; `ψ_1` at `(c,c,b)`: `r[f^{132} − f^{231}]/(y_1 − y_2)`; `ψ_2` at
+`(c,c,b)` (`c > b`, target `(c,b,c)`): `Q_{bc}(y_2,y_3)·s_2(…)`:
+
+    f·ψ_2ψ_1ψ_2 = r Q_{bc}(y_2,y_3) [f − f^{321}] / (y_1 − y_3).
+
+Difference: `r (Q_{bc}(y_2,y_1) − Q_{bc}(y_2,y_3))/(y_1 − y_3) · f`, which is `r t_{cb} f` if
+`b ∼ c` (`Q_{bc}(u,v) = t_{bc}u + t_{cb}v`) and `0` if `Q_{bc} = 1`. This is `C(c,b,c)`.
+
+*`(c, b, c)`, `b > c`* (always the case if `b` is red). `ψ_1`: `f^{213}`; `ψ_2` at `(b,c,c)`:
+`r[f^{213} − f^{312}]/(y_2 − y_3)`; `ψ_1` at `(b,c,c)` (`b > c`, target `(c,b,c)`):
+
+    f·ψ_1ψ_2ψ_1 = r Q_{cb}(y_1,y_2) [f − f^{321}] / (y_1 − y_3).
+
+`ψ_2` (target `(c,c,b)`): `Q_{cb}(y_2,y_3) f^{132}`; `ψ_1` at `(c,c,b)`:
+`r[Q_{cb}(y_2,y_3) f^{132} − Q_{cb}(y_1,y_3) f^{231}]/(y_1 − y_2)`; `ψ_2` (`c < b`): `s_2(…)`:
+
+    f·ψ_2ψ_1ψ_2 = r [Q_{cb}(y_3,y_2) f − Q_{cb}(y_1,y_2) f^{321}] / (y_1 − y_3).
+
+Difference: `r (Q_{cb}(y_1,y_2) − Q_{cb}(y_3,y_2))/(y_1 − y_3) · f`: `r t_{cb} f` if `b ∼ c`
+black, `r_k u_k f` if `b = W` and `c = k` (`Q_{kW}(u, v) = u_k u`, no dependence on the red
+position), `0` otherwise. This is `C(c,b,c)`.
+
+*`(c, c, b)`, `b > c`.* `ψ_1ψ_2ψ_1`: `r[f − f^{213}]/(y_1 − y_2)`, then `s_2`, then `s_1`:
+`r[f^{231} − f^{321}]/(y_2 − y_3)`. `ψ_2ψ_1ψ_2`: `f^{132}`, `f^{231}`, then `r∂_2`:
+`r[f^{231} − f^{321}]/(y_2 − y_3)`. Equal.
+*`(c, c, b)`, `b < c`.* `ψ_1ψ_2ψ_1`: `r[f − f^{213}]/(y_1 − y_2)`; `ψ_2` (target `(c,b,c)`):
+`Q_{bc}(y_2,y_3)·r[f^{132} − f^{312}]/(y_1 − y_3)`; `ψ_1` (target `(b,c,c)`):
+`Q_{bc}(y_1,y_2)Q_{bc}(y_1,y_3)·r[f^{231} − f^{321}]/(y_2 − y_3)`. `ψ_2ψ_1ψ_2`:
+`Q_{bc}(y_2,y_3) f^{132}`, then `Q_{bc}(y_1,y_2)Q_{bc}(y_1,y_3) f^{231}`, then `r∂_2`; the
+prefactor is symmetric in `y_2, y_3`, so the result is the same. Equal.
+*`(b, c, c)`, `b < c`.* `ψ_1ψ_2ψ_1`: `f^{213}`, `f^{312}`, `r[f^{312} − f^{321}]/(y_1 − y_2)`;
+`ψ_2ψ_1ψ_2`: `r[f − f^{132}]/(y_2 − y_3)`, `s_1`, `s_2`: `r[f^{312} − f^{321}]/(y_1 − y_2)`. Equal.
+*`(b, c, c)`, `b > c`.* `ψ_1ψ_2ψ_1`: `Q_{cb}(y_1,y_2) f^{213}`, then
+`Q_{cb}(y_1,y_3)Q_{cb}(y_2,y_3) f^{312}`, then `r∂_1` (prefactor symmetric in `y_1, y_2`):
+`Q_{cb}(y_1,y_3)Q_{cb}(y_2,y_3)·r[f^{312} − f^{321}]/(y_1 − y_2)`. `ψ_2ψ_1ψ_2`:
+`r[f − f^{132}]/(y_2 − y_3)`, then `Q_{cb}(y_1,y_2)·r[f^{213} − f^{231}]/(y_1 − y_3)`, then
+`Q_{cb}(y_2,y_3)Q_{cb}(y_1,y_3)·r[f^{312} − f^{321}]/(y_1 − y_2)`. Equal.
+
+These are all patterns of three strands with at most one red strand (`W` is last in the
+order, so a red middle strand is always the case `b > c`). So (A6) holds with exactly the
+constants `C` of Definition A.1. ∎
+
+(Each line was redone independently by the referee, `R01_referee.md` §1.3, who also notes that
+the representation does not depend on the total order of the colours chosen; I re-derived every
+line above from the definitions. Exact machine checks: `01_polyrep.py twisted`, 276 identities
+for `A_3` with red 1, 2, and `R01_twisted.py`, 6 384 identities for `D_4`, red 1, 2, three
+colour orders. This is the computation of Khovanov–Lauda [KL, Prop. 2.3] with the factor `r_c`
+on equal-colour crossings.)
 
 *Further checks:* `01_polyrep.py relations` (3 746 relation instances on all monomials of
 degree ≤ 3); `01_polyrep.py hom`: for 1 500 random pairs `a, b` of basis elements of the
@@ -747,9 +894,10 @@ therefore `c_w · ŵ + Σ (terms whose permutation is a product of fewer than �
 reflections)`, `c_w ≠ 0`, `ŵ` the permutation of the variables induced by `w` (distinct `w`
 give distinct `ŵ`). The operator of `x^α ψ_w` is `c_w ŵ(y^α) ŵ + (shorter)`. Let `w` be of
 maximal length with `Σ_α c_{α,w} y^α ≠ 0`; the coefficient of `ŵ` in the total operator is
-`c_w ŵ(Σ_α c_{α,w} y^α) ≠ 0`, because no other term contains `ŵ`. By Dedekind's lemma
-(distinct automorphisms of `K` are `K`-linearly independent) the operator is non-zero —
-contradiction. (This is the argument of [KL, Thm. 2.5], [Rouquier, Prop. 3.12], [Webster,
+`c_w ŵ(Σ_α c_{α,w} y^α) ≠ 0`, because no other term contains `ŵ`. The operator vanishes on
+`V_s = R[y]`; restricted to the multiplicative monoid `R[y] ∖ 0`, the maps `f ↦ ŵ(f)` are distinct
+characters with values in `K^×`, so by **Artin's lemma** (distinct characters of a monoid into a
+field are linearly independent) all coefficients `c_w ŵ(…)` would vanish — contradiction. (This is the argument of [KL, Thm. 2.5], [Rouquier, Prop. 3.12], [Webster,
 Thm. 2.8]; it needs only that the leading coefficients are non-zero in a domain, not that they
 are units.)
 
@@ -761,17 +909,44 @@ on `w_0 s` (palindromic words; `C(a, b, a)` is symmetric). `ι(x^α ψ_w) = ψ'_
 `ψ'_{w^{-1}}` the reversed word (a reduced word of `w^{-1}`). Apply (i), (ii) (valid for any
 choice of reduced words) to `e(s') A e(s)` and then `ι`.
 
-(iv) Presentations commute with base change (right exactness of `⊗`); a basis of a free
-module stays a basis.
+(iv) Presentations commute with base change (right exactness of `⊗`); `e(s)Ae(s') ≅
+⊕_w P(s)ψ_w` stays an isomorphism after `⊗_R S`. In particular (F1) holds at `r = 0`, `t = 0`,
+`u = 0`, over `ℤ/N`, … — **by base change, not through `V`**: the polynomial representation is
+*not* faithful there (`01_polyrep.py degenerate`: on all pairs of states of `(1,1,2)`, 72
+elements `x^αψ_w`, `|α| ≤ 1`, have rank 72 generically, **36 at `r_1 = 0`**, 44 at
+`t_{12} = t_{21} = 0`; on `(1,W1,1)`, 54 elements: rank 54 generically, 27 at `r_1 = 0`, **33 at
+`u_1 = 0`**; the referee's `R01_rank.py` part (4) finds the same phenomenon on `(1,1,2,W1)`: 128,
+64, 84, 84).
 
 (v) By (i) every element is `Σ c x^αψ_w`, and the proof of (ii) shows that its operator is
 non-zero unless all `c` vanish. ∎
 
+**Remark A.5′ (generality: no red strand, several red strands).** Theorem A.5 and its proof
+hold verbatim for the algebras of Definition A.1′, for every `N ≥ 0`, with `S(s, s')` the
+permutations carrying colours to colours that keep the red strands in their order. The red
+strands enter the proof only at the following points, each of which is unchanged: (i) words in
+the generators never cross two red strands, and neither do the reduced words of a permutation
+in `S(s, s')` (red strands are not inverted), so Matsumoto and the exchange step take place
+inside the generators; (ii) the polynomial representation has no variables at red positions, the
+(A6) computations of Proposition A.3 involve at most one red strand, and a permutation in
+`S(s, s')` is determined by its values on the black positions (the red positions go to the red
+positions in order), so distinct `w` give distinct `ŵ`; (iii) `ι` maps the relations of A.1′ to
+relations of A.1′. Consequently Theorem E.1 holds for A.1′ as well. **Caveat:** for `N ≥ 2` I
+have checked neither the identification with `klrw` (§A.2 concerns `N = 1`) nor anything
+numerically; and Definition A.1′ is the algebra in which red strands never cross and every
+red–black interaction is that of A.1 — if the algebra wanted for two punctures (Prop. 4/6 of
+`PROOFS.md`, the I-brane) has other relations (e.g. deformation parameters on red strands, or a
+different parameter `u` for each red strand), the remark must be re-read for it. Prop. 6 of
+`PROOFS.md` uses only relations; Prop. 4 with several red strands uses (F1) for A.1′, which this
+remark provides.
+
 **Literature, and what has to be assumed to cite it.**
 
 * Khovanov–Lauda, *A diagrammatic approach to categorification of quantum groups I*,
-  Represent. Theory 13 (2009): polynomial representation (Prop. 2.3) and basis (Thm. 2.5),
-  for KLR algebras over a field.
+  Represent. Theory 13 (2009), arXiv:0803.4121: polynomial representation (Prop. 2.3), basis
+  (Thm. 2.5, stated over `ℤ`: a free graded abelian group), free on both sides (Prop. 2.7);
+  for their choice of `Q` (numbers and "over `ℤ`" as checked by the referee in the arXiv source;
+  I did not re-read KL).
 * Rouquier, *2-Kac-Moody algebras*, arXiv:0812.5023: Thm. 3.7 (the PBW basis holds over any
   commutative ring `k`, for any `Q` with `Q_{ii} = 0`, iff `Q_{ij}(u,v) = Q_{ji}(v,u)`),
   Prop. 3.12 (faithful polynomial representation).
@@ -781,22 +956,35 @@ non-zero unless all `c` vanish. ∎
   `Γ_λ` and the *reduced* algebra obtained by killing the dots on the strand of the new
   vertex `0`, the red strand). **Standing assumption there:** "`Q_e` has coefficients before
   the pure monomials in `u` and `v` which are units" — false for our polynomial `t_{cc'}`,
-  `u_k`. (`PROOFS.md` cites "Prop. 2.23"; there is no such statement in that role — the basis
-  theorem is Thm. 2.8.)
+  `u_k`. `PROOFS.md` cites "flatness of the deformation, Prop. 2.23": v4 does have a
+  Prop. 2.23 ("this deformation is free (and thus flat)"), but it concerns Webster's
+  *canonical deformation* `Q̃_e = Q_e + Σ z_{e,a,b}u^av^b` over `𝕂[z]`, not our deformation
+  (which scales the equal-colour crossings by `r` and has non-unit leading coefficients `t, u`);
+  the basis theorem is Thm. 2.8, and neither applies literally.
 
-How our `A` relates to them: over `R' = R[r_c^{-1}]`, put `ψ' = r_c^{-1}ψ` on equal-colour
-crossings. Then (A4) becomes `x_iψ' − ψ'x_{i+1} = 1`, (A5) is unchanged, and (A6) becomes
-the standard cubic relation `(Q_{ab}(x_i, x_{i+1}) − Q_{ab}(x_{i+2}, x_{i+1}))/(x_i − x_{i+2})`
-(`= t_{ab}`, resp. `u_k`) — so `A ⊗ R'` is the KLR algebra of the Crawley–Boevey quiver
-`Γ ∪ {W}` (`W` joined to `k`) with `Q_{cc'} = t_{cc'}u + t_{c'c}v`, `Q_{kW}(u, v) = u_k u + v`,
-`Q_{cW} = 1` (`c ≠ k`), modulo the dot `y` of the red strand (which is central there: it slides
-through every crossing, all of which are of different colours), up to the sign conventions of
-the respective paper. Rouquier's Thm. 3.7 then gives the basis of `A ⊗ R'` (the quotient by the
-central `y` of a module that is free over `k[y]` with the `y`-free basis), with no unit
-assumption; and the basis statement over `R` follows because `R → R'` is injective and the
-spanning set is the same. Webster's theorem would require inverting `t`, `u` as well. Since the
-sign conventions of these papers were not matched line by line, **Theorem A.5 is proved above
-directly** for our presentation; the literature serves as a cross-check.
+**Remark A.5″ (a second proof of A.5(ii), via Rouquier).** I checked the following dictionary
+against the definition of `H_n(Q)` in the source of arXiv:0812.5023 (§3.2.1; Rouquier's
+products are compositions, `τ_{i,ν} : ν → s_i(ν)`, so his `ab` is our "first `b`, then `a`").
+Over `R' = R[r^{-1}]` (all `r_c` inverted), put `τ = −r_c^{-1}ψ` on equal-colour crossings and
+`τ = ψ` otherwise, and add a vertex `W` joined to `k` with `Q_{kW}(u, v) = u_k u + v`,
+`Q_{Wk}(u, v) = Q_{kW}(v, u)`, `Q_{cW} = Q_{Wc} = 1` (`c ≠ k`), `Q_{cc'}(u,v) = t_{cc'}u + t_{c'c}v`,
+`Q_{cc''} = 1` (non-adjacent), `Q_{cc} = 0`; then `Q_{ij}(u,v) = Q_{ji}(v,u)` holds. Rouquier's
+relations become ours: his `τ_{i,ν}x_{a,ν} − x_{s_i(a)}τ_{i,ν} = −1 (a = i), +1 (a = i+1)` (equal
+colours) is, in our order, `x_iτ − τx_{i+1} = −1`, `x_{i+1}τ − τx_i = +1`, i.e. (A4) with
+`ψ = −rτ`; his quadratic relation is (A5); his cubic relation, in our order,
+`τ_{i+1}τ_iτ_{i+1} − τ_iτ_{i+1}τ_i = (Q_{ν_iν_{i+1}}(x_{i+2},x_{i+1}) − Q_{ν_iν_{i+1}}(x_i,x_{i+1}))/(x_{i+2} − x_i)`
+for `ν_i = ν_{i+2}` (and `0` otherwise), has one equal-colour letter in each word on `(c,b,c)`,
+so in terms of `ψ` it reads `ψψψ − ψψψ = r_c t_{cb}` resp. `r_k u_k` (the red dot cancels in the
+divided difference), which is (A6); on `(c,c,c)` both words carry `(−r_c)^3`, on `(c,c,b)`,
+`(b,c,c)` one factor `−r_c` each, so exactness is preserved. His Theorem 3.7 (label
+`th:PBWHecke`: for any commutative ring `k`, `H_n(Q)` is free over `k` with basis
+`S = {τ_w x^a}` iff `Q_{ij}(u,v) = Q_{ji}(v,u)`; no unit assumption) gives a basis of
+`H_n(Q)` over `R'`. The dot `y` of the unique `W` strand is central (it slides through every
+crossing, all of which have different colours), so `H_n(Q)` is free over `R'[y]` on the
+`y`-free elements of `S`, and `H_n(Q)/(y)` — which has exactly the presentation of `A ⊗ R'` —
+has the basis `{τ_wx^α}` = `{(−r)^{…}ψ_wx^α}`. Since `R → R'` is injective and the spanning set
+of A.5(i) is the same, linear independence over `R` follows. This proof does not use
+Proposition A.3. (Webster's Thm. 2.8 would in addition require inverting `t` and `u`.)
 
 *Numerical check of (F1)* (`01_polyrep.py rank`, ~8 min): for all pairs of states of
 `(1,1,2)`, `(1,W1,1)`, `(1,1,1)` and samples of `(1,2,1,W1)`, `(1,1,W1,2)` (31 pairs), the
@@ -819,7 +1007,8 @@ of the parameters), `s, s'` states, `A_S = A ⊗_R S`, `P_S(s) = S[x_p : p black
 `e(s) A_S e(s')`.
 (c) Hence `f·a·g = 0` implies `a = 0` for such `f, g`. Over `S = R` (a domain), every non-zero
 polynomial in the dots is a non-zero-divisor, e.g. `x_p − x_q` (`p ≠ q`) and
-`z = ∏_{y < m, c(y) = c}(x_m − x_y)`.
+`z = ∏_{y < m, c(y) = c}(x_m − x_y)`. Over **every** `S`, `x_p − x_q` and `z` are non-zero-divisors of
+`S[x]` (they are monic in `x_p`, resp. `x_m`), so for them (a)–(c) hold after every base change.
 
 *Proof.* (a) By Theorem A.5(ii),(iv) every `a` is uniquely `Σ_w a_w ψ_w` with `a_w ∈ P_S(s)`;
 `f a = Σ_w (f a_w) ψ_w`, and this is `0` iff all `f a_w = 0` iff all `a_w = 0`. (b) The same
@@ -890,12 +1079,12 @@ of a fixed permutation is applied to one of its triples. **The proof is complete
 | statement | verdict | remarks / repairs |
 |---|---|---|
 | §1.1 (R2) "`xψ − ψx' = ± r_c`" | imprecise | exact form: (A4) of Definition A.1 (both equations, sign `+r_c` with the dot on the strand *before* minus *after* for the strand going right, and *after* minus *before* for the strand going left). |
-| §1.2 (F1) | statement right, reference wrong | "Webster, Prop. 2.23" is not the basis theorem; Webster's Thm. 2.8 (arXiv v4) assumes unit leading coefficients and does not apply to polynomial `t, u`. Use Theorem A.5 (proved here, over `ℤ[r,t,u]` and every base change; also the right-module version). |
+| §1.2 (F1) | statement right, reference to be corrected | Webster's Prop. 2.23 (arXiv v4) exists but is about his canonical deformation `Q_e + z_e`, not ours; his Thm. 2.8 (the basis theorem) assumes unit leading coefficients and does not apply to polynomial `t, u`. Use Theorem A.5 (proved here, over `ℤ[r,t,u]` and every base change; left and right modules; any number of non-crossing red strands, Remark A.5′). |
 | Lemma 1 | complete, correct | add: `m_j(I)` has a unique reduced word (Lemma C.1). |
 | Prop. 2 | complete, correct | "well defined" is justified by Lemma C.1. |
 | Prop. 3 | complete, correct | implicitly uses that the degree of a reduced diagram is the sum over its inversion pairs of the crossing degrees of their colours (true: each crossing's degree depends only on the two colours). Items 1–6 = Lemma B.2. Independent check `01_prop3.py 40000`: 40 000 random configurations (`A_2…A_4`, `D_4`, `D_5`, `E_6`, arbitrary `F`, not only admissible), own grading group and own reduced words: all satisfy the identity. |
 | Cor. 3.1 | complete, correct | the comparison of coefficients is legitimate (`G` free on the listed generators); the `q`-equation is implied by the `δ`-equations. `01_prop3.py`: the tree monomial has exactly the required degree for 16 785 admissible configurations. |
-| Prop. 4 | complete, correct, **given F1 over polynomial parameters** (now Theorem A.5) | uses: the basis consists of homogeneous elements, so a homogeneous `z` has only basis components of its degree; each basis braid is reduced, so each black strand crosses `W` at most once (`N = ρ + λ`); `l_k ≥ 0` (polynomial `u`). The extension to several red strands needs (F1) for that algebra, which is **not** covered by Theorem A.5 (one red strand). |
+| Prop. 4 | complete, correct, **given F1 over polynomial parameters** (now Theorem A.5) | uses: `R` is `G`-graded with homogeneous monomials and the basis elements `μx^αβ_σ` are homogeneous, so a homogeneous `z` is a `ℤ`-combination of basis elements of its degree; each basis braid is reduced, so each black strand crosses `W` at most once (`N = ρ + λ`); `l_k ≥ 0` (polynomial `u`). The extension to several red strands needs (F1) for that algebra: provided by Remark A.5′ for non-crossing red strands with the relations of Definition A.1′ (not checked numerically). |
 | Thm. 5 | complete, correct | see §C. |
 | Prop. 6 | complete, correct | uses only that juxtaposition is multiplicative (relations are local) and (A2)/(A3) for far-apart pieces; (F1) is not needed. `D` must be the sum of the per-stack `D`'s (as stated). |
 | Prop. 7 | complete, correct | holds for arbitrary words. The same argument shows that the existence of a bad triple (Cor. B.4) is a heap property and inherited by longer words. |
@@ -909,12 +1098,14 @@ of a fixed permutation is applied to one of its triples. **The proof is complete
 **Proved completely** (from the relations (A0)–(A6), Matsumoto (F3), and — where stated — the
 basis theorem, which is itself proved here):
 
-* Definition A.1 is the presentation implemented in `klrw` (re-verified, §A.2), and the
-  polynomial representation of Definition A.2 satisfies it (Prop. A.3; the (A6) part by exact
-  symbolic computation in the twisted group algebra, `01_polyrep.py twisted`).
-* (F1) for this presentation over `ℤ[r, t, u]` (polynomial parameters) and over every base
-  change: spanning, left basis, right basis, faithfulness of `V` (Theorem A.5).
-* Torsion-freeness on both sides (Theorem E.1).
+* The polynomial representation of Definition A.2 satisfies (A0)–(A6) (Prop. A.3; written proof
+  of every case, including (A6)).
+* (F1) for Definition A.1 over `ℤ[r, t, u]` (polynomial parameters) and over every base change
+  (`r = 0`, `t = 0`, `u = 0`, `ℤ/N` included — by base change, since `V` is not faithful there):
+  spanning, left basis, right basis, faithfulness of `V` over `R` (Theorem A.5); verbatim for any
+  number `N ≥ 0` of non-crossing red strands with the relations of Definition A.1′ (Remark A.5′);
+  a second proof of the independence via Rouquier's Thm. 3.7 (Remark A.5″).
+* Torsion-freeness on both sides, also for A.1′ (Theorem E.1).
 * Crossing table, classification of triples (T1–T8 with their middle strands), the red strand
   is in no triple, interval form of bad triples (Lemma B.2, B.3, Cor. B.4).
 * Proposition B.5: no bad triple ⇒ `β(I; j, F)` independent of the reduced word.
@@ -922,52 +1113,71 @@ basis theorem, which is itself proved here):
   which forces a cyclic configuration; none for the minuscule words of `Λ^{1,2,3}ℂ^n` (and
   duals), the vector representation of `so_{2n}`, and `D_4`.
 * The local shield identity, Lemma B.8.
-* Intertwiners: Lemma D.1 (dot sliding, `φ² = r_c²` resp. `Q`), Theorem D.3 (exact braid
-  relation on every state; uses (F1)), Corollary D.4, Proposition D.5 (mixed relation; uses
-  Theorem E.1), Theorem D.6 (naturality `(a⊗1)Φ = Φ(1⊗a)` for all `a`, both directions).
+* Intertwiners, **from the relations alone** (no (F1), no E.1): Lemma D.1 (dot sliding,
+  `φ² = r_c²` resp. `Q`), Lemma D.2, Theorem D.3 (exact braid relation on every state),
+  Corollary D.4, Proposition D.5 (mixed relation, both directions; the second via the flip),
+  Theorem D.6 (naturality `(a⊗1)Φ = Φ(1⊗a)` for all `a`, both directions).
 * Elementary moves: Lemma C.1, Lemma C.2, Corollary C.3; Theorem 5 of `PROOFS.md` (its proof
   is complete).
 * Review of Tier 1 (§F): all statements correct and their proofs complete, with the repairs
-  listed (references for (F1); Prop. 4's several-red-strands extension needs (F1) for that
-  algebra).
+  listed.
 
 **Verified only by computation** (exact, in the stated ranges):
 
-* Bad triples in cycle-free words: exist (multiplicity `≥ 4`), always shielded (§B.5, §B.6).
-* `β` independent of the reduced word for every tree term with a bad triple in cycle-free
-  words tested (552 terms), and dependent for most unshielded bad triples in cyclic words
-  (530 of 550): Conjecture B.9.
+* **That `klrw` implements Definition A.1** (§A.2): by me — all relations on every 2-/3-strand
+  pattern of `A_3` with red 1, 2 (388 checks), every basis braid equals the product of its
+  letters (10 176 braids, 4–5 strands), random products homogeneous (100),
+  `ρ(ab) = ρ(b)∘ρ(a)` against my polynomial representation (1 500 pairs, 3–5 strands); by the
+  referee (`R01_klrw.py`, `R01_hom_negative.py`, `R01_twisted.py`) — basis braids = products of
+  letters and = the words of Def. B.10 (40 200), relations at every position of 5–6-strand
+  states behind dotted braids (8 064), associativity (175 triples), `ρ(ab) = ρ(b)∘ρ(a)` against
+  an independent polynomial representation (560, with negative controls), F2 degrees (120). A
+  proof would need: (a) the relations on all states, (b) associativity, (c) basis braid = product
+  of letters, for the multiplication algorithm of `klrw` — i.e. a correctness proof of
+  `right_multiply_by_s`. Every Tier-2 statement of the project rests on this.
+* (F1) linear independence numerically: 31 pairs of states (me), 126 + 73 rank tests, left and
+  right bases, Lehmer and random reduced words, spanning degree by degree (referee,
+  `R01_rank.py`); rank drops at `r = 0`, `t = 0`, `u = 0` (me and referee).
+* Bad triples in cycle-free words: exist (multiplicity `≥ 4`), always shielded (§B.5, §B.6;
+  reproduced by `R01_triples.py`, `R01_words.py`).
+* `β` independent of the reduced word for every tree term with a bad triple in the cycle-free
+  words tested (552 terms), and dependent for most unshielded bad triples in cyclic words (530
+  of 550): Conjecture B.9.
 * No bad triple in any cycle-free order ideal of `A_7…A_9 ω_4`, `A_{10} ω_3`, `D_5…D_8`
   spinors, `E_6 ω_1`, `E_7 ω_7`, and in no word of `words.json` with `≤ 12` slots.
-* (F1) linear independence numerically on 31 pairs of states; the `klrw` multiplication equals
-  the composition in the polynomial representation (1 500 instances).
-* The converse of Corollary C.3 (bad triple ⇒ the two products differ), 37/37 cases.
+* The converse of Corollary C.3 (bad triple ⇒ the two products differ), 37/37 cases (proved in
+  `04_first_order.md` Cor. B.3, according to the referee; not re-checked by me).
+* Intertwiner identities also by `R01_intertwiners.py` (720 identities incl. 5-strand embeddings
+  and non-reduced dotted `a`; control 63/240 fail).
 
 **Not proved / open**
 
-* Conjecture B.9 (shielded bad triples are harmless globally; cycle-free ⇒ shielded). The
-  local Lemma B.8 is the mechanism; the global argument fails as stated because other strands
-  may pass between the two crossings of the shield, producing further triples that I could not
-  control. For general cycle-free words with a colour of multiplicity `≥ 4` the
-  well-definedness of `β` is therefore only computational; proofs in that range should use
-  Definition B.10 (basis braid) explicitly or cite Conjecture B.9.
-* A proof that cycle-free minuscule order ideals have no bad triples in general (it is proved
-  for multiplicities `≤ 3` and `Λ^3`, computed for the other listed cases; for `Λ^k`, `k ≥ 4`,
-  and the spinors only up to the computed ranks).
+* Conjecture B.9 (shielded bad triples are harmless globally; cycle-free ⇒ shielded). The local
+  Lemma B.8 is the mechanism; the global argument fails as stated because other strands may pass
+  between the two crossings of the shield, producing further triples that I could not control.
+  For general cycle-free words with a colour of multiplicity `≥ 4` the well-definedness of `β` is
+  therefore only computational; proofs in that range should use Definition B.10 (basis braid)
+  explicitly or cite Conjecture B.9.
+* A proof that cycle-free minuscule order ideals have no bad triples in general (proved for
+  multiplicities `≤ 3` and `Λ^3`, computed for the other listed cases).
+* Definition A.1′ for `N ≥ 2`: nothing was checked numerically, and whether it is the algebra
+  used for two punctures / the I-brane has to be confirmed by those fronts.
 
 **Failed attempts.** (1) "Shortening" a bad triple to a cyclic configuration directly (replace
 the mover by `y`, or `p` by `(a_p, y)`) works for pattern S but not in general: in cyclic words
 the naive construction finds no cycle in about half of the unshielded cases
-(`01_bad_search.py`, column "shortening construction found no cycle"), so a proof of
-Conjecture B.9(a) needs a different construction. (2) A degree argument for the vanishing of
-the smoothed diagram of a shielded bad triple: the multidegree does not exclude basis
-elements with other bijections (as for the degree principle in `NOTES.md` §3).
+(`01_bad_search.py`), so a proof of Conjecture B.9(a) needs a different construction. (2) A
+degree argument for the vanishing of the smoothed diagram of a shielded bad triple: the
+multidegree does not exclude basis elements with other bijections (as for the degree principle
+in `NOTES.md` §3).
 
 **For other provers.**
 
 1. Use the presentation of Definition A.1 (labels (A0)–(A6)); (F1) = Theorem A.5 is available
-   with polynomial parameters and on both sides; cancel non-zero polynomials in dots on the
-   left (source dots) or right (target dots) by Theorem E.1.
+   with polynomial parameters, on both sides, for every base change, and for any number of
+   non-crossing red strands (Remark A.5′); cancel non-zero-divisor polynomials in dots on the
+   left (source dots) or right (target dots) by Theorem E.1. At `r = 0` (or `t = 0`, `u = 0`)
+   the basis still exists, but the polynomial representation is not faithful.
 2. `β(I; j, F)` := the basis braid (Definition B.10). For words with multiplicities `≤ 2`, for
    cycle-free words with multiplicities `≤ 3`, and for the minuscule cases of Theorem B.6(c)
    any reduced word may be used (Prop. B.5 + Thm. B.6). For other cycle-free words, the
@@ -978,17 +1188,18 @@ elements with other bijections (as for the degree principle in `NOTES.md` §3).
    `c(x) = c(j) ∼ c(i)`); the red strand is never the middle strand of a triple in any of these
    diagrams.
 4. Intertwiners: `φ = (x_i − x_{i+1})ψ − r_c` for equal colours, `φ = ψ` otherwise; exact braid
-   relation on every state, dot sliding, `φ² = r_c²`/`Q`, and naturality of the intertwiner
-   crossing of a strand with an arbitrary block (Theorem D.6). This makes the README's `Φ` a
-   chain map `C' ⊗ 1 → 1 ⊗ C'` whenever `d'² = 0`.
+   relation on every state, dot sliding, `φ² = r_c²`/`Q`, the mixed relation, and naturality of
+   the intertwiner crossing of a strand with an arbitrary block (Theorem D.6) — all from the
+   relations, valid over every base ring. This makes the README's `Φ` a chain map
+   `C' ⊗ 1 → 1 ⊗ C'` whenever `d'² = 0`.
 5. `05_main_sliding.md`: Lemma 1.2 and Lemma 6.2 are fine; the "Warning" example in its §6 is
    not a failure of well-definedness (§B.9); its (S2) can be weakened to "no *bad* triple"
    (middle strand of adjacent colour) for reduced words.
 
 **Scripts** (all in `proofs/checks/`, run from `experiments/cup_brane`):
-`01_relations.py` (§A.2), `01_polyrep.py relations|hom|rank|twisted` (§A.3–A.4),
-`01_triples.py` (Lemmas B.2, B.3), `01_bad_search.py crosscheck|exhaustive|random` (Cor. B.4,
-§B.5), `01_mult3.py` (Thm. B.6), `01_minuscule_scan.py` (§B.5, minuscule ideals),
+`01_relations.py [basis]` (§A.2), `01_polyrep.py relations|hom|rank|twisted|degenerate`
+(§A.3–A.4), `01_triples.py` (Lemmas B.2, B.3), `01_bad_search.py crosscheck|exhaustive|random`
+(Cor. B.4, §B.5), `01_mult3.py` (Thm. B.6), `01_minuscule_scan.py` (§B.5, minuscule ideals),
 `01_shield_scan.py` (§B.6), `01_local4231.py` (Lemma B.8), `01_beta_words.py WORD | tally …`
-(§B.6, §B.7: dependence on the reduced word in the algebra), `01_intertwiners.py [negative]`
-(§D), `01_moves.py` (§C), `01_prop3.py` (§F, Prop. 3 / Cor. 3.1 / Lemma 1).
+(§B.6, §B.7), `01_intertwiners.py [negative]` (§D), `01_moves.py` (§C), `01_prop3.py` (§F).
+The referee's independent scripts: `R01_*.py` (see `R01_referee.md` §7, §9).

@@ -1,0 +1,9 @@
+A2 red 2 word 1211: adj-by-j: 4 zero / 0 nonzero; diag: 8 zero / 0 nonzero; same, a<j: 2 zero / 0 nonzero; same, a>j: 2 zero / 0 nonzero
+A2 red 2 word 112111: adj-by-j: 44 zero / 0 nonzero; diag: 32 zero / 0 nonzero; same, a<j: 48 zero / 0 nonzero; same, a>j: 48 zero / 0 nonzero
+A2 red 1 word 112111: adj-by-j: 44 zero / 0 nonzero; diag: 32 zero / 0 nonzero; same, a<j: 48 zero / 0 nonzero; same, a>j: 48 zero / 0 nonzero
+A2 red 1 word 1121111: adj-by-j: 143 zero / 0 nonzero; diag: 64 zero / 0 nonzero; same, a<j: 160 zero / 0 nonzero; same, a>j: 160 zero / 0 nonzero
+A2 red 2 word 1112111: adj-by-j: 129 zero / 0 nonzero; diag: 64 zero / 0 nonzero; same, a<j: 160 zero / 0 nonzero; same, a>j: 160 zero / 0 nonzero
+A3 red 2 word 1121311: adj-by-j: 88 zero / 0 nonzero; diag: 64 zero / 0 nonzero; far, a<j: 48 zero / 0 nonzero; far, a>j: 16 zero / 0 nonzero; same, a<j: 96 zero / 0 nonzero; same, a>j: 96 zero / 0 nonzero
+A3 red 3 word 1213111: adj-by-j: 88 zero / 0 nonzero; diag: 64 zero / 0 nonzero; far, a<j: 32 zero / 0 nonzero; far, a>j: 32 zero / 0 nonzero; same, a<j: 96 zero / 0 nonzero; same, a>j: 96 zero / 0 nonzero
+D4 red 2 word 2132422: adj-by-j: 164 zero / 0 nonzero; diag: 64 zero / 0 nonzero; same, a<j: 48 zero / 0 nonzero; same, a>j: 48 zero / 0 nonzero
+D4 red 1 word 2213242: adj-by-j: 152 zero / 0 nonzero; diag: 64 zero / 0 nonzero; same, a<j: 48 zero / 0 nonzero; same, a>j: 48 zero / 0 nonzero

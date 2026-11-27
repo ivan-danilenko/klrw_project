@@ -1,0 +1,309 @@
+28 cases
+A3 red 1 word 1122112: cyclic True ['N']; dot-free candidates r>=2: {2: 148, 4: 4} [0.8s]
+  r^2: kernel in 0, new unknowns 148, equations 680, rhs 176 -> kernel out 2  [2s]
+  r^3: {'order': 3, 'kernel_in': 2, 'new_unknowns': 0, 'equations': 20, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 1/28 A3 red 1 1122112: NO SOLUTION (inconsistent at r^3), kernel 2, extra None, tree missing None wrong None [3s]
+A3 red 2 word 1122112: cyclic True ['N']; dot-free candidates r>=2: {2: 512, 3: 20, 4: 4} [0.9s]
+  r^2: kernel in 0, new unknowns 512, equations 1654, rhs 176 -> kernel out 42  [5s]
+  r^3: {'order': 3, 'kernel_in': 42, 'new_unknowns': 20, 'equations': 120, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 2/28 A3 red 2 1122112: NO SOLUTION (inconsistent at r^3), kernel 42, extra None, tree missing None wrong None [6s]
+A3 red 3 word 1122112: cyclic True ['N']; dot-free candidates r>=2: {2: 512, 3: 20, 4: 4} [1.3s]
+  r^2: kernel in 0, new unknowns 512, equations 1654, rhs 176 -> kernel out 42  [5s]
+  r^3: {'order': 3, 'kernel_in': 42, 'new_unknowns': 20, 'equations': 120, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 3/28 A3 red 3 1122112: NO SOLUTION (inconsistent at r^3), kernel 42, extra None, tree missing None wrong None [7s]
+A3 red 1 word 1221122: cyclic True ['N']; dot-free candidates r>=2: {2: 148, 4: 4} [0.8s]
+  r^2: kernel in 0, new unknowns 148, equations 680, rhs 176 -> kernel out 2  [2s]
+  r^3: kernel in 2, new unknowns 0, equations 28, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 692; tree terms missing 0, wrong coefficient 0; extra 12
+    +1 r_2^2*t_2_1^2                {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 1>4 | R: 4>5 5>1 6>3 7>2 | L: 2>7 3>6
+    -1 r_2^2*t_2_1^2                {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 1>5 | R: 4>1 6>3 7>2 | L: 2>7 3>6 5>4
+    +1 r_2^2*t_2_1^2                {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 2>7 | R: 4>5 5>1 6>3 7>2 | L: 1>4 3>6
+    -1 r_2^2*t_2_1^2                {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 2>7 | R: 4>1 6>3 7>2 | L: 1>5 3>6 5>4
+    -1 r_2^2*t_2_1^2                {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 7>2 | R: 4>5 5>1 6>3 | L: 1>4 2>7 3>6
+    +1 r_2^2*t_2_1^2                {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 5>1 | R: 4>5 6>3 7>2 | L: 1>4 2>7 3>6
+    +1 r_2^2*t_2_1^2                {4,6,7} -> {1,3}  sigma (1 5 4)(2 7)(3 6)      W: 7>2 | R: 4>1 6>3 | L: 1>5 2>7 3>6 5>4
+    -1 r_2^2*t_2_1^2                {4,6,7} -> {2,3}  sigma (1 5 4)(2 7)(3 6)      W: 4>1 | R: 6>3 7>2 | L: 1>5 2>7 3>6 5>4
+    +1 r_1*r_2^3*t_1_2*t_2_1^3      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)         W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)         W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 7)(3 6)      W: 4>5 | R: 5>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+CASE 4/28 A3 red 1 1221122: solved, kernel 0, extra 12, tree missing 0 wrong 0 [3s]
+A3 red 2 word 1221122: cyclic True ['N']; dot-free candidates r>=2: {2: 204, 4: 7} [0.8s]
+  r^2: kernel in 0, new unknowns 204, equations 920, rhs 176 -> kernel out 4  [2s]
+  r^3: kernel in 4, new unknowns 0, equations 56, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 18 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 692; tree terms missing 0, wrong coefficient 0; extra 12
+    +1 r_2^2*t_2_1^2                {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 1>4 | R: 4>5 5>1 6>3 7>2 | L: 2>7 3>6
+    -1 r_2^2*t_2_1^2                {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 1>5 | R: 4>1 6>3 7>2 | L: 2>7 3>6 5>4
+    +1 r_2^2*t_2_1^2                {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 2>7 | R: 4>5 5>1 6>3 7>2 | L: 1>4 3>6
+    -1 r_2^2*t_2_1^2                {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 2>7 | R: 4>1 6>3 7>2 | L: 1>5 3>6 5>4
+    -1 r_2^2*t_2_1^2                {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 7>2 | R: 4>5 5>1 6>3 | L: 1>4 2>7 3>6
+    +1 r_2^2*t_2_1^2                {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 5>1 | R: 4>5 6>3 7>2 | L: 1>4 2>7 3>6
+    +1 r_2^2*t_2_1^2                {4,6,7} -> {1,3}  sigma (1 5 4)(2 7)(3 6)      W: 7>2 | R: 4>1 6>3 | L: 1>5 2>7 3>6 5>4
+    -1 r_2^2*t_2_1^2                {4,6,7} -> {2,3}  sigma (1 5 4)(2 7)(3 6)      W: 4>1 | R: 6>3 7>2 | L: 1>5 2>7 3>6 5>4
+    +1 r_1*r_2^3*t_1_2*t_2_1^3      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)         W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)         W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 7)(3 6)      W: 4>5 | R: 5>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+CASE 5/28 A3 red 2 1221122: solved, kernel 0, extra 12, tree missing 0 wrong 0 [3s]
+A3 red 3 word 1221122: cyclic True ['N']; dot-free candidates r>=2: {2: 204, 4: 7} [1.1s]
+  r^2: kernel in 0, new unknowns 204, equations 920, rhs 176 -> kernel out 4  [2s]
+  r^3: kernel in 4, new unknowns 0, equations 56, rhs 28 -> kernel out 0  [3s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 18 -> kernel out 0  [3s]
+  status solved; kernel dim 0; integral True; terms 692; tree terms missing 0, wrong coefficient 0; extra 12
+    +1 r_2^2*t_2_1^2                {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 1>4 | R: 4>5 5>1 6>3 7>2 | L: 2>7 3>6
+    -1 r_2^2*t_2_1^2                {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 1>5 | R: 4>1 6>3 7>2 | L: 2>7 3>6 5>4
+    +1 r_2^2*t_2_1^2                {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 2>7 | R: 4>5 5>1 6>3 7>2 | L: 1>4 3>6
+    -1 r_2^2*t_2_1^2                {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 2>7 | R: 4>1 6>3 7>2 | L: 1>5 3>6 5>4
+    -1 r_2^2*t_2_1^2                {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 7>2 | R: 4>5 5>1 6>3 | L: 1>4 2>7 3>6
+    +1 r_2^2*t_2_1^2                {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 5>1 | R: 4>5 6>3 7>2 | L: 1>4 2>7 3>6
+    +1 r_2^2*t_2_1^2                {4,6,7} -> {1,3}  sigma (1 5 4)(2 7)(3 6)      W: 7>2 | R: 4>1 6>3 | L: 1>5 2>7 3>6 5>4
+    -1 r_2^2*t_2_1^2                {4,6,7} -> {2,3}  sigma (1 5 4)(2 7)(3 6)      W: 4>1 | R: 6>3 7>2 | L: 1>5 2>7 3>6 5>4
+    +1 r_1*r_2^3*t_1_2*t_2_1^3      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)         W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1*r_2^3*t_1_2*t_2_1^3      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)         W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 7)(3 6)      W: 4>5 | R: 5>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+CASE 6/28 A3 red 3 1221122: solved, kernel 0, extra 12, tree missing 0 wrong 0 [4s]
+A3 red 1 word 1221322: cyclic True ['N']; dot-free candidates r>=2: {2: 50, 4: 2} [0.3s]
+  r^2: kernel in 0, new unknowns 50, equations 268, rhs 144 -> kernel out 0  [2s]
+  r^3: {'order': 3, 'kernel_in': 0, 'new_unknowns': 0, 'equations': 28, 'rhs_nonzero': 28, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 7/28 A3 red 1 1221322: NO SOLUTION (inconsistent at r^3), kernel 0, extra None, tree missing None wrong None [2s]
+A3 red 2 word 1221322: cyclic True ['N']; dot-free candidates r>=2: {2: 74, 4: 3} [0.4s]
+  r^2: kernel in 0, new unknowns 74, equations 380, rhs 144 -> kernel out 0  [2s]
+  r^3: {'order': 3, 'kernel_in': 0, 'new_unknowns': 0, 'equations': 28, 'rhs_nonzero': 28, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 8/28 A3 red 2 1221322: NO SOLUTION (inconsistent at r^3), kernel 0, extra None, tree missing None wrong None [3s]
+A3 red 3 word 1221322: cyclic True ['N']; dot-free candidates r>=2: {2: 74, 4: 3} [0.3s]
+  r^2: kernel in 0, new unknowns 74, equations 380, rhs 144 -> kernel out 0  [3s]
+  r^3: {'order': 3, 'kernel_in': 0, 'new_unknowns': 0, 'equations': 28, 'rhs_nonzero': 28, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 9/28 A3 red 3 1221322: NO SOLUTION (inconsistent at r^3), kernel 0, extra None, tree missing None wrong None [3s]
+D4 red 4 word 1221322: cyclic True ['N']; dot-free candidates r>=2: {2: 74, 4: 3} [0.4s]
+  r^2: kernel in 0, new unknowns 74, equations 380, rhs 144 -> kernel out 0  [2s]
+  r^3: {'order': 3, 'kernel_in': 0, 'new_unknowns': 0, 'equations': 28, 'rhs_nonzero': 28, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 10/28 D4 red 4 1221322: NO SOLUTION (inconsistent at r^3), kernel 0, extra None, tree missing None wrong None [2s]
+A3 red 1 word 1322132: cyclic True ['B']; dot-free candidates r>=2: {2: 78, 3: 2, 4: 2} [0.2s]
+  r^2: kernel in 0, new unknowns 78, equations 334, rhs 160 -> kernel out 4  [2s]
+  r^3: {'order': 3, 'kernel_in': 4, 'new_unknowns': 2, 'equations': 42, 'rhs_nonzero': 18, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 11/28 A3 red 1 1322132: NO SOLUTION (inconsistent at r^3), kernel 4, extra None, tree missing None wrong None [3s]
+A3 red 2 word 1322132: cyclic True ['B']; dot-free candidates r>=2: {2: 116, 3: 4, 4: 2} [0.2s]
+  r^2: kernel in 0, new unknowns 116, equations 434, rhs 160 -> kernel out 8  [2s]
+  r^3: {'order': 3, 'kernel_in': 8, 'new_unknowns': 4, 'equations': 54, 'rhs_nonzero': 18, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 12/28 A3 red 2 1322132: NO SOLUTION (inconsistent at r^3), kernel 8, extra None, tree missing None wrong None [3s]
+A3 red 3 word 1322132: cyclic True ['B']; dot-free candidates r>=2: {2: 78, 3: 2, 4: 2} [0.2s]
+  r^2: kernel in 0, new unknowns 78, equations 334, rhs 160 -> kernel out 4  [3s]
+  r^3: {'order': 3, 'kernel_in': 4, 'new_unknowns': 2, 'equations': 42, 'rhs_nonzero': 18, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 13/28 A3 red 3 1322132: NO SOLUTION (inconsistent at r^3), kernel 4, extra None, tree missing None wrong None [3s]
+D4 red 4 word 1322132: cyclic True ['B']; dot-free candidates r>=2: {2: 116, 3: 4, 4: 2} [0.3s]
+  r^2: kernel in 0, new unknowns 116, equations 434, rhs 160 -> kernel out 8  [2s]
+  r^3: {'order': 3, 'kernel_in': 8, 'new_unknowns': 4, 'equations': 54, 'rhs_nonzero': 18, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 14/28 D4 red 4 1322132: NO SOLUTION (inconsistent at r^3), kernel 8, extra None, tree missing None wrong None [3s]
+A3 red 1 word 2112211: cyclic True ['N']; dot-free candidates r>=2: {2: 204, 4: 7} [0.7s]
+  r^2: kernel in 0, new unknowns 204, equations 920, rhs 176 -> kernel out 4  [2s]
+  r^3: kernel in 4, new unknowns 0, equations 56, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 18 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 692; tree terms missing 0, wrong coefficient 0; extra 12
+    +1 r_1^2*t_1_2^2                {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 1>4 | R: 4>5 5>1 6>3 7>2 | L: 2>7 3>6
+    -1 r_1^2*t_1_2^2                {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 1>5 | R: 4>1 6>3 7>2 | L: 2>7 3>6 5>4
+    +1 r_1^2*t_1_2^2                {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 2>7 | R: 4>5 5>1 6>3 7>2 | L: 1>4 3>6
+    -1 r_1^2*t_1_2^2                {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 2>7 | R: 4>1 6>3 7>2 | L: 1>5 3>6 5>4
+    -1 r_1^2*t_1_2^2                {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 7>2 | R: 4>5 5>1 6>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*t_1_2^2                {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 5>1 | R: 4>5 6>3 7>2 | L: 1>4 2>7 3>6
+    +1 r_1^2*t_1_2^2                {4,6,7} -> {1,3}  sigma (1 5 4)(2 7)(3 6)      W: 7>2 | R: 4>1 6>3 | L: 1>5 2>7 3>6 5>4
+    -1 r_1^2*t_1_2^2                {4,6,7} -> {2,3}  sigma (1 5 4)(2 7)(3 6)      W: 4>1 | R: 6>3 7>2 | L: 1>5 2>7 3>6 5>4
+    +1 r_1^3*r_2*t_1_2^3*t_2_1      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)         W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)         W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 7)(3 6)      W: 4>5 | R: 5>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+CASE 15/28 A3 red 1 2112211: solved, kernel 0, extra 12, tree missing 0 wrong 0 [3s]
+A3 red 2 word 2112211: cyclic True ['N']; dot-free candidates r>=2: {2: 148, 4: 4} [0.7s]
+  r^2: kernel in 0, new unknowns 148, equations 680, rhs 176 -> kernel out 2  [2s]
+  r^3: kernel in 2, new unknowns 0, equations 28, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 4, equations 18, rhs 18 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 692; tree terms missing 0, wrong coefficient 0; extra 12
+    +1 r_1^2*t_1_2^2                {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 1>4 | R: 4>5 5>1 6>3 7>2 | L: 2>7 3>6
+    -1 r_1^2*t_1_2^2                {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 1>5 | R: 4>1 6>3 7>2 | L: 2>7 3>6 5>4
+    +1 r_1^2*t_1_2^2                {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 2>7 | R: 4>5 5>1 6>3 7>2 | L: 1>4 3>6
+    -1 r_1^2*t_1_2^2                {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 2>7 | R: 4>1 6>3 7>2 | L: 1>5 3>6 5>4
+    -1 r_1^2*t_1_2^2                {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 7>2 | R: 4>5 5>1 6>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*t_1_2^2                {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 5>1 | R: 4>5 6>3 7>2 | L: 1>4 2>7 3>6
+    +1 r_1^2*t_1_2^2                {4,6,7} -> {1,3}  sigma (1 5 4)(2 7)(3 6)      W: 7>2 | R: 4>1 6>3 | L: 1>5 2>7 3>6 5>4
+    -1 r_1^2*t_1_2^2                {4,6,7} -> {2,3}  sigma (1 5 4)(2 7)(3 6)      W: 4>1 | R: 6>3 7>2 | L: 1>5 2>7 3>6 5>4
+    +1 r_1^3*r_2*t_1_2^3*t_2_1      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)         W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)         W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 7)(3 6)      W: 4>5 | R: 5>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+CASE 16/28 A3 red 2 2112211: solved, kernel 0, extra 12, tree missing 0 wrong 0 [3s]
+A3 red 3 word 2112211: cyclic True ['N']; dot-free candidates r>=2: {2: 204, 4: 7} [1.0s]
+  r^2: kernel in 0, new unknowns 204, equations 920, rhs 176 -> kernel out 4  [2s]
+  r^3: kernel in 4, new unknowns 0, equations 56, rhs 28 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 7, equations 34, rhs 18 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 692; tree terms missing 0, wrong coefficient 0; extra 12
+    +1 r_1^2*t_1_2^2                {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 1>4 | R: 4>5 5>1 6>3 7>2 | L: 2>7 3>6
+    -1 r_1^2*t_1_2^2                {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 1>5 | R: 4>1 6>3 7>2 | L: 2>7 3>6 5>4
+    +1 r_1^2*t_1_2^2                {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 2>7 | R: 4>5 5>1 6>3 7>2 | L: 1>4 3>6
+    -1 r_1^2*t_1_2^2                {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 2>7 | R: 4>1 6>3 7>2 | L: 1>5 3>6 5>4
+    -1 r_1^2*t_1_2^2                {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 7>2 | R: 4>5 5>1 6>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*t_1_2^2                {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 7)(3 6)      W: 5>1 | R: 4>5 6>3 7>2 | L: 1>4 2>7 3>6
+    +1 r_1^2*t_1_2^2                {4,6,7} -> {1,3}  sigma (1 5 4)(2 7)(3 6)      W: 7>2 | R: 4>1 6>3 | L: 1>5 2>7 3>6 5>4
+    -1 r_1^2*t_1_2^2                {4,6,7} -> {2,3}  sigma (1 5 4)(2 7)(3 6)      W: 4>1 | R: 6>3 7>2 | L: 1>5 2>7 3>6 5>4
+    +1 r_1^3*r_2*t_1_2^3*t_2_1      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 6 3 7)         W: 5>5 | R: 4>1 6>3 7>2 | L: 1>4 2>6 3>7
+    -1 r_1^3*r_2*t_1_2^3*t_2_1      {4,5,6,7} -> {1,2,3}  sigma (1 4)(2 7 3 6)         W: 5>5 | R: 4>1 6>2 7>3 | L: 1>4 2>7 3>6
+    +1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 7)(3 6)      W: 4>5 | R: 5>1 6>3 7>2 | L: 1>4 2>7 3>6
+    -1 r_1^2*r_2^2*t_1_2^2*t_2_1^2  {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 7)(3 6)      W: 5>4 | R: 4>1 6>3 7>2 | L: 1>5 2>7 3>6
+CASE 17/28 A3 red 3 2112211: solved, kernel 0, extra 12, tree missing 0 wrong 0 [3s]
+A3 red 1 word 2132213: cyclic True ['T']; dot-free candidates r>=2: {2: 80, 4: 2} [0.2s]
+  r^2: kernel in 0, new unknowns 80, equations 364, rhs 160 -> kernel out 4  [2s]
+  r^3: kernel in 4, new unknowns 0, equations 84, rhs 42 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 622; tree terms missing 0, wrong coefficient 0; extra 14
+    -1 r_1*r_3*t_1_2*t_3_2          {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 1>4 | R: 4>5 5>1 6>2 7>3 | L: 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 1>5 | R: 4>1 6>2 7>3 | L: 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 2>6 | R: 4>5 5>1 6>2 7>3 | L: 1>4 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 2>6 | R: 4>1 6>2 7>3 | L: 1>5 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {3,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 3>7 | R: 4>5 5>1 6>2 7>3 | L: 1>4 2>6
+    +1 r_1*r_3*t_1_2*t_3_2          {3,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 3>7 | R: 4>1 6>2 7>3 | L: 1>5 2>6 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,2,5}  sigma (1 4 5)(2 6)(3 7)      W: 7>3 | R: 4>5 5>1 6>2 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 6>2 | R: 4>5 5>1 7>3 | L: 1>4 2>6 3>7
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 5>1 | R: 4>5 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,2}  sigma (1 5 4)(2 6)(3 7)      W: 7>3 | R: 4>1 6>2 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,3}  sigma (1 5 4)(2 6)(3 7)      W: 6>2 | R: 4>1 7>3 | L: 1>5 2>6 3>7 5>4
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {2,3}  sigma (1 5 4)(2 6)(3 7)      W: 4>1 | R: 6>2 7>3 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 6)(3 7)      W: 4>5 | R: 5>1 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+CASE 18/28 A3 red 1 2132213: solved, kernel 0, extra 14, tree missing 0 wrong 0 [2s]
+A3 red 2 word 2132213: cyclic True ['T']; dot-free candidates r>=2: {2: 46, 4: 2} [0.1s]
+  r^2: kernel in 0, new unknowns 46, equations 232, rhs 160 -> kernel out 2  [2s]
+  r^3: kernel in 2, new unknowns 0, equations 42, rhs 42 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 622; tree terms missing 0, wrong coefficient 0; extra 14
+    -1 r_1*r_3*t_1_2*t_3_2          {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 1>4 | R: 4>5 5>1 6>2 7>3 | L: 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 1>5 | R: 4>1 6>2 7>3 | L: 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 2>6 | R: 4>5 5>1 6>2 7>3 | L: 1>4 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 2>6 | R: 4>1 6>2 7>3 | L: 1>5 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {3,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 3>7 | R: 4>5 5>1 6>2 7>3 | L: 1>4 2>6
+    +1 r_1*r_3*t_1_2*t_3_2          {3,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 3>7 | R: 4>1 6>2 7>3 | L: 1>5 2>6 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,2,5}  sigma (1 4 5)(2 6)(3 7)      W: 7>3 | R: 4>5 5>1 6>2 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 6>2 | R: 4>5 5>1 7>3 | L: 1>4 2>6 3>7
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 5>1 | R: 4>5 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,2}  sigma (1 5 4)(2 6)(3 7)      W: 7>3 | R: 4>1 6>2 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,3}  sigma (1 5 4)(2 6)(3 7)      W: 6>2 | R: 4>1 7>3 | L: 1>5 2>6 3>7 5>4
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {2,3}  sigma (1 5 4)(2 6)(3 7)      W: 4>1 | R: 6>2 7>3 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 6)(3 7)      W: 4>5 | R: 5>1 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+CASE 19/28 A3 red 2 2132213: solved, kernel 0, extra 14, tree missing 0 wrong 0 [2s]
+A3 red 3 word 2132213: cyclic True ['T']; dot-free candidates r>=2: {2: 80, 4: 2} [0.2s]
+  r^2: kernel in 0, new unknowns 80, equations 364, rhs 160 -> kernel out 4  [3s]
+  r^3: kernel in 4, new unknowns 0, equations 84, rhs 42 -> kernel out 0  [3s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [3s]
+  status solved; kernel dim 0; integral True; terms 622; tree terms missing 0, wrong coefficient 0; extra 14
+    -1 r_1*r_3*t_1_2*t_3_2          {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 1>4 | R: 4>5 5>1 6>2 7>3 | L: 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 1>5 | R: 4>1 6>2 7>3 | L: 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 2>6 | R: 4>5 5>1 6>2 7>3 | L: 1>4 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 2>6 | R: 4>1 6>2 7>3 | L: 1>5 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {3,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 3>7 | R: 4>5 5>1 6>2 7>3 | L: 1>4 2>6
+    +1 r_1*r_3*t_1_2*t_3_2          {3,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 3>7 | R: 4>1 6>2 7>3 | L: 1>5 2>6 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,2,5}  sigma (1 4 5)(2 6)(3 7)      W: 7>3 | R: 4>5 5>1 6>2 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 6>2 | R: 4>5 5>1 7>3 | L: 1>4 2>6 3>7
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 5>1 | R: 4>5 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,2}  sigma (1 5 4)(2 6)(3 7)      W: 7>3 | R: 4>1 6>2 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,3}  sigma (1 5 4)(2 6)(3 7)      W: 6>2 | R: 4>1 7>3 | L: 1>5 2>6 3>7 5>4
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {2,3}  sigma (1 5 4)(2 6)(3 7)      W: 4>1 | R: 6>2 7>3 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 6)(3 7)      W: 4>5 | R: 5>1 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+CASE 20/28 A3 red 3 2132213: solved, kernel 0, extra 14, tree missing 0 wrong 0 [3s]
+D4 red 4 word 2132213: cyclic True ['T']; dot-free candidates r>=2: {2: 80, 4: 2} [0.2s]
+  r^2: kernel in 0, new unknowns 80, equations 364, rhs 160 -> kernel out 4  [2s]
+  r^3: kernel in 4, new unknowns 0, equations 84, rhs 42 -> kernel out 0  [2s]
+  r^4: kernel in 0, new unknowns 2, equations 12, rhs 12 -> kernel out 0  [2s]
+  status solved; kernel dim 0; integral True; terms 622; tree terms missing 0, wrong coefficient 0; extra 14
+    -1 r_1*r_3*t_1_2*t_3_2          {1,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 1>4 | R: 4>5 5>1 6>2 7>3 | L: 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {1,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 1>5 | R: 4>1 6>2 7>3 | L: 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {2,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 2>6 | R: 4>5 5>1 6>2 7>3 | L: 1>4 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {2,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 2>6 | R: 4>1 6>2 7>3 | L: 1>5 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {3,4,5,6,7} -> {1,2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 3>7 | R: 4>5 5>1 6>2 7>3 | L: 1>4 2>6
+    +1 r_1*r_3*t_1_2*t_3_2          {3,4,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 3>7 | R: 4>1 6>2 7>3 | L: 1>5 2>6 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,2,5}  sigma (1 4 5)(2 6)(3 7)      W: 7>3 | R: 4>5 5>1 6>2 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {1,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 6>2 | R: 4>5 5>1 7>3 | L: 1>4 2>6 3>7
+    -1 r_1*r_3*t_1_2*t_3_2          {4,5,6,7} -> {2,3,5}  sigma (1 4 5)(2 6)(3 7)      W: 5>1 | R: 4>5 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,2}  sigma (1 5 4)(2 6)(3 7)      W: 7>3 | R: 4>1 6>2 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {1,3}  sigma (1 5 4)(2 6)(3 7)      W: 6>2 | R: 4>1 7>3 | L: 1>5 2>6 3>7 5>4
+    +1 r_1*r_3*t_1_2*t_3_2          {4,6,7} -> {2,3}  sigma (1 5 4)(2 6)(3 7)      W: 4>1 | R: 6>2 7>3 | L: 1>5 2>6 3>7 5>4
+    -1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 4 5)(2 6)(3 7)      W: 4>5 | R: 5>1 6>2 7>3 | L: 1>4 2>6 3>7
+    +1 r_1*r_2^2*r_3*t_1_2*t_2_1*t_2_3*t_3_2 {4,5,6,7} -> {1,2,3}  sigma (1 5 4)(2 6)(3 7)      W: 5>4 | R: 4>1 6>2 7>3 | L: 1>5 2>6 3>7
+CASE 21/28 D4 red 4 2132213: solved, kernel 0, extra 14, tree missing 0 wrong 0 [2s]
+A3 red 1 word 2211221: cyclic True ['N']; dot-free candidates r>=2: {2: 512, 3: 20, 4: 4} [0.8s]
+  r^2: kernel in 0, new unknowns 512, equations 1654, rhs 176 -> kernel out 42  [3s]
+  r^3: {'order': 3, 'kernel_in': 42, 'new_unknowns': 20, 'equations': 120, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 22/28 A3 red 1 2211221: NO SOLUTION (inconsistent at r^3), kernel 42, extra None, tree missing None wrong None [5s]
+A3 red 2 word 2211221: cyclic True ['N']; dot-free candidates r>=2: {2: 148, 4: 4} [0.7s]
+  r^2: kernel in 0, new unknowns 148, equations 680, rhs 176 -> kernel out 2  [2s]
+  r^3: {'order': 3, 'kernel_in': 2, 'new_unknowns': 0, 'equations': 20, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 23/28 A3 red 2 2211221: NO SOLUTION (inconsistent at r^3), kernel 2, extra None, tree missing None wrong None [2s]
+A3 red 3 word 2211221: cyclic True ['N']; dot-free candidates r>=2: {2: 512, 3: 20, 4: 4} [1.0s]
+  r^2: kernel in 0, new unknowns 512, equations 1654, rhs 176 -> kernel out 42  [4s]
+  r^3: {'order': 3, 'kernel_in': 42, 'new_unknowns': 20, 'equations': 120, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 24/28 A3 red 3 2211221: NO SOLUTION (inconsistent at r^3), kernel 42, extra None, tree missing None wrong None [5s]
+A3 red 1 word 2213221: cyclic True ['N']; dot-free candidates r>=2: {2: 140, 3: 4, 4: 2} [0.3s]
+  r^2: kernel in 0, new unknowns 140, equations 556, rhs 144 -> kernel out 2  [2s]
+  r^3: {'order': 3, 'kernel_in': 2, 'new_unknowns': 4, 'equations': 34, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 25/28 A3 red 1 2213221: NO SOLUTION (inconsistent at r^3), kernel 2, extra None, tree missing None wrong None [2s]
+A3 red 2 word 2213221: cyclic True ['N']; dot-free candidates r>=2: {2: 50, 4: 2} [0.2s]
+  r^2: kernel in 0, new unknowns 50, equations 268, rhs 144 -> kernel out 0  [1s]
+  r^3: {'order': 3, 'kernel_in': 0, 'new_unknowns': 0, 'equations': 12, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 26/28 A3 red 2 2213221: NO SOLUTION (inconsistent at r^3), kernel 0, extra None, tree missing None wrong None [2s]
+A3 red 3 word 2213221: cyclic True ['N']; dot-free candidates r>=2: {2: 140, 3: 4, 4: 2} [0.3s]
+  r^2: kernel in 0, new unknowns 140, equations 556, rhs 144 -> kernel out 2  [2s]
+  r^3: {'order': 3, 'kernel_in': 2, 'new_unknowns': 4, 'equations': 34, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 27/28 A3 red 3 2213221: NO SOLUTION (inconsistent at r^3), kernel 2, extra None, tree missing None wrong None [2s]
+D4 red 4 word 2213221: cyclic True ['N']; dot-free candidates r>=2: {2: 140, 3: 4, 4: 2} [0.3s]
+  r^2: kernel in 0, new unknowns 140, equations 556, rhs 144 -> kernel out 2  [2s]
+  r^3: {'order': 3, 'kernel_in': 2, 'new_unknowns': 4, 'equations': 34, 'rhs_nonzero': 12, 'result': 'inconsistent'}
+  status NO SOLUTION (inconsistent at r^3)
+CASE 28/28 D4 red 4 2213221: NO SOLUTION (inconsistent at r^3), kernel 2, extra None, tree missing None wrong None [2s]
+
+SUMMARY
+  A3 red 1 1122112    N        NO SOLUTION (inconsistent at r^3)        kernel 2   extra None tree missing None wrong None
+  A3 red 2 1122112    N        NO SOLUTION (inconsistent at r^3)        kernel 42  extra None tree missing None wrong None
+  A3 red 3 1122112    N        NO SOLUTION (inconsistent at r^3)        kernel 42  extra None tree missing None wrong None
+  A3 red 1 1221122    N        solved                                   kernel 0   extra 12   tree missing 0   wrong 0  
+  A3 red 2 1221122    N        solved                                   kernel 0   extra 12   tree missing 0   wrong 0  
+  A3 red 3 1221122    N        solved                                   kernel 0   extra 12   tree missing 0   wrong 0  
+  A3 red 1 1221322    N        NO SOLUTION (inconsistent at r^3)        kernel 0   extra None tree missing None wrong None
+  A3 red 2 1221322    N        NO SOLUTION (inconsistent at r^3)        kernel 0   extra None tree missing None wrong None
+  A3 red 3 1221322    N        NO SOLUTION (inconsistent at r^3)        kernel 0   extra None tree missing None wrong None
+  D4 red 4 1221322    N        NO SOLUTION (inconsistent at r^3)        kernel 0   extra None tree missing None wrong None
+  A3 red 1 1322132    B        NO SOLUTION (inconsistent at r^3)        kernel 4   extra None tree missing None wrong None
+  A3 red 2 1322132    B        NO SOLUTION (inconsistent at r^3)        kernel 8   extra None tree missing None wrong None
+  A3 red 3 1322132    B        NO SOLUTION (inconsistent at r^3)        kernel 4   extra None tree missing None wrong None
+  D4 red 4 1322132    B        NO SOLUTION (inconsistent at r^3)        kernel 8   extra None tree missing None wrong None
+  A3 red 1 2112211    N        solved                                   kernel 0   extra 12   tree missing 0   wrong 0  
+  A3 red 2 2112211    N        solved                                   kernel 0   extra 12   tree missing 0   wrong 0  
+  A3 red 3 2112211    N        solved                                   kernel 0   extra 12   tree missing 0   wrong 0  
+  A3 red 1 2132213    T        solved                                   kernel 0   extra 14   tree missing 0   wrong 0  
+  A3 red 2 2132213    T        solved                                   kernel 0   extra 14   tree missing 0   wrong 0  
+  A3 red 3 2132213    T        solved                                   kernel 0   extra 14   tree missing 0   wrong 0  
+  D4 red 4 2132213    T        solved                                   kernel 0   extra 14   tree missing 0   wrong 0  
+  A3 red 1 2211221    N        NO SOLUTION (inconsistent at r^3)        kernel 42  extra None tree missing None wrong None
+  A3 red 2 2211221    N        NO SOLUTION (inconsistent at r^3)        kernel 2   extra None tree missing None wrong None
+  A3 red 3 2211221    N        NO SOLUTION (inconsistent at r^3)        kernel 42  extra None tree missing None wrong None
+  A3 red 1 2213221    N        NO SOLUTION (inconsistent at r^3)        kernel 2   extra None tree missing None wrong None
+  A3 red 2 2213221    N        NO SOLUTION (inconsistent at r^3)        kernel 0   extra None tree missing None wrong None
+  A3 red 3 2213221    N        NO SOLUTION (inconsistent at r^3)        kernel 2   extra None tree missing None wrong None
+  D4 red 4 2213221    N        NO SOLUTION (inconsistent at r^3)        kernel 2   extra None tree missing None wrong None

@@ -1,9 +1,39 @@
 # 05 — The main theorem by direct diagrammatics (cone induction on the last slot)
 
+> **REVISION NOTES** (revision after `R05_referee.md`; work in progress)
+>
+> *Applied:*
+> * 1 (Prop. 10.2, "only products"): full proof, steps 1–4, valid for all configurations; new
+>   check `checks/05r_only_products.py` (numbers in §11 still to be filled in).
+> * 2 (§8 preamble): restricted to configurations in which `a` is not the mover; uses named.
+> * 3 (§1.1): strands identified by source positions, effect of a move on the rest of the
+>   word; used in the proofs of Lemmas 1.1, 1.2.
+> * 4 (Lemma 4.3): steps (a) truncation by idempotents, (b) coordinates in the right basis,
+>   Theorem A.5(iii), (c) monomial ideal, (d) lowest degree; part 2 with A.5(ii); remark: the
+>   same by base change, A.5(iv), and Theorem E.1.
+> * 5 (§11): uses of (F1) listed precisely (Lemma 3.1, 4.3, Props. 4.5, 4.6) with the parts of
+>   Theorem A.5; referee's checks added (table, new subsection); caveat on (S2) updated.
+> * 6 (Lemma 6.1): direction statement for (e) added (the outer strand moves left; not used).
+> * 7 (Convention after Lemma 3.2): one-line proof from Definition B.10 that the basis braids
+>   are compatible with `ι_L`, `ι_R` for every word; table 10.1 updated.
+> * 8 (Warning after Lemma 6.2): `β` is well defined in the example (Prop. B.5 of
+>   `01_foundations.md`; both triples have middle strand `L_{(1,5)}`); pointers in 10.1, 10.5.
+> * (F1) references made precise: preamble, Lemma 3.1, Lemma 4.3, Proposition 4.5 (proof of
+>   `⋂ 𝔪^N A = 0` written out), Remark (1) after 4.5, Proposition 4.6, table 10.1, §11.
+>
+> *Remaining:* re-run of the author's scripts (running) and update of the "Runs" table.
+
 Notation and standing facts are those of `../PROOFS.md` (section 1) and of
 `README_FOR_PROVERS.md`; the tree formula is that of `../NOTES.md` section 2, with the signs of
 `../formula.py`. All scripts named below are in `proofs/checks/` and are run with
-`sage -python`.
+`sage -python` (except `05r_only_products.py`, plain `python3`).
+The basis theorem (F1) is used in the form proved in `01_foundations.md`, Theorem A.5 (over
+`R = ℤ[r, t, u]` with polynomial parameters): (ii) the left basis `{x^α ψ_w}` (free left module
+over the dots of the source, for any choice of reduced words), (iii) the right basis
+`{ψ_w x^β}` (free right module over the dots of the target), (iv) base change; and its
+consequence Theorem E.1 there (multiplication by a non-zero-divisor in the dots is injective).
+The literature reference given for (F1) in `PROOFS.md` §1.2 is not the right one
+(`01_foundations.md` §F).
 
 ## 0. Results
 
@@ -73,10 +103,18 @@ We use three moves on words:
 * (M2) `(…, i, i+1, i, …) ↔ (…, i+1, i, i+1, …)`;
 * (M3) `(…, i, i, …) → (…, …)` (deletion of two equal neighbouring letters).
 
-(M1) and (M2) do not change the numbers `n_D(A,B)`: for (M2), if `A, B, C` are the strands at
-the positions `i, i+1, i+2` before the three letters, both sides cross each of the pairs
-`{A,B}`, `{A,C}`, `{B,C}` once. (M3) lowers one `n_D(A,B)` by 2. In particular the numbers
-`n_D(A,B)` never increase.
+Strands are identified by their **source positions**: "the strand `A`" is the strand that
+starts at a given position of `s`, whatever word is applied. So `n_D(A,B)` and `n_{D*}(A,B)` can
+be compared for any two words `D`, `D*` from the same state `s`. A move replaces a segment of
+consecutive letters by a segment with the same permutation of the positions (for (M3) both
+permutations are the identity). Hence the letters before the segment are unchanged, after the
+segment every strand stands at the same position as before, and every letter after the segment
+crosses the same two strands as before; only the crossings inside the segment change.
+(M1) and (M2) do not change the numbers `n_D(A,B)`: for (M1) the two letters cross the same two
+(disjoint) pairs of strands in both orders; for (M2), if `A, B, C` are the strands at the
+positions `i, i+1, i+2` before the three letters, both sides cross each of the pairs `{A,B}`,
+`{A,C}`, `{B,C}` once. (M3) lowers one `n_D(A,B)` by 2. In particular the numbers `n_D(A,B)`
+never increase along a sequence of moves.
 
 **Lemma 1.1 (word property).** Every word can be transformed into a reduced word by a finite
 sequence of moves (M1), (M2), (M3). Any two reduced words with the same permutation are
@@ -84,10 +122,14 @@ connected by moves (M1), (M2).
 
 *Proof.* The second statement is (F3). For the first, let `D` be non-reduced and let
 `D_0 = (i_1, …, i_{t−1})` be its longest reduced prefix, so that the strands `A, B` crossed by
-`i_t` have `n_{D_0}(A,B) = 1`. Then `σ_{D_0} s_{i_t}` has one inversion less than `σ_{D_0}`.
+`i_t` have `n_{D_0}(A,B) = 1` (`≥ 1` because `D_0·(i_t)` is not reduced, `≤ 1` because `D_0`
+is). So `(A, B)` is an inversion of `σ_{D_0}` standing at the adjacent positions `i_t, i_t+1`,
+and `σ_{D_0} s_{i_t}` has one inversion less than `σ_{D_0}`.
 Choose a reduced word `D_1` of `σ_{D_0} s_{i_t}`; then `D_1·(i_t)` is a reduced word of
-`σ_{D_0}`, and by (F3) `D_0` is connected to it by moves (M1), (M2). Now
-`D_1·(i_t)·(i_t)·(i_{t+1}, …)` admits a move (M3). The length has dropped by 2; induct on the
+`σ_{D_0}`, and by (F3) `D_0` is connected to it by moves (M1), (M2). Applied to the prefix
+`D_0` of `D`, these moves keep the permutation of the prefix, so (§1.1) they transform `D` into
+`D_1·(i_t)·(i_t)·(i_{t+1}, …)`, whose suffix `(i_t, i_{t+1}, …)` crosses the same pairs of strands
+as in `D`. This word admits a move (M3). The length has dropped by 2; induct on the
 length. ∎
 
 (This is Tits' solution of the word problem; it is stated because (F3) alone is about reduced
@@ -107,7 +149,8 @@ Then `ψ_D = ψ_{D'}` for **every** reduced word `D'` from `s` with `σ_{D'} = �
 particular the element of a reduced word satisfying (S2) does not depend on the reduced word.
 
 *Proof.* By Lemma 1.1 there is a sequence of moves from `D` to a reduced word `D_1`. Every
-word `D*` in the sequence has `n_{D*} ≤ n_D`, so it satisfies (S1) and (S2). We check that no
+word `D*` in the sequence has `n_{D*}(A,B) ≤ n_D(A,B)` for all strands `A, B` (identified by
+their source positions, §1.1), so it satisfies (S1) and (S2). We check that no
 move changes the element.
 (M1) is relation (R1).
 (M2) is applied to three strands `A, B, C` (at the positions `i, i+1, i+2`) which cross
@@ -243,10 +286,11 @@ multiplicative and `R`-linear, and they are injective.
 
 *Proof.* The defining relations (R1)–(R4) are local: each of them holds in `A` verbatim with
 an additional vertical strand far to the left or right. So the maps are well defined and
-multiplicative. Injectivity: by (F1), `e_s A' e_{s'}` has the basis
+multiplicative. Injectivity: by (F1) in the form of Theorem A.5(ii) of `01_foundations.md`
+(left basis, valid for any choice of the reduced words), `e_s A' e_{s'}` has the `R`-basis
 `x^α β_σ`. The diagram `ι(β_σ)` is reduced and realises the bijection `ι(σ)` (the new strand
-is fixed), so by (F1) for `A`, with `β_{ι(σ)} := ι(β_σ)`, the elements
-`ι(x^α β_σ) = x^α ι(β_σ)` are part of a basis. ∎
+is fixed), so by Theorem A.5(ii) for `A`, with the reduced word of `ι(σ)` chosen as
+`β_{ι(σ)} := ι(β_σ)`, the elements `ι(x^α β_σ) = x^α ι(β_σ)` are part of an `R`-basis. ∎
 
 The idempotent of a vertex `I` of `w` is `e_{I'}·c` if `I = I' ∪ {m}` (the strand of `m` is at
 the position `+m`, far right) and `c·e_{I}` if `m ∉ I` (position `−m`, far left).
@@ -280,8 +324,17 @@ graph is connected, `F = ∅`; `κ = (−1)^0`. (γ): the remaining case; `(a, m
 **Convention.** For a general word the element `β(I; j, F)` is defined through a chosen
 reduced word. We assume the choice compatible with Lemma 3.2: `β_w(I; j, F) = ι_L β_{w'}(I; j, F)`
 in case 1 and `= ι_R β_{w'}(I'; j, F)` in case (α). (If the element does not depend on the
-reduced word — Lemma 6.2 below for colour multiplicities `≤ 2` — this is automatic; for the
-basis braids of `klrw` it is checked in `05_cone.py`.)
+reduced word — Lemma 6.2 below for colour multiplicities `≤ 2` — this is automatic.) The basis
+braids of `klrw` (Definition B.10 of `01_foundations.md`, the definition of `β` used in all
+computations) satisfy the convention **for every word**: the basis braid of a bijection `π` of
+`n` positions is the insertion-sort word `w(π) = ∏_{p=1}^{n} (p−1, …, p−ℓ_p)`,
+`ℓ_p = #\{p' < p : π(p') > π(p)\}`. A strand fixed at the far left (`p = 1`, `π(1) = 1`) has
+`ℓ_1 = 0` and is counted in no other `ℓ_p` (it ends to the left of every strand), so the other
+factors are those of `w(π)` with every letter raised by 1: `w(ι_L π) = ι_L w(π)`. A strand
+fixed at the far right (`p = n+1`, `π(n+1) = n+1`) is processed last, with `ℓ_{n+1} = 0`, and does
+not change the earlier factors: `w(ι_R π) = w(π)`, read from the larger state, `= ι_R w(π)`. In
+cases 1 and (α) the strand of `m` is such a fixed strand (at `−m`, resp. `+m`).
+(`05_cone.py` confirms this numerically.)
 
 Let `d'_{I',J'} ∈ e_{I'} A' e_{J'}` be the components of the tree differential of `w'`, and
 define, for `I', K' ⊆ {1,…,n}`,
@@ -357,16 +410,43 @@ idempotent and `N ≥ 0`.
 1. If `z ∈ e' A e_0` and `z μ ∈ 𝔪^{N+1} A`, then `z ∈ 𝔪^{N+1} A`.
 2. If `z ∈ e_1 A e'` and `μ z ∈ 𝔪^{N+1} A`, then `z ∈ 𝔪^{N+1} A`.
 
-*Proof.* 1. `z P = z μ μ^* ∈ 𝔪^{N+1} A`. By the standing fact quoted in the README (the
-algebra is free as a right module over the polynomial ring in the dots; this is the mirror
-image of (F1)), `e' A e_0` is a free right module over `R[x]` (dots at the right end); let
-`(b_σ)` be a basis and write `z = Σ b_σ f_σ`. Then
-`𝔪^{N+1} e' A e_0 = ⊕ b_σ 𝔪^{N+1} R[x]`, so `f_σ P ∈ 𝔪^{N+1} R[x]` for all `σ`. Grade `R[x]` by the total degree in the variables `r`; `𝔪^{N+1} R[x]` consists of the
-elements whose components of degree `≤ N` vanish. If `f_σ ∉ 𝔪^{N+1} R[x]`, let `g ≠ 0` be its
-component of lowest degree `d ≤ N`; as `P` has degree 0, the component of degree `d` of
-`f_σ P` is `g P ≠ 0`, a contradiction.
-2. `P z = μ^* μ z ∈ 𝔪^{N+1} A`, and `e_1 A e'` is a free left `R[x]`-module with basis the
-`β_σ` ((F1) as stated in `PROOFS.md`); write `z = Σ f_σ β_σ` and argue as in 1. ∎
+*Proof.* Here `R = ℤ[r, t, u]`, and `R[x] = P(e_0)` is the polynomial ring over `R` in the dots
+of the state of `e_0`, i.e. the polynomial ring `ℤ[r, t, u, x]`; the dots of `P` are those at
+`e_0`, the right end of `z`.
+1. `𝔪^{N+1} A` is a two-sided ideal (`R` is central), so `z P = z μ μ^* ∈ 𝔪^{N+1} A`.
+(a) *Truncation by the idempotents:* `𝔪^{N+1} A ∩ e' A e_0 = 𝔪^{N+1} · e' A e_0`. Indeed, if
+`y = Σ_i ρ_i a_i ∈ e' A e_0` with `ρ_i ∈ 𝔪^{N+1}`, `a_i ∈ A`, then `y = e' y e_0 = Σ_i ρ_i · e' a_i e_0`
+because `R` is central. So `z P ∈ 𝔪^{N+1} · e' A e_0`.
+(b) *Coordinates:* by Theorem A.5(iii) of `01_foundations.md` (the right basis), `e' A e_0` is a
+free right `R[x]`-module with basis `{ψ_w}` (`w` running through the colour-preserving
+permutations from the state of `e'` to that of `e_0`, any fixed reduced words):
+`e' A e_0 = ⊕_w ψ_w · R[x]`. As `R[x]` is a free `R`-module on the monomials, `e' A e_0` is a free
+`R`-module with basis `{ψ_w x^β}`, and therefore `𝔪^{N+1} · e' A e_0 = ⊕_w ψ_w · 𝔪^{N+1} R[x]`
+(an element lies in it iff all its coordinates lie in `𝔪^{N+1}`). Write `z = Σ_w ψ_w f_w` with
+`f_w ∈ R[x]`; then `z P = Σ_w ψ_w (f_w P)`, so `f_w P ∈ 𝔪^{N+1} R[x]` for every `w`.
+(c) *Monomial ideal:* `𝔪^{N+1} R[x]` is the ideal of `ℤ[r, t, u, x]` generated by the monomials of
+degree `N+1` in the variables `r_e`; it is a monomial ideal, so a polynomial lies in it iff
+each of its monomials does, i.e. (grading `ℤ[r, t, u, x]` by the total degree in the `r_e`)
+iff all its homogeneous components of `r`-degree `≤ N` vanish.
+(d) *Lowest degree:* suppose some `f_w ∉ 𝔪^{N+1} R[x]`, and let `g ≠ 0` be its component of
+lowest `r`-degree `d`; by (c), `d ≤ N`. By Lemma 4.2, `P ≠ 0` is `r`-homogeneous of degree 0, so
+the component of `r`-degree `d` of `f_w P` is `g P`, which is non-zero because `ℤ[r, t, u, x]`
+is a domain. This contradicts (b) and (c). Hence every `f_w ∈ 𝔪^{N+1} R[x]`, and
+`z = Σ_w ψ_w f_w ∈ 𝔪^{N+1} A`.
+2. `P z = μ^* μ z ∈ 𝔪^{N+1} A`, now with `P` in the dots of `e_1`, the left end of `z`. The same
+steps with the left basis: by Theorem A.5(ii) of `01_foundations.md`, `e_1 A e'` is a free left
+`P(e_1)`-module with basis `{ψ_w}`, `e_1 A e' = ⊕_w P(e_1) · ψ_w`; (a) holds in the form
+`𝔪^{N+1} A ∩ e_1 A e' = 𝔪^{N+1} · e_1 A e'`; writing `z = Σ_w f_w ψ_w`, `P z = Σ_w (P f_w) ψ_w`, and
+(b)–(d) apply verbatim. ∎
+
+*Remark (the same proof by base change).* `𝔪^{N+1} A` is the kernel of `A → A ⊗_R S`,
+`S = R/𝔪^{N+1}` (for every `R`-module `M`, `M ⊗_R R/𝔞 = M/𝔞M`). By Theorem A.5(iv) of
+`01_foundations.md`, `A ⊗_R S = A_S` is presented by the same generators and relations over `S`
+and has the bases of Theorem A.5(i)–(iii). `P` is a non-zero-divisor of `P_S(e_0) = S[x]`, which
+is a free `ℤ[t, u, x]`-module on the `r`-monomials of degree `≤ N`, on which
+`P ∈ ℤ[t, u, x] ∖ \{0\}` acts coordinatewise. So Lemma 4.3.1 is Theorem E.1(b) of
+`01_foundations.md` (torsion-freeness on the right) over `S`, and Lemma 4.3.2 is Theorem
+E.1(a) over `S`.
 
 **Lemma 4.4 (the mover-`a` block).** Let `a` be any slot of `w'` and `K̃ ∌ a` a vertex. The
 terms of `d'` from a vertex `J' ∋ a` to `K̃` are: the elementary move `±m_a(K̃ ∪ a)` from
@@ -383,7 +463,11 @@ be a slot of `w'` which is the first occurrence of its colour in `w'`. If
 
 then `E = 0`, hence `d² = 0` for `w`.
 
-*Proof.* Suppose `E ≠ 0`. `A` is a free `R`-module (F1), so `⋂_N 𝔪^N A = 0` and there is a
+*Proof.* Suppose `E ≠ 0`. By Theorem A.5(ii) of `01_foundations.md` (F1),
+`A = ⊕_{s,s'} e(s) A e(s')` is a free `R`-module with basis `{x^α ψ_w}`; an element lies in
+`𝔪^N A` iff all its coordinates lie in `𝔪^N`, and `⋂_N 𝔪^N = 0` in `R` (every monomial of a
+non-zero element of `𝔪^N` has `r`-degree `≥ N`). So `⋂_N 𝔪^N A = 0`, and as there are
+finitely many components `E_{I',K'}` and `𝔪^0 A = A`, there is a
 largest `N` with `E_{I',K'} ∈ 𝔪^N A` for all `I', K'`. Choose `(I', K'')` with
 `E_{I',K''} ∉ 𝔪^{N+1} A`; then `a ∈ K''`. Put `K̃ = K'' ∖ {a}` and apply Lemma 4.1 to
 `(I', K̃)`. The first sum vanishes because `a ∉ K̃`. In the second sum the terms with
@@ -394,7 +478,8 @@ largest `N` with `E_{I',K'} ∈ 𝔪^N A` for all `I', K'`. Choose `(I', K'')` w
 So `E_{I',K''} · ι_L(m_a(K'')) ∈ 𝔪^{N+1} A`, and Lemma 4.3.1 gives `E_{I',K''} ∈ 𝔪^{N+1} A`, a
 contradiction. The last statement is Proposition 3.3. ∎
 
-*Remarks.* (1) Nothing but `d'² = 0`, (F1) and the shape of the tree formula at lowest order
+*Remarks.* (1) Nothing but `d'² = 0`, (F1) (Theorem A.5(ii), (iii) of `01_foundations.md`:
+`R`-freeness of `A`, left and right bases) and the shape of the tree formula at lowest order
 is used; in particular `F` could be any family for which `E` is defined. (2) The hypothesis
 "first occurrence" cannot be dropped in this argument: if a strand of colour `c(a)` is
 crossed, `μ μ^* ∈ 𝔪 A` and right multiplication by a same-colour crossing is not injective.
@@ -428,7 +513,7 @@ By hypothesis all summands except the one with `j = s` in the second sum lie in
 all summands except the one with `j = s` in the first sum lie in `𝔪^{N+1} A`, so
 `ι_R(m_s(I' ∪ s)) E_{I',K'} ∈ 𝔪^{N+1} A`, and Lemma 4.3.2 applies.
 For the last statement suppose `E ≠ 0`, let `N` be the largest integer with all
-`E_{I',K'} ∈ 𝔪^N A`, and apply (r), (l) starting with `𝒵 = 𝒵_0`: all components lie in
+`E_{I',K'} ∈ 𝔪^N A` (it exists, by Theorem A.5(ii), as in the proof of Proposition 4.5), and apply (r), (l) starting with `𝒵 = 𝒵_0`: all components lie in
 `𝔪^{N+1} A`, contradicting the choice of `N`. ∎
 
 Proposition 4.5 is the case `𝒵_0 = \{(I', K') : a ∉ K'\}`, with one application of (r) for
@@ -493,8 +578,14 @@ configuration with target `J`. The strands are the *mover* (from `+j` to `−j`)
 * (e) `L_p` and `L_q`, and `R_p` and `R_q`, iff `p, q` are nested (`a_p < a_q < b_q < b_p` or
   the same with `p, q` exchanged).
 
-In every such crossing the strand moving towards the left is the mover in (a), (b), (c), and
-`L_p`, `R_p` in (d). *Proof.* Items 1–6 of the proof of Proposition 3 in `PROOFS.md`. ∎
+In every such crossing the strand moving towards the left is the mover in (a), (b), (c),
+`L_p`, `R_p` in (d), and in (e) the outer strand: `L_p` resp. `R_p` if `q` is nested inside `p`
+(`a_p < a_q < b_q < b_p`). (The direction in (e) is not used below.)
+*Proof.* Items 1–6 of the proof of Proposition 3 in `PROOFS.md` (= Lemma B.2 of
+`01_foundations.md`). For the directions: a strand moves towards the left in its crossing with
+`B` iff it starts to the right of `B` and ends to the left of `B`; in (e), `L_p` starts at
+`−a_p > −a_q` and ends at `−b_p < −b_q`, and `R_p` starts at `+b_p > +b_q` and ends at
+`+a_p < +a_q`; (a)–(d) are read off from the positions in the same way. ∎
 
 So a *diagram of the configuration* is a reduced word from `e_I` whose inversions are (a)–(e).
 
@@ -516,8 +607,20 @@ So (S2) holds, and Lemma 1.2 applies ((S1) is empty for a reduced word). ∎
 the basis braid with two random reduced words for every tree term of every word tested
 (more than 1 100 000 terms).
 
-*Warning.* For general words (S2) can fail for a tree diagram (e.g. `A_3`, word `3232332`,
-`I = {5,6,7}`, mover 6, pairs `(1,5), (2,7)`); there Lemma 1.2 does not apply as it stands.
+*Warning (and why it is harmless for `β`).* For general words a reduced word of a tree diagram
+can violate (S2): e.g. `A_3`, word `3232332`, `I = {5,6,7}`, mover 6, pairs `(1,5), (2,7)`, where
+`L_{(1,5)}`, `M` (both of colour 3) and the unaffected `U_4` (colour 2) cross pairwise. There
+Lemma 1.2 does not apply as it stands. **`β` is nevertheless well defined in this example.** For
+*reduced* words only the middle strand (in source order) of a triple of pairwise crossing
+strands matters, since a braid move between reduced words of one permutation acts on such a
+triple in its source order (`01_foundations.md`, Proposition B.5 and §B.9). Here the only
+triples are `{U_3, L_{(1,5)}, M}` and `{U_4, L_{(1,5)}, M}` (Lemma 6.1: `M` crosses `U_3, U_4,
+L_{(1,5)}, R_{(1,5)}` and the red strand, `L_{(1,5)}` crosses `U_3, U_4`, `L_{(2,7)}` crosses `U_3, U_4`,
+and nothing else crosses), both with middle strand `L_{(1,5)}` (source positions `−3 < −1 < +6`,
+`−4 < −1 < +6`), on the states `(3,3,3)` and `(2,3,3)`, where the braid relation is exact. So
+neither triple is bad, and by Proposition B.5 of `01_foundations.md` all reduced words give
+the same element. (Genuine dependence on the reduced word needs a cyclic word,
+`01_foundations.md` §B.7.)
 
 ---
 
@@ -561,9 +664,13 @@ in `w'`, so by the Reduction Lemma 4.5 it suffices to show
 
     E_{I',K'} = 0     for all I', and all K' with a ∉ K'.                                  (8.0)
 
-Facts used repeatedly: `c` is the colour of no node of a configuration of `w'` (the slot `a`
-has no twin in `w'`, so it is in no pair of `w'`; it can be a mover). In a term of kind (γ)
-the pair containing `m` is `(a, m)`, and `a ∉ I'`.
+Facts used repeatedly: the slot `a` is the only slot of colour `c` in `w'`, so it is in no pair
+of a configuration of `w'` (it can be a mover). Hence `c` is the colour of no node of a
+configuration of `w'` **in which `a` is not the mover** — in particular of no node of a frozen
+term (§8.2) — since a pair of `w'` never has the colour `c` and a mover of colour `c` is `a`.
+(For a configuration with mover `a` the statement is false.) It is used, through Lemma 5.4,
+only for frozen terms: in Lemma 8.3 and in (L3) after Lemma 8.4. In a term of kind (γ) the
+pair containing `m` is `(a, m)`, and `a ∉ I'`.
 
 ### 8.1 The components with `a ∈ I'`, `a ∉ K'`
 
@@ -1099,12 +1206,12 @@ of the induction", which is the same as "every colour at most twice".
 | step | uses T1? | what is used |
 |---|---|---|
 | Lemmas 1.1–1.4, Sliding Lemma 2.1–2.2 | no | relations of the algebra only |
-| Cone decomposition 3.1–3.3 | no | (for general words: a compatible choice of the reduced words) |
-| Cocycle identity 4.1, Reduction Lemma 4.2–4.6 | no | `d'² = 0`, (F1), first occurrence of a colour |
+| Cone decomposition 3.1–3.3 | no | (for general words: a compatible choice of the reduced words; the basis braids are one, Convention after Lemma 3.2) |
+| Cocycle identity 4.1, Reduction Lemma 4.2–4.6 | no | `d'² = 0`, (F1) (Theorem A.5(ii), (iii) of `01_foundations.md`), first occurrence of a colour |
 | Theorem A | no | |
 | Lemma 6.1 | no | |
 | Lemmas 5.1–5.4 | **yes** | pairs have different colours, the link graph embeds into `Γ` |
-| Lemma 6.2 (tree diagrams satisfy (S2)) | **yes** | 5.1, 5.3; false in general (warning after 6.2) |
+| Lemma 6.2 (tree diagrams satisfy (S2)) | **yes** | 5.1, 5.3; (S2) fails in general (warning after 6.2), but `β` is still well defined whenever there is no bad triple (`01_foundations.md` Prop. B.5) |
 | section 8, set-up | **yes** (`N = 1`) | the only pair with `m` is `(a, m)`; `a` is in no pair of `w'`; `a` is a first occurrence |
 | Lemma 8.1, Corollary 8.2 | only `N = 1` | the proof uses `N = 1`, Lemma 6.1 and the Sliding Lemma, nothing else: **it holds for every word in which `c` occurs once in `w'`** |
 | Lemma 8.3 (one bad letter) | **yes** | 5.4 |
@@ -1271,10 +1378,63 @@ them moves in the first factor and the other in the second. Going through Lemma 
 
 In each case the pair crossing twice has adjacent colours `c ∼ e` resp. `c ∼ e'`, and the
 permutation is that of `β_0`. Lemma 1.3 gives the four formulas.
-*Other products.* A product of two tree terms from `I` to `K` moves `j`, `j'` to the left as
-movers, removes `b` from the right and adds `a`; the only ways to do the latter with pairs
-are the pair `(a,b)` in one factor, or pairs `(y, b)`, `(a, y)` in the two factors with `y` of
-colour `c`, `a < y < b`, excluded by (H1).
+*Other products.* We show more: every product of two *configurations* from `I` to `K`
+(admissible or not; a configuration at a vertex `V` is a mover `μ ∈ V` and a set of pairwise
+disjoint pairs `(x < y)` with `c(x) = c(y)`, `x ∉ V`, `y ∈ V`, `y ≠ μ`, as in section 5 but for
+an arbitrary word) is one of `P_1, …, P_4`. Let the product be `(μ_1, F_1)` at `V_0 = I`, with
+target `V_1`, followed by `(μ_2, F_2)` at `V_1`, with target `V_2 = K`. By the definition of the
+target, step `i` changes the membership of a slot (`s ∈ V_{i−1}` versus `s ∈ V_i`) exactly if `s`
+is the mover `μ_i` or a slot of a pair of `F_i`: the mover and the larger slots `y` of the pairs
+leave the vertex, the smaller slots `x` enter it, all other slots stay. Say that step `i`
+*flips* `s`. The mover and the slots of the pairs are pairwise different, so a step flips a
+slot at most once.
+
+1. *Parity.* A slot is flipped at most twice, and an odd number of times iff it lies in
+   `I Δ K = \{a, b, j, j'\}`. So `a, b, j, j'` are flipped exactly once, every other slot zero
+   or two times.
+2. *The movers are `j` and `j'`, and they lie in no pair.* The slot `j ∈ I ∖ K` is flipped
+   once, at a step `i` with `j ∈ V_{i−1}`; so at that step it leaves either as the mover or
+   as the larger slot of a pair `(z, j) ∈ F_i`, with `z < j` and `c(z) = c(j) = e`. A slot
+   `z < j` of colour `e` does not exist by (H2). So `j` is the mover of one of the two steps.
+   In the same way `j'` is the mover of one step (a pair `(z, j')` would need a slot `z < j'`
+   of colour `e'`, excluded by (H2)). As `j ≠ j'` and each step has exactly one mover,
+   `{μ_1, μ_2} = {j, j'}`. Since `j`, `j'` are flipped only once, they lie in no pair of
+   `F_1` or `F_2`.
+3. *Monotonicity.* Let `G` be the graph on the slots with one edge `\{x, y\}` for every pair
+   `(x, y)` of `F_1` and every pair of `F_2`. By 2 every flip of a slot `s ∉ \{j, j'\}` comes
+   from a pair, and the pairs of one `F_i` are disjoint, so the degree of `s` in `G` is the
+   number of flips of `s`: `1` for `a, b`; `0` for `j, j'`; `0` or `2` for all other slots.
+   Let `s` have degree 2. If `s ∈ I`, then `s ∈ V_0`, `s ∉ V_1`, `s ∈ V_2`: at step 1 it
+   leaves, so it is the larger slot of its pair in `F_1`; at step 2 it enters, so it is the
+   smaller slot of its pair in `F_2`. If `s ∉ I`, it is the smaller slot of its pair in `F_1`
+   and the larger slot of its pair in `F_2`. In both cases **one neighbour of `s` in `G` is
+   smaller than `s` and the other one is larger.**
+4. *Conclusion.* A graph of maximal degree 2 is a disjoint union of paths and cycles. `G` has
+   no cycle: the largest slot of a cycle would have two smaller neighbours, contradicting 3.
+   The only slots of degree 1 are `a` and `b`, so the edges of `G` form a single path from `b`
+   to `a`, and by 3 its slots decrease strictly: `b = s_0 > s_1 > … > s_l = a`. The two slots of
+   a pair have the same colour, so all `s_i` have the colour `c`. By (H1) no slot strictly
+   between `a` and `b` has the colour `c`; hence `l = 1`, and `G` has the single edge
+   `\{a, b\}`: `F_1 ∪ F_2 = \{(a,b)\}`, and `(a,b)` lies in exactly one of `F_1`, `F_2` (in
+   both it would give `a` degree 2).
+
+By 2 and 4 the product is one of `(j; ∅)·(j'; \{(a,b)\})`, `(j'; \{(a,b)\})·(j; ∅)`,
+`(j; \{(a,b)\})·(j'; ∅)`, `(j'; ∅)·(j; \{(a,b)\})`, i.e. `P_1, P_4, P_2, P_3`. Conversely these
+four are products of two tree terms: elementary moves are tree terms, and in
+`(j'; \{(a,b)\})` at `I` and at `I ∖ j`, and `(j; \{(a,b)\})` at `I` and at `I ∖ j'`, the slot `a`
+is not in the vertex, `b` is and is not the mover, and the pair is linked to the mover
+(`a < j < j' < b`, `e, e' ∼ c`); the two nodes have different colours (`e, e' ≠ c` by (H1)), so
+conditions 1, 2 of `NOTES.md` §2 are empty and the link graph is a tree (admissible).
+(Only (H2) and (H1) were used, and no admissibility. The referee's version of this argument
+(`R05_referee.md`, §10) first fixes the colours of the movers by a colour count — pairs preserve
+the multiset of colours on the right of the red strand, a mover removes one strand of its
+colour, so `{c(μ_1), c(μ_2)} = {e, e'}`; this is correct but not needed, since 2 identifies
+the movers directly. Its chaining step names only the chains `(a,b)` and `(a,y), (y,b)`; when
+(H1) fails, longer chains alternating between the two factors are also compatible with the
+vertex conditions, e.g. `F_1 = \{(a, s_2), (s_1, b)\}`, `F_2 = \{(s_2, s_1)\}` with
+`a < s_2 < s_1 < b` (chains with 3, 4 and 5 pairs occur in `05r_only_products.py`, control
+`noH1`; e.g. word `111231`, `(a, j, j', b) = (1, 4, 5, 6)`, `I = \{2,4,5,6\}`,
+`(4; (1,2), (3,6)) · (5; (2,3))`); steps 3 and 4 exclude all of them, and the cycles, at once.)
 *Signs.* By (8.2), with `s = s_{(a,b)}`, and since the connector of `(a,b)` is the mover,
 which lies in the source vertex (factor `−1`), the signs of the four products are the
 coefficients of `ω_K` in `−∂_{j'} s ∂_j ω_I` (`P_1`), `−∂_j ∂_{j'} s ω_I` (`P_4`),
@@ -1288,6 +1448,17 @@ coefficients of `ω_K` in `−∂_{j'} s ∂_j ω_I` (`P_1`), `−∂_j ∂_{j'}
 *Check.* `05_fourterm.py A 3 40 7 1`, `05_fourterm.py D 4 40 7 2`: 80 random words (arbitrary,
 random red colour), 384 cases, 64 of them with a further slot of colour `c` below `a`: the
 four products are the only ones, each equals the predicted element, and the sum is zero.
+*Check of the uniqueness claim and of each step of its proof.* `05r_only_products.py`
+(plain `python3`; logs in `proofs/checks/05r_logs/`) enumerates, for **all** words in 3 colours
+of length `≤ 8` and all words in 4 colours of length `≤ 7`, every quadruple `a < j < j' < b`
+with (H1), (H2), every vertex `I` as in the statement and **all** configurations (admissible or
+not) of the two factors, and asserts steps 2 (movers `j, j'`, in no pair), 3 (degrees,
+monotonicity) and 4 (`F_1 ∪ F_2 = \{(a,b)\}`), and that the products are exactly the four; it
+also checks with `formula.Stack` (types `A_3`, `D_4`) that the factors with a pair are
+admissible when `e, e' ∼ c`. Controls: with (H1) dropped, resp. (H2) dropped, every tested
+vertex has further products (longer chains of pairs, resp. other movers). Numbers in §11.
+Independently, the referee's `R05_thmC.py 102` (486 cases) confirms the uniqueness among tree
+terms (`R05_referee.md`).
 
 When (H2) fails — e.g. for `22112`, where the two movers are twins — the dot of a mover has
 to pass a crossing with a strand of its own colour, which produces an additional term with
@@ -1300,8 +1471,10 @@ Each item is verified by exact computation for the words of the runs quoted (and
 implied by the verification of `d² = 0` in `PROOFS.md` section 3 and `general_words.py`).
 
 1. **Diagrams.** A statement replacing Lemma 6.2 for general non-cyclic words: the element of
-   a tree term does not depend on the reduced word (front 01), or a version of the
-   Straightening Lemma with the positional form of the bad triples.
+   a tree term does not depend on the reduced word (front 01: proved when there is no bad
+   triple, `01_foundations.md` Prop. B.5, e.g. for cycle-free words with multiplicities `≤ 3`,
+   Theorem B.6; Conjecture B.9 in general), or a version of the Straightening Lemma with the
+   positional form of the bad triples.
 2. **(R1)** of 10.3, for `N = 1` and arbitrary other colours: no dots; single diagrams,
    vanishing products (Lemma 1.4), cancellation in pairs.
 3. For `N ≥ 2`, equation (∗) on the components with `a_1 ∉ K'` (or on any set of components
@@ -1335,28 +1508,39 @@ implied by the verification of `d² = 0` in `PROOFS.md` section 3 and `general_w
 
 ## 11. Status
 
-### Proved completely (human-checkable; inputs: (R1)–(R4) with the signs of the README, (F1) in its left and right module forms, (F3))
+### Proved completely (human-checkable; inputs: (R1)–(R4) with the signs of the README, (F1) in the form of Theorem A.5(ii)–(iv) of `01_foundations.md` (left basis, right basis, base change), (F3))
 
-| statement | generality | checked by |
+All statements of this table were re-derived by hand and confirmed correct and complete by the
+referee (`R05_referee.md`); the one under-argued step (Prop. 10.2, uniqueness of the four
+products) is now proved in full. Last column: the author's checks (§"Runs" below) and the
+referee's independent checks (§"Independent checks" below).
+
+| statement | generality | checked by (author; referee) |
 |---|---|---|
 | Lemma 1.1 (word property), from (F3) | all words of crossings | – (combinatorial) |
-| Lemma 1.2 (Straightening), 1.3 (bigons), 1.4 (vanishing) | arbitrary states | `05_straighten.py` |
-| Lemmas 2.1, 2.2 (Sliding Lemma, sign `+γ`) | arbitrary words, red strand anywhere | `05_sliding.py` |
-| Lemmas 3.1, 3.2, Proposition 3.3 (cone, signs) | arbitrary words (with the convention on reduced words stated there) | `05_cone.py` |
-| Lemmas 4.1–4.4, Propositions 4.5, 4.6 (Reduction Lemma, deduction rule) | arbitrary words with `d'² = 0` | `05_reduction.py` (inputs 4.2, 4.4) |
+| Lemma 1.2 (Straightening), 1.3 (bigons), 1.4 (vanishing) | arbitrary states | `05_straighten.py`; `R05_tools.py` |
+| Lemmas 2.1, 2.2 (Sliding Lemma, sign `+γ`) | arbitrary words, red strand anywhere | `05_sliding.py`; `R05_tools.py` |
+| Lemmas 3.1, 3.2, Proposition 3.3 (cone, signs) | arbitrary words (with the convention on reduced words stated after Lemma 3.2, which the basis braids satisfy for every word) | `05_cone.py`; `R05_sec8.py`, `R05b_sec8.py` (Lemma 3.2) |
+| Lemmas 4.1–4.4, Propositions 4.5, 4.6 (Reduction Lemma, deduction rule) | arbitrary words with `d'² = 0` | `05_reduction.py` (inputs 4.2, 4.4); `R05_tools.py` (4.2), `R05b_lemma43.py` (4.3), `R05_reduction.py` (4.1, 4.5, perturbed families), `R05_redlin.py` (4.5 as linear algebra) |
 | Theorem A, Corollary 7.1 (new colour; reproves Theorem 5) | arbitrary `w'` | `05_T1_check.py` ("new colour: exact slides") |
 | Lemmas 5.1–5.4, 6.2 | T1 words | `05_T1_check.py` |
-| Lemmas 8.1–8.7, Proposition 8.8, **Theorem B** (`d² = 0` if every colour occurs at most twice) | T1 words, any `Γ` that is a forest, any red colour | `05_T1_check.py` |
+| Lemmas 8.1–8.7, Proposition 8.8, **Theorem B** (`d² = 0` if every colour occurs at most twice) | T1 words, any `Γ` that is a forest, any red colour | `05_T1_check.py`; `R05_sec8.py`, `R05b_sec8.py` (§8 lemma by lemma, families with `k = 2`), `R05_d2.py`, `R05b_d2.py` (`d² = 0`) |
 | Corollary 9.1 (one repeated colour), 9.2 (`sl_n` `ω_1, ω_2`; `so_{2n}` vector; `D_4`) | | |
-| Proposition 10.2 (four-term bigon identity under (H1), (H2)) | arbitrary words | `05_fourterm.py` |
-| **Theorem C** (one colour three times, all others at most once), section 9A | | `05_F3_check.py` |
+| Proposition 10.2 (four-term bigon identity under (H1), (H2)), including the uniqueness of the four products | arbitrary words | `05_fourterm.py`, `05r_only_products.py` (uniqueness, for all configurations, and each step of its proof); `R05_thmC.py` |
+| **Theorem C** (one colour three times, all others at most once), section 9A | | `05_F3_check.py`; `R05_thmC.py` |
 
 Inputs taken from elsewhere: the list of relations with signs (README, `alg.py`); Lemma 6.1 =
-items 1–6 of the proof of Proposition 3 of `PROOFS.md`; (F1) in both forms (free left and free
-right module over the dots), used only in Lemmas 3.1 (injectivity, not needed for Theorem B)
-and 4.3; (F3). Theorem B does not use the grading (F2), nor any result of the fronts 01–04, 06.
+items 1–6 of the proof of Proposition 3 of `PROOFS.md` (= Lemma B.2 of `01_foundations.md`);
+(F1) in the form of Theorem A.5 of `01_foundations.md` — the left basis (ii) in Lemma 3.1
+(injectivity, not needed for Theorem B), Lemma 4.3.2 and Propositions 4.5, 4.6 (`R`-freeness
+of `A`, for `⋂_N 𝔪^N A = 0`, i.e. the existence of the largest `N`), the right basis (iii) in
+Lemma 4.3.1, base change (iv) only in the remark after Lemma 4.3 (where Lemma 4.3 is
+identified with Theorem E.1 of `01_foundations.md` over `R/𝔪^{N+1}`); (F3). Theorem B does not
+use the grading (F2), nor any result of the fronts 02–04, 06; from front 01 it uses only
+Theorem A.5, which is the standing fact (F1) of the README with a proof for our presentation.
 
-Referee pass (done after the last change of sections 4 and 8): every case distinction was
+Internal re-reading by the author (before `R05_referee.md`; after the last change of sections
+4 and 8): every case distinction was
 re-read against Lemma 6.1; two points were made explicit (the pair `(M, A)` in the list of
 Lemma 8.5; Lemma 4.3 now only uses freeness over the dots, with an arbitrary basis). The signs
 that enter are: `+γ` in the Sliding Lemma (`05_sliding.py`); the signs of the cone
@@ -1390,6 +1574,25 @@ elements of the formula with the sliding error and within each family); the fina
 | `05_blocks_general.py A 3 1 80 8 1 [a1]`, `… D 4 1 60 8 2 a1`, `… A 3 2 80 8 3 [a1]` | data of 10.3, 10.4 |
 | `05_closure.py …` (11 runs, see `run_all.sh`) | table of 10.4 |
 
+### Independent checks (referee, `R05_referee.md`)
+
+The referee's scripts `proofs/checks/R05_*.py`, `R05b_*.py` do not import `05_lib.py`;
+`R05_lib.py` is a brute-force implementation of the tree formula from the text of `NOTES.md` §2
+(compared with `formula.Stack`), with its own random reduced words and its own (S1)/(S2) test.
+Logs: `proofs/checks/R05_logs/` and `proofs/checks/R05_logs/rerun/` (results as reported in
+`R05_referee.md`, "Independent checks"; all with 0 failures).
+
+| script | what it tests (from the statements in the text) | main runs (log) |
+|---|---|---|
+| `R05_basic.py` | the relations with the README signs; `R05_lib` tree formula = `formula.Stack` | 186 relation checks; 80 words, 22 221 terms (`rerun/basic.log`) |
+| `R05_tools.py` | Lemmas 1.2, 1.3, 1.4 on random, mostly non-reduced words; Sliding Lemma 2.2 with `E_t`, `γ_t`; Lemma 4.2 | 3000 words, 1738 bad letters, 3860 first-occurrence cases; hypotheses shown not vacuous (`tools.log`, `rerun/tools_seed21.log`) |
+| `R05b_lemma43.py` | Lemma 4.3 (`r`-adic valuation of `zμ`, `μ'z`) | 1966 cases; control (not first occurrence): valuation jumps (`rerun/lemma43.log`) |
+| `R05_reduction.py` | Lemma 4.1, Prop. 4.5 for perturbed families, T1 and arbitrary words | 40 + 40 words, all perturbation types (`reduction_T1.log`, `reduction_any.log`, `rerun/reduction.log`) |
+| `R05_redlin.py` | Prop. 4.5 as linear algebra (rank of `G ↦ E(G)` restricted to `a ∉ K'`) | 5 words, confirmed; strictly smaller rank for non-first slots (`redlin.log`, `rerun/reduction.log`) |
+| `R05_sec8.py`, `R05b_sec8.py` | Lemmas 3.2, 8.1, 8.3–8.7 one by one, bijection 8.4.3, `E = 0` in every component | all of `A_3`, `D_4` length `≤ 6`; stress words in `D_4, D_5, E_6, A_4, A_5` with families `k = 2` (`sec8_A3_all.log`, `sec8_D4_le6.log`, `rerun/sec8_stress.log`) |
+| `R05_d2.py`, `R05b_d2.py` | `d² = 0` (random reduced words, resp. the project's basis braids) | every word of `A_3` (801 cases) and of `D_4` (19 360 cases, 19 823 744 products) with multiplicities `≤ 2` and length `≤ 7`; 1048 random words with 9–12 strands in `A_5, A_6, D_5, D_6, E_6` (`d2_*.log`, `rerun/b_d2_*.log`, `rerun/samples_b.log`, `rerun/samples_c.log`) |
+| `R05_thmC.py` | Theorem C: (C1)–(C4) and full `d² = 0`; Prop. 10.2: the four products, their uniqueness among tree terms, the sum | all of `A_3` (261 cases), `A_4`, `D_4` (`thmC_*.log`, `rerun/thmC_A3.log`); Prop. 10.2: 486 cases (`prop102.log`, `rerun/prop102.log`) |
+
 ### Verified only by computation (Tier 2)
 
 * (R1) of 10.3 (`N = 1`, other colours arbitrary): structure of the components described
@@ -1416,5 +1619,6 @@ See 10.6.
 * README, "Cone structure": correct, with the signs of Lemma 3.2 (`−d'` on `C_R`, `+1` for
   `X_m`).
 * For general words a tree diagram can violate (S2) (warning after Lemma 6.2); this does not
-  contradict the observed independence of the reduced word, but the strong Straightening
-  Lemma 1.2 does not prove it.
+  contradict the observed independence of the reduced word. The strong Straightening
+  Lemma 1.2 does not prove it there, but Proposition B.5 of `01_foundations.md` does whenever
+  the diagram has no bad triple — in particular in the example of the warning.

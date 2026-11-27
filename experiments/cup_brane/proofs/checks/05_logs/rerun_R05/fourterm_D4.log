@@ -1,0 +1,4 @@
+$ sage -python 05_fourterm.py D 4 40 7 2
+four-term identity (Prop. 10.2), type ['D', 4]: 40 words, 224 cases (24 of them with a further slot of colour c below a), all four products as predicted, sum zero
+exit code 0
+wall time 5 s
