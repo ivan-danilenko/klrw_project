@@ -1,0 +1,3 @@
+relations with signs: 186 checks, all exact
+tree formula: my brute-force implementation == formula.Stack on 80 random words (arbitrary), 22221 terms
+sage -python R05_basic.py 80  3.02s user 0.35s system 89% cpu 3.769 total

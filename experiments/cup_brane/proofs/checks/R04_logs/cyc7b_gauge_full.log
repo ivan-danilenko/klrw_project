@@ -1,0 +1,6 @@
+orders 1-2: unique solution (rank 298 of 298); non-zero h-coefficients: 2; integral: True
+   h: [4, 6, 7] -> [1, 2, 3]  coefficient -1  element r_2^2*t_2_1^2*E_(V1, V2, V2, V1, W2, V1, V2, V2)*s1*s2*s1*s3*s7*E_(V2, V2, V1, V1, W2, V1, V2, V2)
+   h: [4, 5, 6, 7] -> [1, 2, 3, 5]  coefficient -1  element r_2^2*t_2_1^2*E_(V2, V2, V1, W2, V1, V1, V2, V2)*s1*s5*s6*s7*s6*E_(V2, V2, V1, W2, V1, V2, V2, V1)
+after orders < 3: g d_X - d_F g has coefficients by r-degree {}
+==> g d_X = d_F g EXACTLY: d_F and d_X are gauge-equivalent (g = 1 + h, h in (r), nilpotent)
+[112s]

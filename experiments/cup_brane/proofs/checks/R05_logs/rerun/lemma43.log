@@ -1,0 +1,7 @@
+   NOT first, side L: cases                           517
+   NOT first, side L: v(product) > v(z)               215
+   NOT first, side R: cases                           517
+   NOT first, side R: v(product) > v(z)               234
+   first, side L: cases                               983
+   first, side R: cases                               983
+sage -python R05b_lemma43.py 1500 7  25.14s user 2.67s system 45% cpu 1:00.95 total

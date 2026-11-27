@@ -2,18 +2,16 @@
 
 ## RESUME NOTES (for whoever continues this report)
 
-* **Finished (reading, line by line):** §§1–8 of `05_main_sliding.md` (all lemmas re-derived by
-  hand, verdicts below), §9 (Cor. 9.1, 9.2), §9A up to and including (C4) (line ~1076).
-* **Doing right now:** reading the rest of §9A (after (C4): the coefficient checks of (C1)–(C4)
-  are done; remaining text of §9A after line 1076) and §10 (Prop. 10.2, four-term bigon identity).
-* **Remains:** (i) finish §9A/§10 reading; (ii) independent numerical checks: read and re-run the
-  previous referee's scripts `proofs/checks/R05_{lib,tools,basic,d2,reduction,redlin,sec8,thmC}.py`
-  (logs in `proofs/checks/R05_logs/`), extend: full-complex `d² = 0` on all A_3/D_4 T1 words of
-  length ≤ 7 (every red colour), sampled vertices for 9–11 strands in A_5, A_6, D_5, D_6, E_6,
-  identity tests (Sliding Lemma, `μμ^* = P`, Lemma 8.5/8.6 products), perturbed-`F` test of the
-  Reduction Lemma; (iii) final verdict section.
-* **No scripts of this referee yet**; no intermediate results other than the old R05 logs (not yet
-  re-run/verified by me).
+* **Finished:** reading of all of `05_main_sliding.md` (§§1–11), verdicts below; reading of the old
+  scripts `R05_{lib,basic,tools,d2,reduction,redlin,sec8,thmC}.py` (they test what they say, see
+  "Independent checks"); re-runs `R05_basic.py 80`, `R05_tools.py 3000 21`, new `R05b_d2.py all A 3 2 6`.
+* **Running (background, logs in `proofs/checks/R05_logs/rerun/`):** `b_d2_D4_le7.log` (all T1 words of
+  `D_4` of length ≤ 7, every red colour, basis braid), `sec8_stress.log` (`run_sec8.sh`: section-8
+  assertions on k = 2 words etc.), `reduction.log` (`run_red.sh`: perturbed `F`, rank test).
+* **Remains:** collect those logs; sampled 9–11-strand runs of `R05b_d2.py` (A_5, A_6, D_5, D_6, E_6,
+  patterns nb/red/twinred/branch); `R05_thmC.py 102` with a new seed; final verdict section.
+* **New scripts of this referee:** `R05b_d2.py` (d² with `formula.Stack` + klrw basis braid; word
+  generators with stress patterns), `R05b_sec8.py` (driver for `R05_sec8.check_word`).
 
 Status of this report: **in progress** (written section by section while reading; a previous
 referee's 15-line preliminary note in this file has been replaced — its scripts are re-used
@@ -205,4 +203,115 @@ targets are distinct; (C1); (C2) (equal reduced diagrams, opposite Koszul signs)
 `i = 1`, `i = 2` with `a_2 ∉ I'`, `i = 2` with `a_2 ∈ I'` (crossing lists and (S2) re-done;
 coefficient computation for `m_{a_2}·G^2_j` re-done); (C4) "otherwise" case. No error so far.
 
-(Sections 9A rest, 10: in progress.)
+Details of the re-derivation (§9A):
+* *Exhaustiveness of (C1)–(C4).* Only `P_j`, `G^1_j` add `a_1`, only `m_{a_1}` removes it. First
+  sum: `t' = m_j` with `j = a_1` (`a_1 ∈ I'`), `j = a_2` (`a_1 ∉ I'`), or `j ∉ {a_1,a_2}`,
+  `a_1 ∉ I'`. Products (one factor of kind (γ), the other a term of `d'`): with `P_j` none; with
+  `G^1_j` only `G^1_j·m_{a_1}`; with `G^2_j` and `m_{j'}`: `j' = a_1` (C2, both orders),
+  `j' = a_2` (exactly one order, fixed by `a_2 ∈ I'` or not), `j' ∉ {a_1,a_2}` (C4; then
+  `a_2 ∉ I'` is forced in both orders), `j' = j` impossible. For fixed `I'` the three kinds of
+  `K'` are distinct, and the (C1) targets `I'∖a_i` receive no product. Complete.
+* *(C3).* The unique reduced word of `m_j` crosses right slots `< j` (decreasing), red, left
+  slots `< j` (increasing). If `a_2 ∈ I'`, `a_2 < j`, **both** `χ_1` (with `A_1`, left) and `χ_2`
+  (with `A_2`, right) are bad, matched with `G^1_j·m_{a_1}` and `m_{a_2}·G^2_j`; the draft's case
+  "`i = 1`" is stated for both positions of `a_2` and its (S2) argument covers the strand `j`
+  crossing `A_2` through `χ_2` (which precedes `χ_1`). Crossing sets of `E_{χ_i}` and of the
+  products re-derived in all three cases; they agree.
+* *Coefficients.* `G^i_j·m_{a_i}` (`a_i ∉ I'`): Lemma 8.7 (`𝒯 = F' = ∅`, `a = a_i`) ✓;
+  `m_{a_2}·G^2_j`: `∂_j s_{(a_2,m)} ∂_{a_2}(ω_{I'}∧e_m) = −κ'ω_{K'}` (the two signs from removing
+  `e_{a_2}` and re-appending it cancel) ✓; (C2) and (C4)-two-term: opposite Koszul signs from
+  `∂_x∂_y = −∂_y∂_x` and `s ∂_x = ∂_x s` ✓.
+
+**Theorem C.** Correct and complete (given Theorem B for `w_{<b}`, Theorem A for the slots after
+`b`, and Proposition 10.2 for the four-term case of (C4), whose hypotheses (H1), (H2) hold
+there).
+
+## Section 10
+
+**Proposition 10.2 (four-term bigon identity).** Correct. Re-derived: in each `P_i` exactly one
+pair crosses twice (`(j,A)`, `(M,j)`, `(M,j')`, `(j',A)` for `P_1, P_4, P_2, P_3`), all other
+pairs at most once; no two strands of the same colour cross at all ((H1) for `A, M`, (H2) for
+`j, j'`), so Lemma 1.3 applies with every hypothesis met, the dots of `Q` are those of `e_I`, and
+the four formulas are right (the coefficient of `x_A` in `Q_{jA}` is `t_{ce}`). Signs: with `ε`
+the sign of `−∂_{j'}∂_j s ω_I`, the four signs are `ε, −ε, ε, −ε` for `P_1, P_4, P_2, P_3`;
+monomials `r_c t_{ce'}` (`P_1, P_4`), `r_c t_{ce}` (`P_2, P_3`); the sum vanishes.
+
+*Gap (repairable, now filled): "These are the only products of two tree terms from `I` to `K`".*
+The draft asserts that a product "moves `j, j'` to the left as movers" without argument. It is
+true; here is a proof. Let the product be `(μ_1,F_1)·(μ_2,F_2)`. Pairs preserve the multiset of
+colours on the right of the red strand and a mover removes one strand of its colour; the net
+change from `I` to `K` removes colours `e, e'` (`j, j'`) and `c` (`b`) and adds `c` (`a`), so
+`{c(μ_1), c(μ_2)} = {e, e'}`. If the mover of colour `e` were a slot `x ≠ j`, then `x > j` by
+(H2), and `j ∈ I ∖ K` would have to leave the right side as the `b` of a pair `(z, j)` with
+`z < j`, `c(z) = e` — excluded by (H2) (the other mover has colour `e' ≠ e`). Likewise the mover of
+colour `e'` is `j'`. Neither `j` nor `j'` can be re-added by a pair of the second factor (it would
+not be removed in total) nor removed by a pair (same reason, (H2)). The pairs therefore have the net
+effect "remove `b`, add `a`, nothing else". A pair `(x,y)` of one factor can only be compensated by a
+pair of the other factor sharing a slot with it, and chaining gives either the single pair `(a,b)`
+in one factor, or `(a,y)`, `(y,b)` in the two factors (either order) with `c(y) = c`,
+`a < y < b`, excluded by (H1). So the factors are `{m_j, (j';(a,b))}` or `{m_{j'}, (j;(a,b))}` in
+either order: exactly `P_1, …, P_4`. (In Theorem C this claim is not needed, since the list
+(C1)–(C4) is derived independently.)
+
+**§10.1–10.6.** These are descriptions of data and of what remains; nothing in them is claimed as
+proved beyond Proposition 10.2. Two remarks: (i) the table entry "Lemma 8.1, Corollary 8.2 hold for
+every word in which `c` occurs once in `w'`" is right (the proof uses only that `A` is the only
+strand of colour `c` in `w'`); (ii) in (∗) of 10.2 the bad letters with `γ = r_ku_k` (black of
+colour `k` left of the red strand) never occur for tree diagrams, since no strand of a tree term
+crosses the red strand from left to right — the text's description "crossings of any strand of
+colour `c` standing to the left of a strand of adjacent colour" is therefore complete.
+
+*Verdict after reading everything:* no fatal error, one under-argued step (Prop. 10.2 "only
+products"; filled above), several cosmetic points.
+
+## Independent checks (in progress)
+
+### What the scripts are, and why I trust them
+
+All scripts are in `proofs/checks/`, run with `sage -python` from there; logs of this pass are in
+`proofs/checks/R05_logs/rerun/`. The `R05_*.py` scripts were written by an earlier referee (not by
+the author); I read every one of them before using it. They do not import `05_lib.py`.
+
+* `R05_lib.py`: an independent brute-force implementation of the tree formula from the text of
+  `NOTES.md` §2 (`Setup.my_terms`: all sets of disjoint pairs, admissibility 1–3, connectors,
+  `κ`, connector signs), random reduced words (`rand_reduced`), and a checker of (S1), (S2)
+  (`check_S1_S2`) from their statement in Lemma 1.2. I checked `analyse` line by line against
+  `formula.py`.
+* `R05_basic.py`: (a) every relation with the README signs on all 2- and 3-strand states over
+  `A_3` with one red strand; (b) `my_terms == formula.Stack.terms_from` on random arbitrary words.
+* `R05_tools.py`: Lemmas 1.2, 1.3, 1.4 on random (mostly non-reduced) words on random states with
+  the red strand anywhere; the Sliding Lemma 2.2 with the error words `E_t` and constants `γ_t`
+  computed from the statement; Lemma 4.2 (`μμ^* = P e_0`, `μ^*μ = P e_1`, both sides `ι_L`/`ι_R`).
+* `R05_d2.py`: `d² = 0` with `my_terms` and a fresh **random** reduced word for every use of a term.
+* `R05_sec8.py`: for words `w'·c` with every colour ≤ 2 and `c` twice: every statement of Lemma 3.2,
+  8.1, 8.3, 8.4 (data, families, the bijection 8.4.3 against a direct enumeration of all pairs
+  `(t_1,t_2)`), 8.5 ((S1), (S2) of the concatenated words, permutation `σ_U`, product = element of
+  a random reduced word of `σ_U`), 8.6 ((S1), (S2) of `E_t`, `ψ_{E_t} = B`, the slide formula),
+  8.7 (the alternation `(−1)^{k−|S|}` and the case `𝒯 = ∅`), and `E_{I',K'} = 0` for all
+  components, computed from the definition in §3.
+* `R05_reduction.py`: Lemma 4.1 and Prop. 4.5 for `E(F+G)` with deliberately perturbed families
+  (drop / sign-flip / `t_{xy} ↔ t_{yx}` of one (γ)-term, drop all of `F_1`, random elements,
+  random elements concentrated on components with `a ∈ K'`, coboundaries); control with slots
+  that are not first occurrences.
+* `R05_redlin.py`: Prop. 4.5 as linear algebra: on an ansatz space of families (dots up to a
+  degree × one reduced diagram per bijection), rank of `G ↦ E(G)` equals the rank of its
+  restriction to the components with `a ∉ K'`, for every first-occurrence slot `a` (over
+  `GF(32003)`; Prop. 4.5 holds over every base change by Theorem A.5(iv), so this is a valid
+  test). For non-first slots the restricted rank is printed as a control.
+* `R05_thmC.py`: Theorem C (full `d² = 0`, and (C1)–(C4) for the last step); Prop. 10.2 (the four
+  products from the formulas, that they are the **only** products from `I` to `K`, and the sum).
+* New in this pass: `R05b_d2.py` (`d² = 0` with the project's definition: `formula.Stack` and the
+  klrw basis braid, via `sample_verify.check_vertex`; stress patterns for random words) and
+  `R05b_sec8.py` (runs `R05_sec8.check_word` on stress words, in particular words producing data
+  with `k = 2` components, which no earlier run contained).
+
+### Results so far
+
+| run | result |
+|---|---|
+| `R05_basic.py 80` | 186 relation checks exact; `my_terms == formula.Stack` on 80 random arbitrary words (22 221 terms) |
+| `R05_tools.py 3000 21` (new seed) | Lemma 1.2: 1008 cases (462 non-reduced), 0 failures; hypotheses violated: 1992 words, of which 1917 differ from the reduced word (hypotheses not vacuous); Lemma 1.3: 530, Lemma 1.4: 534, Sliding Lemma: 3000 words with 1738 bad letters, Lemma 4.2: 3860 first-occurrence cases — **0 failures**; for 2140 non-first slots `μμ^* ≠ P` every time (the hypothesis matters) |
+| `R05b_d2.py all A 3 2 6 6` | all 801 (word, red colour) cases of `A_3` with multiplicities ≤ 2 (this is every length, since length ≤ 6), full complexes, 219 546 products, **0 failures**; same product count as the old `R05_d2.py` run with random reduced words (log `d2_A3_all.log`, 0 failures) |
+| `R05b_sec8.py D 4 60 7 11 3 k2` (words built so that data with **k = 2** components occur: two neighbour colours of `c` straddle `a`, a third neighbour after `a`) | 60 words: all assertions of Lemmas 3.2, 8.1, 8.3–8.7 and `E = 0` in all 19 680 components; data k = 0/1/2: 2880/960/**60**; products with 0/1/2 double crossings: 4438/556/**46** |
+| `R05b_sec8.py D 4 40 8 12 3 k2` | 40 words, all assertions pass; data k = 0/1/2: 4576/1920/**194**; products with 2 double crossings: 168; 34 627 `E`-components, all 0 |
+| `R05b_lemma43.py 1500 7` (new; Lemma 4.3 from its statement: for random `z` with random coefficients containing powers of `r`, the `r`-adic valuation of `zμ` (`μ = ι_L m_a`) resp. `μ'z` (`μ' = ι_R m_a`) equals that of `z`) | first-occurrence slot: 1966 cases, **0 failures**; control, slot not a first occurrence: valuation jumps in 449 of 1034 cases (the hypothesis is needed) |

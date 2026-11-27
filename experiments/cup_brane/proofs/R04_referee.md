@@ -1,27 +1,17 @@
 # R04 — Referee report on `04_first_order.md`
 
-## RESUME NOTES (saved under usage-limit warning)
+*(The resume notes written under the usage-limit warning are closed: everything they listed as
+remaining is done and incorporated below.)*
 
-* **Finished:**
-  * line-by-line review of §§1–10;
-  * independent checks for Thms A, B, C, Prop. 5.3, Cor. 5.4, signs, Prop. 7.1, Prop. 7.4,
-    Lemma 8.5, Ex. 8.3, §8 dimensions, Thm 9.1(a), (b), (d), z1. All agree with the draft.
-* **Major finding (FATAL for Thm 9.1(c) and the §0 headline "no dot-free completion"):** for
-  `1221122`, red 2, there **is** a dot-free differential `d_T + κ* + ε₄`, `d² = 0` exactly
-  (`R04_cyc7.py c2`, log `checks/R04_logs/cyc7_c2.log`). The author's
-  `04_cyclic7_dotfree.py` step (3) drops all products `δ₁·κ`: predecessors are taken as
-  `Ip = I | {x}`, which is right for `δ₀` but never a source of a `δ₁`-component into `I`. Hence
-  the spurious "rank 4 → 5". With the products included, the rank stays 4 → 4. (Reproduced:
-  dropping `δ₁·κ` in my code gives 4 → 5.)
-* **Was doing:** writing this up (G0 below), and re-running c2 to print `ε₄` explicitly.
-* **Remains:** print `ε₄`; final message.
-* **Scripts:** `proofs/checks/R04_comb.py`, `R04_alg.py`, `R04_gauge.py`, `R04_cyc7.py`. Logs:
-  `proofs/checks/R04_logs/*.log`.
+Referee scripts:
 
-Referee scripts: `proofs/checks/R04_comb.py` (pure Python), `R04_alg.py`, `R04_gauge.py`,
-`R04_cyc7.py` (`sage -python`), logs in `proofs/checks/R04_logs/`. None of the author's `04_*.py`
-or `04_lib.py` is imported. My scripts have their own Dynkin diagrams, their own grading group
-(PROOFS F2, coordinates `q, σ_c, δ_c, ε_{cc'}, ε_{cW}`), their own enumeration of homogeneous
+* `proofs/checks/R04_comb.py` (pure Python);
+* `R04_alg.py`, `R04_gauge.py`, `R04_cyc7.py`, `R04_cyc7b.py`, `R04_gauge_h.py`
+  (`sage -python`);
+* logs in `proofs/checks/R04_logs/`, data in `proofs/checks/R04_data/`.
+
+None of the author's `04_*.py` or `04_lib.py` is imported. My scripts have their own Dynkin
+diagrams, their own grading group (PROOFS F2, coordinates `q, σ_c, δ_c, ε_{cc'}, ε_{cW}`), their own enumeration of homogeneous
 elements (a direct coefficient comparison, not `degree_model.py` and not Prop. 7.1), their own
 strand simulation and their own reduced words. The reduced words come from a bubble sort,
 *not* the klrw insertion sort. From the project I use only `formula.Stack` (the tree formula and its
@@ -51,11 +41,13 @@ because the theorem is stated for the klrw basis braid.
 | Example 8.3 | correct (re-derived from scratch). It does **not** contradict NOTES §3 as NOTES states it; it does refute the arbitrary-word reading of PROOFS C2 (G1) |
 | Theorem 8.4, Lemma 8.5 | correct and complete (F1 undeclared, G3) |
 | Comp. 8.5, Remarks 8.6, 8.7 | consistent with my spot checks; Remark 8.6 "excludes exactly" is unproved wording (G7) |
-| Theorem 9.1 | (a), (b), (d) reproduced exactly; **(c) is WRONG** (G0): a dot-free differential `d_T + κ* + ε₄` exists; the author's script drops all products `δ₁·κ`. Wording "the true differential" and the basis dependence of "dot-free" need fixing (G2) |
+| Theorem 9.1 | (a), (b), (d) reproduced exactly; "no dot-free completion with `ε ∈ (r)³`" is correct; **"no dot-free completion with `ε ∈ (r)²`" is WRONG** (G0). A dot-free, monotone differential `d_F = d_T + κ* + ε₄` exists, and it is **gauge-equivalent** to the dotted one: `d_F = (1+h)(d_T+X)(1−h)` with `h` dot-free, monotone, of order `r_2²t_21²`. The author's script drops all products `δ₁·κ`. "The true differential" and the basis dependence of "dot-free" need fixing (G2) |
 | §10 | formulation only; item 1 simplifies by I1 |
 
-**One fatal error, in the Tier-2 part:** Theorem 9.1(c), the "no dot-free completion", is false
-(G0). It comes from a bug in the author's script.
+**One fatal error, in the Tier-2 part:** the second half of Theorem 9.1(c), and with it the
+headline "the tree formula cannot be completed by dot-free terms" (§0, §9, §11), is false (G0).
+It comes from a bug in the author's script. Worse for the narrative of §9 and NOTES §6: the
+dotted cyclic terms of this example are a gauge artefact.
 
 Every statement labelled "proved" (Tier 1) in the Status section is proved by the argument
 given, under the declared standing facts plus (F1), which is used in some places without being
@@ -123,37 +115,87 @@ cannot have bijection `τ` because `a ∉ I`.
 
 ## 3. Errors, gaps, improvements (numbered; severity in brackets)
 
-**G0 [FATAL for Theorem 9.1(c) and the §0 / §11 headline "the tree formula cannot be completed
-by dot-free terms"].**
+**G0 [FATAL for the second half of Theorem 9.1(c) and the headline "the tree formula cannot be
+completed by dot-free terms" (§0 table, §9, §11 Status)].**
 
-* *The claim.* 9.1(c): "there is no differential `d_T + ε` with `ε` a combination of dot-free
-  terms of `r`-degree ≥ 2 … the `r³`-parts of `[δ₀ + δ₁, κ]` span a 4-dimensional space not
-  containing `(d_T²)₃` (rank 4 → 5)".
-* *Why it is false.* The claim rests on `04_cyclic7_dotfree.py`, step (3). There the products
-  `(δ₀+δ₁)·κ` are collected only from predecessors `Ip = I ∪ {x}`. That is correct for `δ₀`,
-  but a `δ₁`-component into `I` starts at `I∖{a}∪{j,b}`, never at `I ∪ {x}`. So all products
-  `δ₁·κ` are silently dropped.
-* *Corrected computation* (my code, all predecessors): rank 4 → 4. The obstruction is
-  removable by `κ*` (8 terms `±r_2²t_21²β`, §4.6).
-* *Direct construction.* Beyond the linear algebra, I built the differential explicitly:
-  `d_T + κ* + ε₄`, with `ε₄` a ℤ-combination of the 7 dot-free `r⁴` elements, satisfies
-  **`d² = 0` exactly** (full cube, `R04_cyc7.py c2`).
-* *What survives.*
-  * (a), (b) and (d) are correct.
-  * (d) shows only that the *dotted* completion `X` is unique **if the `r²`-part is kept equal to
-    the tree formula's**. Since `κ*` changes the `r²`-part, (d) says nothing against it.
-  * The correct statement is: *"the tree formula cannot be completed by dot-free terms
-    **without changing its `r`-degree-2 part**; changing the `r²`-part by `κ*` (eight terms
-    `±r_2²t_21²β`) gives a dot-free differential."*
-* *Consequences.*
-  * The §9 "What the example adds" points (1) "the tree formula is untouched" and
-    (3) (dotted correction) describe one of at least two non-equal completions. Whether they
-    are gauge-equivalent is not settled.
-  * The dotted terms of NOTES §6 are therefore **not forced** in this example. This weakens
-    the evidence for the spanning-tree × bigon rule as the canonical form of the true
-    differential, and should be reported to whoever maintains NOTES §6 / PROOFS C4.
-  * The Status line "Theorem 9.1 … no dot-free completion of the tree formula by terms of
-    `r`-degree ≥ 2" must be withdrawn.
+*The claim* (9.1(c)). "No differential `d_T + ε` with `ε` a combination of dot-free terms of
+`r`-degree ≥ 2: neither with `ε ∈ (r)³` …, nor with `ε ∈ (r)²`: … the `r³`-parts of
+`[δ₀ + δ₁, κ]` span a 4-dimensional space not containing `(d_T²)₃` (rank 4 → 5)."
+
+*The bug.* `checks/04_cyclic7_dotfree.py`, lines 66–74, assembles `(δ₀+δ₁)κ + κ(δ₀+δ₁)` for the
+kernel vectors `κ`. The left products are taken only from predecessors `Ip = I | {x}`
+(line 70). That is right for `δ₀`. But a component of `δ₁` that ends in `I` starts at
+`I∖{a}∪{j,b}`, never at `I ∪ {x}`. So the test `if I in dd[Ip]` (line 71) is always false for
+`dd = d1`, and **every product `δ₁·κ` is dropped**; only `κ·δ₁` is kept.
+
+* With all products, the rank stays 4 → 4 (`R04_cyc7.py c`).
+* Dropping `δ₁·κ` in my own code reproduces the author's 4 → 5 (`R04_cyc7.py c2`).
+
+*Exact statement of what holds* for `1221122`, red 2. Throughout: "dot-free" with respect to the
+klrw basis (Definition B.10), maps homogeneous of homological degree −1, coefficients in
+`ℤ[r, t, u]`.
+
+1. **(true, as in the draft)** There is no differential `d_T + ε` with `ε ∈ (r)³` dot-free.
+   Equivalently, the tree formula cannot be completed by dot-free terms **without changing its
+   `r`-degree-2 part**. This is (a) + (b): there are no dot-free elements of `r`-degree 3, and
+   `(d_T²)₃ ≠ 0`. It also holds with my own reduced words.
+2. **(false in the draft)** There **is** a differential `d_T + ε` with `ε ∈ (r)²` dot-free:
+   `d_F = d_T + κ* + ε₄`.
+   * `κ*`: 8 terms `±r_2²t_21² β_σ`. Their components are `{4,6,7}→{1,3}`, `{4,6,7}→{2,3}`,
+     `{1,4,6,7}→{1,2,3}`, `{2,4,6,7}→{1,2,3}`, with `σ = (1 5 4)(2 7)(3 6)`, and
+     `{4,5,6,7}→{1,3,5}`, `{4,5,6,7}→{2,3,5}`, `{1,4,5,6,7}→{1,2,3,5}`,
+     `{2,4,5,6,7}→{1,2,3,5}`, with `σ = (1 4 5)(2 7)(3 6)`. Signs are in §4.6.
+   * `ε₄`: 4 terms in `I₀→J₀`:
+     * `+r_1r_2³t_12t_21³ β_{σ'}`, `−r_1r_2³t_12t_21³ β_{σ''}`, `−r_1²r_2²t_12²t_21² β_{σ'''}`
+       (exactly three of the author's `X_r` terms);
+     * `+r_1²r_2²t_12²t_21² β_σ` with `σ = (1 4 5)(2 7)(3 6)`.
+   * None of the 12 extra terms has the bijection of a tree term. So `d_F` contains **all 680
+     tree-formula terms with their coefficients**, plus 12 dot-free terms (692 terms).
+   * `d_F` is monotone: no strand crosses `W` from left to right, in any term. So `d_F`
+     satisfies (H1), (H2) and (M₁).
+3. **Verification of 2**, airtight relative to the `klrw` implementation:
+   * `d_F` is saved as `checks/R04_data/cyclic7_1221122_W2_dotfree.json`, with the basis
+     convention written into the file;
+   * `R04_cyc7b.py verify` rebuilds it **from the JSON alone** and checks: `d_F² = 0` exactly
+     on the full cube; every component homogeneous of degree `D(I) − D(J)` for **klrw's own**
+     grading (`Cube.eq_degree`, independent of my grading code); no dot variables; no `u`;
+     `r`-degree ≤ 1 part equal to `δ₀ + δ₁`.
+   * The same checks pass for the dotted `d_X = d_T + X` of 9.1(d)
+     (`…_dotted.json`, 690 terms).
+4. **Gauge equivalence.** The two completions are gauge-equivalent:
+
+       d_F = (1 + h) d_X (1 − h),     h = −r_2²t_21² ( β_{{4,6,7}→{1,2,3}} + β_{{4,5,6,7}→{1,2,3,5}} ),
+
+   * the bijections are `(1 5 4)(2 7)(3 6)` and `(1 4 5)(2 7)(3 6)`;
+   * `h` is homogeneous of homological degree 0, dot-free, and monotone (no strand crosses `W`
+     at all);
+   * `h² = 0`, so `(1+h)^{-1} = 1 − h`;
+   * checked exactly in `R04_gauge_h.py`, which reads only the JSON files; `h` is saved as
+     `…_gauge_h.json`.
+   * The gauge was found by solving `g d_X = d_F g` order by order (`R04_cyc7b.py gauge_full`).
+     At orders `r¹, r²` the system for `g = 1 + h₁ + h₂` (290 + 8 candidates, dots allowed)
+     has full rank 298. So the `r¹` and `r²` parts of any gauge `g ≡ 1 mod (r)` from `d_X` to
+     `d_F` are **forced**; higher parts could only differ by elements commuting with the
+     differentials. With `g = 1 + h`, `g d_X − d_F g = 0` already holds exactly.
+
+*Consequences.*
+
+* (d) is correct but says less than the draft suggests. Kernel 0 at the four orders of `X`
+  means: `X` is the unique completion *keeping the tree formula's `r²`-part*. The dotted terms
+  `X_dot` are **not gauge-invariant**: the monotone, dot-free gauge `h` of order `r_2²t_21²`
+  turns them into the 8 hand-over-type `r²`-terms `κ*` (and changes the `r⁴`-part).
+* Hence §0 "the true differential = tree formula + 10 terms … exactly the spanning-tree × bigon
+  rule" and §9 "What the example adds", points (1)–(3), describe one normal form of a gauge
+  class, chosen by the normalisation "tree formula untouched at `r²`". They do not describe an
+  invariant.
+* For NOTES §6 / PROOFS C4: in this example the dotted cyclic terms are a normal-form
+  phenomenon, not forced. Whether this persists in the 32 local pieces of NOTES §6, where the
+  solver also keeps the tree formula fixed, is an open question that the maintainers of C4
+  should be told about.
+* The Status line "Theorem 9.1 … no dot-free completion of the tree formula by terms of
+  `r`-degree ≥ 2" must be replaced by 1 and 2 above.
+* *What the "Not shown" remark should say:* a dot-free differential `δ₀ + ε`, `ε ∈ (r)`, does
+  exist (`d_F`); it even keeps `δ₁`.
 
 **G1 [repairable; attribution and wording].** *"Corrections to other files", item 1 (and Ex. 8.3):
 "NOTES §3 / PROOFS Tier 2 … is false for arbitrary words".*
@@ -191,15 +233,17 @@ violates exactly (M₁). This is consistent with Theorem 8.4.
   only that `d_T + X` is *a* differential, and that `X` is unique at its four orders *given the
   tree formula at all other orders*. The draft itself reports a 106-dimensional space of
   dot-free first-order cycles for this word, mostly gauge directions (see §4.6 for my count).
-  So other differentials exist, and "the" should be "the completion of the tree formula".
+  So other differentials exist, and "the" should be "the completion of the tree formula
+  keeping its `r²`-part". G0 makes this concrete: a different, dot-free, gauge-equivalent
+  completion exists.
 * (ii) "Dot-free" in (a), (c) is relative to the klrw basis (Definition B.10). Changing the
   reduced words changes basis elements by `r`-multiples of shorter, possibly dotted, words, and
   §1.2's sentence "all statements below are modulo ideals and therefore independent of these
   choices" is false for §9. The basis must be named in the statement. (For this word my
   recomputation of (b) with my own bubble-sort words gives the same `r`-parts, so nothing changes
   numerically.)
-* (iii) (c) is correctly reasoned: `ε_3 = 0` by (a), and the `r³`-equation reduces to a span
-  condition.
+* (iii) The *reasoning* of (c) is right: `ε_3 = 0` by (a), and the `r³`-equation reduces to a
+  span condition. The *computation* of that span condition is wrong (G0).
 
 **G3 [cosmetic; undeclared input].** (F1) is used and not declared:
 
@@ -388,14 +432,37 @@ All in `A_4`, `D_4`, `D_5`, `E_6`.
     at 4**. The obstruction is removable, contrary to the draft;
   * dropping the products `δ₁·κ`, as `04_cyclic7_dotfree.py` does, reproduces the draft's
     4 → 5;
-  * the solution `κ*` (coefficients `(1, 0, 0, −1)` on the kernel basis) has eight terms
-    `±r_2²t_21² β`, in the components `{4,6,7}→{1,3}`, `{4,6,7}→{2,3}`, `{1,4,6,7}→{1,2,3}`,
-    `{2,4,6,7}→{1,2,3}`, `{4,5,6,7}→{1,3,5}`, `{4,5,6,7}→{2,3,5}`, `{1,4,5,6,7}→{1,2,3,5}`,
-    `{2,4,5,6,7}→{1,2,3,5}`;
+  * the solution `κ*` (coefficients `(1, 0, 0, −1)` on the kernel basis; the `r³` map on the
+    kernel is injective, so `κ*` is unique) is `r_2²t_21²` times:
+    * `+β`: `{4,6,7}→{1,3}`, `{4,5,6,7}→{2,3,5}`, `{1,4,5,6,7}→{1,2,3,5}`,
+      `{2,4,5,6,7}→{1,2,3,5}`;
+    * `−β`: `{4,6,7}→{2,3}`, `{1,4,6,7}→{1,2,3}`, `{2,4,6,7}→{1,2,3}`, `{4,5,6,7}→{1,3,5}`;
+
+    with `σ = (1 5 4)(2 7)(3 6)` in the components without slot 5, and `(1 4 5)(2 7)(3 6)` in
+    those with it. All are monotone, and none is the bijection of a tree term;
   * direct multiplication: `(d_T + κ*)²` has only 18 coefficients, all of `r`-degree 4;
-  * at `r⁴` the 7 dot-free candidates have rank 7 and absorb the obstruction (rank 7 → 7);
-  * the resulting `d_T + κ* + ε₄` satisfies **`d² = 0` exactly**, is dot-free, homogeneous
-    (built from homogeneous candidates) and `u`-free. See G0.
+  * at `r⁴` the 7 dot-free candidates have rank 7 and absorb the obstruction (rank 7 → 7),
+    giving `ε₄` (4 terms in `I₀→J₀`, listed in G0);
+  * the resulting `d_F = d_T + κ* + ε₄` satisfies **`d² = 0` exactly**
+    (`R04_cyc7b.py build`, log `cyc7b_build.log`).
+* **`d_F` as data:** `R04_data/cyclic7_1221122_W2_dotfree.json` (692 terms); the dotted
+  `d_X = d_T + X` is `…_dotted.json` (690 terms). `R04_cyc7b.py verify` (log
+  `cyc7b_verify.log`) re-checks both from the JSON alone:
+  * `d² = 0`;
+  * homogeneity under klrw's own grading;
+  * no `u`;
+  * `r`-degree ≤ 1 part = `δ₀ + δ₁`;
+  * dot-free (`d_F`) / dotted (`d_X`).
+* **Gauge** (`R04_cyc7b.py gauge`, `gauge_full`, `R04_gauge_h.py`; logs `cyc7b_gauge*.log`,
+  `gauge_h.log`):
+  * `r`-free homogeneous elements of homological degree 0: 1 896 (952 with a `t`);
+  * at `r`-degrees 1 and 2: 290 and 8 elements (dots allowed);
+  * the system for `g = 1 + h₁ + h₂` with `g d_X ≡ d_F g` modulo `(r)³` has rank 298 = number
+    of unknowns, so its solution is unique;
+  * that solution has `h₁ = 0`, `h₂ = h` (2 terms, see G0), and gives `g d_X = d_F g`
+    **exactly**;
+  * `h² = 0`, and `(1+h)d_X(1−h) = d_F` is checked again from the JSON files;
+  * `h` is saved as `…_gauge_h.json`.
 * **(d)** (`cyc7_d.log`):
   * the 10 terms of `X`, typed in from the text, give `(d_T + X)² = 0` exactly;
   * with `X_dot` alone, 6 components of `d²` stay non-zero;
@@ -423,6 +490,7 @@ All in `A_4`, `D_4`, `D_5`, `E_6`.
 | PROOFS Lemma 1, Prop. 3 / `01` Lemma B.2 (crossing table) | Lemma 5.2, Prop. 5.3 | yes |
 | independence of `β(I;j,F)` of the reduced word | not needed for A, B, C, 7, 8 (everything modulo `(r)²`, or exact with no triples); needed for §9, which fixes the basis braid | implicit; should be stated in §9 (G2) |
 | `klrw` implementation and solver | Ex. 8.3, Rem. 8.7, Thm 9.1, all of §4 above | yes (Tier 2) |
+| `klrw` implementation (products, basis expansion, grading) | **my G0** (`d_F`, the gauge `h`) | Tier 2 as well. It needs no solver and no degree enumeration: `d_F` and `h` are explicit data, re-checked from JSON by direct multiplication |
 
 Theorems A, B, C, Prop. 5.3, Prop. 7.1 use only the relations, (F3), (F3′) and the crossing
 table. Theorem 8.4 additionally uses (F1) and (F2).

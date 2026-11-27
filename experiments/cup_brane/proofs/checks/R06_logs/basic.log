@@ -1,0 +1,44 @@
+ok   psi^2 on (1,2) = t12 x_1 + t21 x_2
+ok   D('t_1_2') == edge_variable(1,2)
+ok   D('r_1') == vertex_variable(1)
+ok   (S) x1 psi - psi x2 = r
+ok   (S) psi x1 - x2 psi = r
+ok   phi = -psi(x1-x2) + r
+ok   x1 phi = phi x2
+ok   x2 phi = phi x1
+ok   phi^2 = r^2
+ok   Lemma 1.1 psi f = (s f) psi + r df
+ok   Lemma 2.3 ['A', 3] word (1, 2, 1) red 1: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 2, 1) red 2: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 2, 1) red 3: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 1, 2) red 1: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 1, 2) red 2: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 1, 2) red 3: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (2, 1, 1) red 1: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (2, 1, 1) red 2: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (2, 1, 1) red 3: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 1, 1) red 1: 72 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 1, 1) red 2: 72 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 3, 1) red 1: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 3, 1) red 3: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 3, 1) red 2: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 2, 3) red 1: 48 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 2, 3) red 2: 48 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (1, 2, 3) red 3: 48 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (2, 2, 3) red 2: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (2, 2, 3) red 3: 56 identities, 0 failures
+ok   Lemma 2.3 ['A', 3] word (2, 2, 3) red 1: 56 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (2, 1, 2) red 1: 56 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (2, 1, 2) red 2: 56 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (2, 1, 2) red 3: 56 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (1, 3, 1) red 1: 56 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (1, 3, 1) red 3: 56 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (1, 3, 1) red 2: 56 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (2, 2, 2) red 2: 72 identities, 0 failures
+ok   Lemma 2.3 ['D', 4] word (2, 2, 2) red 1: 72 identities, 0 failures
+ok   negative control: psi braid on (1,2,1) is NOT exact
+ok   Prop 3.2/3.3/3.5 ['A', 3] red 2 word (2, 1, 3, 2, 1): failures 0 0 0 (12 trials)
+ok   Prop 3.2/3.3/3.5 ['D', 4] red 1 word (2, 1, 3, 4, 2, 1): failures 0 0 0 (12 trials)
+ok   Prop 3.2/3.3/3.5 ['A', 2] red 1 word (1, 2, 1, 2, 1): failures 0 0 0 (12 trials)
+ok   Prop 3.2/3.3/3.5 ['A', 2] red 2 word (2, 2, 1, 2): failures 0 0 0 (12 trials)
+TOTAL FAILURES 0

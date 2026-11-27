@@ -1,0 +1,147 @@
+  D4 red 4 word 3123412: k=2 data 1, E FAIL 0
+  D4 red 4 word 4124132: k=2 data 1, E FAIL 0
+  D4 red 4 word 1423142: k=2 data 1, E FAIL 0
+  D4 red 3 word 3121432: k=2 data 1, E FAIL 0
+  D4 red 1 word 1423412: k=2 data 1, E FAIL 0
+  D4 red 3 word 3123142: k=2 data 1, E FAIL 0
+  D4 red 4 word 1424312: k=2 data 1, E FAIL 0
+  D4 red 1 word 4323412: k=2 data 1, E FAIL 0
+  D4 red 2 word 3423142: k=2 data 1, E FAIL 0
+  D4 red 4 word 1424132: k=2 data 1, E FAIL 0
+  D4 red 2 word 4124312: k=2 data 1, E FAIL 0
+  D4 red 4 word 4324312: k=2 data 1, E FAIL 0
+  D4 red 2 word 3121342: k=2 data 1, E FAIL 0
+  D4 red 1 word 3123412: k=2 data 1, E FAIL 0
+  D4 red 4 word 1323142: k=2 data 1, E FAIL 0
+  D4 red 4 word 3423412: k=2 data 1, E FAIL 0
+  D4 red 4 word 1421432: k=2 data 1, E FAIL 0
+  D4 red 3 word 3424132: k=2 data 1, E FAIL 0
+  D4 red 3 word 1423142: k=2 data 1, E FAIL 0
+  D4 red 1 word 3423412: k=2 data 1, E FAIL 0
+  D4 red 3 word 3124312: k=2 data 1, E FAIL 0
+  D4 red 1 word 1423142: k=2 data 1, E FAIL 0
+  D4 red 4 word 1321432: k=2 data 1, E FAIL 0
+  D4 red 1 word 1423142: k=2 data 1, E FAIL 0
+  D4 red 4 word 4124312: k=2 data 1, E FAIL 0
+  D4 red 4 word 3421432: k=2 data 1, E FAIL 0
+  D4 red 3 word 1424132: k=2 data 1, E FAIL 0
+  D4 red 4 word 1423412: k=2 data 1, E FAIL 0
+  D4 red 2 word 3123412: k=2 data 1, E FAIL 0
+  D4 red 1 word 4121432: k=2 data 1, E FAIL 0
+  D4 red 3 word 1424312: k=2 data 1, E FAIL 0
+  D4 red 2 word 1321342: k=2 data 1, E FAIL 0
+  D4 red 2 word 3421342: k=2 data 1, E FAIL 0
+  D4 red 1 word 4323412: k=2 data 1, E FAIL 0
+  D4 red 1 word 4123142: k=2 data 1, E FAIL 0
+  D4 red 2 word 3124132: k=2 data 1, E FAIL 0
+  D4 red 3 word 3124132: k=2 data 1, E FAIL 0
+  D4 red 1 word 1321342: k=2 data 1, E FAIL 0
+  D4 red 1 word 4323412: k=2 data 1, E FAIL 0
+  D4 red 1 word 4121432: k=2 data 1, E FAIL 0
+  D4 red 3 word 4321432: k=2 data 1, E FAIL 0
+  D4 red 4 word 3423412: k=2 data 1, E FAIL 0
+  D4 red 4 word 4123142: k=2 data 1, E FAIL 0
+  D4 red 1 word 3421432: k=2 data 1, E FAIL 0
+  D4 red 2 word 1424132: k=2 data 1, E FAIL 0
+  D4 red 4 word 1323142: k=2 data 1, E FAIL 0
+  D4 red 1 word 1324132: k=2 data 1, E FAIL 0
+  D4 red 1 word 3423142: k=2 data 1, E FAIL 0
+  D4 red 1 word 3123142: k=2 data 1, E FAIL 0
+  D4 red 2 word 1423412: k=2 data 1, E FAIL 0
+  D4 red 3 word 3424132: k=2 data 1, E FAIL 0
+  D4 red 4 word 3121342: k=2 data 1, E FAIL 0
+  D4 red 4 word 3121432: k=2 data 1, E FAIL 0
+  D4 red 4 word 1424312: k=2 data 1, E FAIL 0
+  D4 red 3 word 3121432: k=2 data 1, E FAIL 0
+  D4 red 1 word 1324312: k=2 data 1, E FAIL 0
+  D4 red 1 word 4324132: k=2 data 1, E FAIL 0
+  D4 red 3 word 4321342: k=2 data 1, E FAIL 0
+  D4 red 1 word 1423412: k=2 data 1, E FAIL 0
+  D4 red 4 word 1324312: k=2 data 1, E FAIL 0
+RESULT sec8 D4 len 7 pattern 'k2': 60 words, no assertion failed [36s]
+   3.2 vertices                                  3840
+   8.1 cases                                     3000
+   8.3 frozen terms                              4800
+   8.3 with a bad letter                         2880
+   8.4 data with k=0                             2880
+   8.4 data with k=1                             960
+   8.4 data with k=2                             60
+   8.4 pairs (t1,t2)                             5040
+   8.5 products with 0 double crossings          4438
+   8.5 products with 1 double crossings          556
+   8.5 products with 2 double crossings          46
+   8.6 cases                                     2880
+   8.7 (T empty) cases                           2880
+   E components computed                         19680
+   E components with a notin K'                  8820
+  D4 red 4 word 34234112: k=2 data 4, E FAIL 0
+  D4 red 2 word 41213342: k=2 data 4, E FAIL 0
+  D4 red 4 word 43124312: k=2 data 6, E FAIL 0
+  D4 red 1 word 31244312: k=2 data 4, E FAIL 0
+  D4 red 4 word 14234132: k=2 data 4, E FAIL 0
+  D4 red 3 word 41321432: k=2 data 6, E FAIL 0
+  D4 red 2 word 41234312: k=2 data 4, E FAIL 0
+  D4 red 1 word 41321432: k=2 data 6, E FAIL 0
+  D4 red 4 word 34213142: k=2 data 4, E FAIL 0
+  D4 red 1 word 43234112: k=2 data 4, E FAIL 0
+  D4 red 4 word 31424312: k=2 data 6, E FAIL 0
+  D4 red 2 word 41324132: k=2 data 6, E FAIL 0
+  D4 red 1 word 31424312: k=2 data 6, E FAIL 0
+  D4 red 2 word 31214432: k=2 data 4, E FAIL 0
+  D4 red 4 word 43121342: k=2 data 6, E FAIL 0
+  D4 red 4 word 41231432: k=2 data 4, E FAIL 0
+  D4 red 3 word 13231442: k=2 data 4, E FAIL 0
+  D4 red 2 word 41233412: k=2 data 4, E FAIL 0
+  D4 red 1 word 34231142: k=2 data 4, E FAIL 0
+  D4 red 1 word 13421432: k=2 data 6, E FAIL 0
+  D4 red 4 word 43241312: k=2 data 4, E FAIL 0
+  D4 red 2 word 41323412: k=2 data 6, E FAIL 0
+  D4 red 4 word 31214432: k=2 data 4, E FAIL 0
+  D4 red 2 word 13421432: k=2 data 6, E FAIL 0
+  D4 red 3 word 34241132: k=2 data 4, E FAIL 0
+  D4 red 4 word 41324312: k=2 data 6, E FAIL 0
+  D4 red 2 word 31423412: k=2 data 6, E FAIL 0
+  D4 red 3 word 13231442: k=2 data 4, E FAIL 0
+  D4 red 3 word 43211432: k=2 data 4, E FAIL 0
+  D4 red 3 word 14214332: k=2 data 4, E FAIL 0
+  D4 red 3 word 34124132: k=2 data 6, E FAIL 0
+  D4 red 2 word 31244312: k=2 data 4, E FAIL 0
+  D4 red 2 word 14214332: k=2 data 4, E FAIL 0
+  D4 red 2 word 43211342: k=2 data 4, E FAIL 0
+  D4 red 3 word 13423412: k=2 data 6, E FAIL 0
+  D4 red 3 word 13214432: k=2 data 4, E FAIL 0
+  D4 red 4 word 34231142: k=2 data 4, E FAIL 0
+  D4 red 2 word 41323412: k=2 data 6, E FAIL 0
+  D4 red 4 word 31421432: k=2 data 6, E FAIL 0
+  D4 red 2 word 14324312: k=2 data 6, E FAIL 0
+RESULT sec8 D4 len 8 pattern 'k2': 40 words, no assertion failed [77s]
+   3.2 vertices                                  5120
+   8.1 cases                                     4425
+   8.3 frozen terms                              7680
+   8.3 with a bad letter                         4576
+   8.4 data with k=0                             4576
+   8.4 data with k=1                             1920
+   8.4 data with k=2                             194
+   8.4 pairs (t1,t2)                             9192
+   8.5 products with 0 double crossings          7816
+   8.5 products with 1 double crossings          1208
+   8.5 products with 2 double crossings          168
+   8.6 cases                                     4576
+   8.7 (T empty) cases                           4576
+   E components computed                         34627
+   E components with a notin K'                  14219
+  D5 red 3 word 154314253: k=2 data 4, E FAIL 0
+  D5 red 4 word 541352423: k=2 data 8, E FAIL 0
+  D5 red 4 word 543142523: k=2 data 8, E FAIL 0
+  D5 red 2 word 253215143: k=2 data 4, E FAIL 0
+  D5 red 1 word 541342253: k=2 data 8, E FAIL 0
+  D5 red 3 word 421535243: k=2 data 13, E FAIL 0
+  D5 red 2 word 523421543: k=2 data 8, E FAIL 0
+  D5 red 3 word 254324513: k=2 data 12, E FAIL 0
+  D5 red 4 word 142532543: k=2 data 12, E FAIL 0
+  D5 red 5 word 523452113: k=2 data 4, E FAIL 0
+  D5 red 3 word 524352413: k=2 data 12, E FAIL 0
+  D5 red 1 word 251434523: k=2 data 13, E FAIL 0
+  D5 red 3 word 542321543: k=2 data 12, E FAIL 0
+  D5 red 2 word 423515423: k=2 data 8, E FAIL 0
+  D5 red 4 word 521432453: k=2 data 13, E FAIL 0

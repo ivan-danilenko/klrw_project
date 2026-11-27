@@ -1,0 +1,5 @@
+ok   psi^2 on (1,2) = t12 x_1 + t21 x_2
+ok   D('t_1_2') == edge_variable(1,2)
+ok   D('r_1') == vertex_variable(1)
+ok   (S) x1 psi - psi x2 = r
+ok   (S) psi x1 - x2 psi = r

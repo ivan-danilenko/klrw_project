@@ -1,0 +1,2 @@
+RESULT all A3 2 6 6: 801 (word, red) cases, 24507 vertices, 219546 products, 0 FAILURES [20s]
+sage -python R05b_d2.py all A 3 2 6 6  85.85s user 3.24s system 401% cpu 22.211 total

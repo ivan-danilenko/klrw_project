@@ -1,0 +1,11 @@
+A2 red 1 word 121: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 15/15
+A2 red 1 word 111: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 12/15
+A2 red 2 word 121: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 15/15
+A2 red 1 word 211: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 15/15
+A2 red 1 word 1221: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 15/15
+A3 red 2 word 2132: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 13/15
+A3 red 1 word 1211: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 12/15
+D4 red 2 word 21342: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 15/15
+D4 red 1 word 12131: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 14/15
+A2 red 2 word 222: naturality failures 0/15, zeta failures 0/30, negative control (psi only) failures 12/15
+RESULT naturality: 0/150 failures; zeta: 0 failures; negative control: 138/150 differ
