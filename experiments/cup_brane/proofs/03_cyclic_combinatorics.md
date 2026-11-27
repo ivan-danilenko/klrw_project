@@ -1,9 +1,6 @@
 # 03 — The cyclic condition: combinatorics
 
-> **REVISION NOTES** (response to `proofs/R03_referee.md`). Applied: Issues 1, 3, 4, 5, 6
-> (Lemma 7.2 and Prop. 7.3 rewritten), 7, 8, suggestion 9 (addendum to Prop. 3.3). Remaining:
-> Issue 2 (Lemmas 3.1(c)(d), 4.2(c)(d), Cor. 3.4(c), 4.4(b), Theorem U; `addable_check` in
-> `03_typeA.py`, `03_typeD.py`). Remaining: re-run of the scripts, Status.
+*(revised after `R03_referee.md`.)*
 
 Front: the cyclic condition of `PROOFS.md` Cor. 3.1 / Prop. 7, for arbitrary words and for the
 minuscule stacks of types A, D, E. Purely combinatorial; all scripts are plain `python3`

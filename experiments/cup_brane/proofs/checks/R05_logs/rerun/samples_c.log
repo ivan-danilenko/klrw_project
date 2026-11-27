@@ -18,3 +18,6 @@ RESULT sample D6 20 11 40 917 4 red: 20 (word, red) cases, 800 vertices, 40047 p
 RESULT sample D6 20 11 40 918 4 twinred: 20 (word, red) cases, 800 vertices, 41587 products, 0 FAILURES [15s]
 RESULT sample D6 20 11 40 919 4 branch: 20 (word, red) cases, 800 vertices, 41820 products, 0 FAILURES [15s]
 RESULT sample D6 20 11 40 920 4 k2: 20 (word, red) cases, 800 vertices, 46511 products, 0 FAILURES [40s]
+RESULT sample E6 20 11 40 921 4: 20 (word, red) cases, 800 vertices, 42553 products, 0 FAILURES [34s]
+RESULT sample E6 20 11 40 922 4 nb: 20 (word, red) cases, 800 vertices, 37886 products, 0 FAILURES [27s]
+RESULT sample E6 20 11 40 923 4 red: 20 (word, red) cases, 800 vertices, 39275 products, 0 FAILURES [27s]
