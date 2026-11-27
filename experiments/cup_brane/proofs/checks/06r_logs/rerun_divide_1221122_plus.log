@@ -1,0 +1,11 @@
+$ sage -python 06_divide.py A 2 1 1221122 plus
+A2 red 1 word 1221122: zeta * F = R solvable for all components: True  (153 components, 0 not divisible)  [48s]
+components of F different from the tree formula: 1
+components of F different from the stored true differential: 0
+  F[{4,5,6,7} -> {1,2,3}] - tree:
+      sigma (1 4)(2 6 3 7)         len  4  t_1_2 * r_1 * t_2_1^3 * r_2^3
+      sigma (1 5 4)(2 7)(3 6)      len  4  (-1) * t_2_1^2 * t_1_2^2 * r_2^2 * r_1^2
+      sigma (1 4)(2 7 3 6)         len  4  (-1) * t_1_2 * r_1 * t_2_1^3 * r_2^3
+      sigma (1 4)(2 7)(3 6)        len  5  (-1) * t_1_2 * r_1 * t_2_1^2 * r_2^2 * (t_1_2*x_1_1 + t_1_2*x_1_2 + 2*t_1_2*x_1_3 + t_2_1*x_2_1 + t_2_1*x_2_2 + t_2_1*x_2_3 + t_2_1*x_2_4)
+the cube with F as connecting map satisfies d^2 = 0: True
+[exit 0, 89 s]

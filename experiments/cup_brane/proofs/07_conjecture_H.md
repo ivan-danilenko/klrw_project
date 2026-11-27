@@ -22,11 +22,20 @@
   from the source to the target); (d) with (c), the off-diagonal components `K = (I∖{m,j})∪{a}`
   vanish: for `a < j` both kinds of product are 0 by 05 Lemma 1.4 (a same-colour pair crosses
   twice), for `a > j` they cancel in pairs (symmetric polynomial slides through `X_j`).
-* **Doing right now:** writing up the one-colour case (Theorem H1a) completely; then H1 with
-  spectator colours (other colours once): there the new ingredients are bigons and the tree
-  terms of `F` and `d′` (nested pairs of colour `c` around a mover of adjacent colour); the
-  data (`07_tabulate.py A 2 2 1211`) show the bigon divided difference `Q(x_a,y) − Q(x_b,y) =
-  t(x_a − x_b)` of 06 §6 doing the job.
+* **Correction to (c):** the dot `x_m` in `W_c` must be read *between* the left slide `LS_c`
+  and the right slide `Seg_0` (before `m` moves), not at the target; corrected form verified by
+  `checks/07_compact.py` (all `(I,c)` of `11111` red 1, 2; `121121`, `112121`, `1213121`,
+  `2131212`, `D_4 2132422`). Equivalently `H_c = ε(−r)·LS_c·ζ̂_c·Seg_0(m→c)`,
+  `ζ̂_c = ∏_{a∈Same∖c}(x_a − x_m)` read between the two slides.
+* **Group splitting (`checks/07_groups.py … adjj`):** for H1 words (one colour `c` repeated,
+  all others once: `1211`, `112111`, `1121311`, `1312131`, `D_4 2132422`) (★) splits into groups
+  that vanish separately: "diag" (`K = I∖m`), "same" (mover of colour `c`, `a<j` / `a>j`),
+  "far" (mover of a colour not adjacent to `c`), "adj-by-j" (all terms whose prefix term has a
+  mover `j` of colour adjacent to `c`, any chain start, plus `ζ·P(j; F∪(a,m))`). Only the last
+  group involves trees and bigons. The bigon divided difference `Q(x_a,y) − Q(x_b,y) =
+  t(x_a − x_b)` of 06 §6 is visible there (`07_tabulate.py A 2 2 1211`).
+* **Doing right now:** writing up the one-colour case (Theorem H1a) completely; then the groups
+  "same"/"far" with spectators, then "adj-by-j".
 * **Next steps planned:** H1 with spectators; then H2 (hanging forests: the compact form must
   be extended to sums over chains *and* forests).
 * **Scripts / logs:** as listed above.

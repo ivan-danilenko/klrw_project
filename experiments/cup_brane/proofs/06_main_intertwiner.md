@@ -1,5 +1,7 @@
 # 06 — The main theorem via intertwiners ("renormalised R-matrix")
 
+*revised after `R06_referee.md`*
+
 Notation and standing facts are those of `../PROOFS.md` §1 and `README_FOR_PROVERS.md`
 (product `a·b` = first `a`, then `b`; the tree formula of `../NOTES.md` §2 with the signs of
 `../formula.py`). All scripts named below are in `proofs/checks/`; run them from that
@@ -24,9 +26,12 @@ same-colour crossings replaced by the intertwiner `φ = (x_1 − x_2)ψ − r_c`
    satisfy the braid relations *exactly* (Lemma 2.3), so products of them depend only on the
    permutation of the *labelled* strands, and double crossings multiply by explicit
    polynomials (the *labelled calculus*, §3).
-2. **[proved]** If a triangular map `G : C_Φ → C` with non-zero polynomials on the diagonal
-   satisfies `d_Φ G = G d` for some family `d` of cube components, then `d² = 0`
-   (Proposition 5.1); one-step (cone) version: Proposition 5.2.
+2. **[proved]** If a map `G : C_Φ → C` that is triangular for *some* strict partial order on
+   the vertices, with non-zero polynomials on the diagonal, satisfies `d_Φ G = G d` for some
+   family `d` of cube components, then `d² = 0` (Proposition 5.1); one-step (cone) version:
+   Proposition 5.2. The `G` of Definition 6.2 is triangular for the order `≺` by the sum of
+   the slots and for the colex order `<_c`; a factorised `G = Γ^{(1)}⋯Γ^{(m)}` of one-step
+   maps of cone form is in general triangular only for `<_c` (Lemma 5.0, Remark 5.3).
 3. **[proved] Theorem 6.2.** If every colour occurs at most twice in the word, then
    `d_Φ G = G d_tree` for the explicit map
 
@@ -50,23 +55,30 @@ same-colour crossings replaced by the intertwiner `φ = (x_1 − x_2)ψ − r_c`
    including the minuscule words of `A_5 ω_3` (9 strands) and `D_5` spinor (10 strands).
    By Proposition 5.2, Conjecture H implies Conjecture C1′ (tree formula for every
    cycle-free word).
-5. **[computed]** Cyclic case (§8). For the 7-strand cyclic word `1221122` (`A_2`, red 1)
-   the true differential is the tree formula plus one component (dotted terms, a
-   coefficient 2, hand-over terms). A comparison map `Γ : Cone(Φ_7) → (C, d_true)` **exists**
-   and is unique up to homotopy (chain maps modulo null-homotopic ones: dimension 1). The
-   tree-only formula of Conjecture H is not enough (the division of `Φ − [d′, h]` by `ζ`
-   fails in 21 components), but a small extension `H⁺` (Definition 8.1: a hanging pair may
-   start at a chain slot) is: **`F = ζ^{-1}(Φ − (d′⊗1)h⁺ − h⁺(1⊗d′))` is polynomial and equals
-   the true differential exactly**, including the dotted terms, the coefficient 2 and the
-   hand-over terms; for red 2 it equals the differential computed independently by the
-   first-order front (`04_data/cyclic7_1221122_W2_tree.json`), in all components.
-   The same holds for `2132213` (`A_3`, red 2; there the comparison map is unique outright).
-   *Iterated division* (§8.5) starting from `d_Φ` thus defines the differential without
-   reference to the tree formula, as long as the prefix is cycle-free. **It fails one step
-   later**: for the 8-strand word `12211221`, whose prefix is cyclic, the division at the
-   last step is not exact with the same formula for `h` (18 components). What is missing: a
-   proof; the correction of `h` after a cyclic step; a term-by-term description of the
-   quotient.
+5. **[computed, on a few words only]** Cyclic case (§8). Everything in §8 is an exact
+   computation on five cyclic 7-strand cases (and one 8-strand word); nothing there is
+   claimed in general. For `1221122` (`A_2`, red 1) the differential `d_true` found by the
+   order-by-order solver — *one normal form* in a gauge class, fixed by the solver's choices
+   (Remark 8.0) — is the tree formula plus one component (dotted terms, a coefficient 2,
+   hand-over terms). A comparison map `Γ : Cone(Φ_7) → (C, d_true)` exists and is unique up
+   to homotopy (chain maps modulo null-homotopic ones: dimension 1). The formula of
+   Conjecture H for `h` is not enough (the division of `Φ − [d′, h]` by `ζ_7` fails in 21
+   components), but a small extension `H⁺` (Definition 8.1: a hanging pair may start at a
+   chain slot) is, in this example: `F = ζ_7^{-1}(Φ − (d′⊗1)h⁺ − h⁺(1⊗d′))` is polynomial and
+   equals the solver's differential in all components. For red 2 the quotient is exactly the
+   *dotted* completion `d_X` of `04_first_order.md` Theorem 9.1(d), not the gauge-equivalent
+   *dot-free* completion `d_F` of Theorem 9.1(e); replacing `h⁺` by `h⁺ − ζ_7 h_g` (`h_g` the
+   dot-free gauge of `R04_referee.md`) gives `d_F` exactly, and the same `h_g` removes the
+   dots for red 1 as well (`06r_gauge_1221122.py`, Remark 8.0). So the dotted terms are
+   produced by the choice of `h⁺`; they are not an invariant of the intertwiner description.
+   The division is also exact for `2132213` (`A_3`, red 2; there the comparison map is unique
+   outright), `2211221` (red 2) and `1322312` (`A_3`, red 1). On these five cases, *iterated
+   division* (§8.5) starting from `d_Φ` produces a differential without using the tree
+   formula; that this happens whenever the prefix is cycle-free is **Conjecture H⁺**, not a
+   theorem. **It fails one step later**: for the 8-strand word `12211221`, whose prefix is
+   cyclic, the division at the last step is not exact with the same formula for `h`
+   (18 components). What is missing: a proof; the correction of `h` after a cyclic step; a
+   term-by-term description of the quotient.
 
 Conventions fixed here: `φ = (x_1 − x_2)ψ − r` with the dots *before* the crossing (README);
 consequently the diagonal of `G` is `ζ_I = ∏_{x∈I} ∏_{i<x, c(i)=c(x)} (x_i − x_x)`, which is
@@ -86,9 +98,29 @@ the red colour `k`, with the signs of the README:
 * (B) `ψ_1ψ_2ψ_1 = ψ_2ψ_1ψ_2` on every state of three strands except
   `(c, c′, c)`, `c ∼ c′`: difference `+ r_c t_{cc′}`, and `(k, W, k)`: difference `+ r_k u_k`.
 
-Standing facts used: (F1) basis theorem, in the form "`e A e′` is free as a left and as a
-right module over the polynomial ring in the dots" (only in Proposition 5.1 and Lemma 6.5);
-(F3) Matsumoto's theorem (Proposition 3.2).
+Standing facts used:
+
+* (F1) the basis theorem, **Theorem A.5 of `01_foundations.md`** (proved there over
+  `ℤ[r, t, u]` and every base change): `e A e′` is a free left module over the polynomial ring
+  in the dots of the source and a free right module over the polynomial ring in the dots of
+  the target, with basis `{ψ_w}` for any choice of reduced words; and its consequence,
+  torsion-freeness, **Theorem E.1 of `01_foundations.md`**: left multiplication by a non-zero
+  polynomial in the dots at the source, and right multiplication by one at the target, are
+  injective on `e A e′`. Used in:
+  * Proposition 4.4 (injectivity of multiplication by `ζ_m`: Theorem E.1);
+  * Proposition 5.1 (cancellation of `ζ_I` on the left: Theorem E.1(a));
+  * Proposition 5.2 (cancellation of `ζ_m` on the left, via Proposition 4.4);
+  * Lemma 6.5 (independence of the reduced word: cancellation of `z_p` on the left,
+    Theorem E.1(a)); hence in Theorem 6.2 and Corollary 6.3 (which also use Proposition 5.1);
+  * §9: Proposition 9.2 (rank one; only the injectivity of `Pol → e(t) A e(t)` is needed,
+    which also follows from the polynomial representation, §A.3 of `01_foundations.md`),
+    Proposition 9.3 (`e A e_I` is a free `Pol`-module of rank the number of colour-preserving
+    bijections, Theorem A.5(ii)), hence Corollary 9.4; the remark after it (`G` injective,
+    Theorem E.1).
+
+  Lemma 2.3 and §3 do not use F1.
+* (F2) the grading: only in the degree remarks of §4 and in the computations of §§5, 7, 8.
+* (F3) Matsumoto's theorem (Proposition 3.2).
 
 **1.2 Divided differences.** On a state with two neighbouring strands of the same colour at
 positions `i, i+1`, for a polynomial `f` in the dots write `s_i f` for `f` with `x_i, x_{i+1}`
@@ -302,25 +334,53 @@ multiplication by `ζ_m` is injective on every `e A e′`.
 *Proof.* As a polynomial in the dots, `ζ_m` is symmetric in the dots of the strands of
 colour `c(m)` other than `m`. It commutes with dots, with crossings of different colours
 (D), and with a crossing of two strands of the same colour among those of `w′` by Lemma 1.1.
-Injectivity is (F1). ∎ (`06_check_basic.py`, `z central: True`.)
+Injectivity is (F1): Theorem E.1 of `01_foundations.md`. ∎ (`06_check_basic.py`, `z central: True`.)
 
 ---
 
 ## 5. Comparison maps: the reduction
 
-Order the subsets of `{1,…,m}` by `J ≺ I` iff `|J| = |I|` and `Σ_{x∈J} x < Σ_{x∈I} x`.
+**Orders on the vertices.** A map `G : C_Φ → C` of degree 0 has components `G_{IJ}` only for
+`|J| = |I|`, so only vertices of equal size have to be compared. Two orders are used:
 
-**Proposition 5.1 [proved].** Let `d = (d_{IJ})`, `d_{IJ} ∈ e_I A e_J` (`|J| = |I| − 1`), be
-any family, and `G = (G_{IJ})`, `G_{IJ} ∈ e_I A e_J` (`|J| = |I|`), such that
+* `J ≺ I` iff `|J| = |I|` and `Σ_{x∈J} x < Σ_{x∈I} x` (*sum order*);
+* `J <_c I` iff `|J| = |I|` and `Σ_{x∈J} 2^x < Σ_{x∈I} 2^x` (*colex order*); equivalently
+  `J ≠ I` and the largest element of the symmetric difference `I △ J` lies in `I`.
 
-* `G_{II} = ζ_I e_I` with `ζ_I` a non-zero polynomial in the dots, and `G_{IJ} = 0` unless `J = I` or `J ≺ I`;
+Both are strict partial orders (`<_c` is total on the vertices of a given size), and, the
+cube being finite, every strict partial order on its vertices is well-founded.
+
+**Lemma 5.0 [proved].** Let `|I| = |J|`, `I ≠ J`.
+(a) If there is a bijection `β : I∖J → J∖I` with `β(x) < x` for all `x`, then `J ≺ I` and
+`J <_c I`.
+(b) If some `k ∈ I∖J` satisfies `I ∩ {k+1,…,m} = J ∩ {k+1,…,m}`, then `J <_c I`.
+
+*Proof.* (a) `Σ J − Σ I = Σ_{x∈I∖J} (β(x) − x) < 0`, as `I∖J ≠ ∅`. Let `y = max(I △ J)`. If
+`y ∈ J∖I`, then `y = β(x) < x` for some `x ∈ I∖J ⊆ I △ J`, contradicting the maximality; so
+`y ∈ I`. (b) `I △ J ⊆ {1,…,k}` and `k ∈ I △ J`, so `max(I △ J) = k ∈ I`. ∎
+
+(b) does not give `J ≺ I`: `I = {1,5}`, `J = {3,4}`, `k = 5` satisfies (b) and has the larger
+sum. (`06r_triangular.py` part (0): (a), (b) and the equivalence of the two descriptions of
+`<_c` on all pairs of subsets of `{1,…,9}`.)
+
+**Proposition 5.1 [proved].** Let `◁` be a strict partial order on the set of vertices (for
+instance `≺` or `<_c`). Let `d = (d_{IJ})`, `d_{IJ} ∈ e_I A e_J` (`|J| = |I| − 1`), be any
+family, and `G = (G_{IJ})`, `G_{IJ} ∈ e_I A e_J` (`|J| = |I|`), such that
+
+* `G_{II} = ζ_I e_I` with `ζ_I` a non-zero polynomial in the dots, and `G_{IJ} = 0` unless
+  `J = I` or `J ◁ I` (`G` is *`◁`-triangular*);
 * `Σ_J (d_Φ)_{IJ} G_{JK} = Σ_J G_{IJ} d_{JK}` for all `I, K`.
 
 Then `Σ_J d_{IJ} d_{JK} = 0` for all `I, K`.
 
-*Proof.* `G d² = d_Φ G d = d_Φ² G = 0` by Proposition 4.3, i.e.
-`ζ_I (d²)_{IK} = − Σ_{J ≺ I} G_{IJ} (d²)_{JK}`. By induction on `I` along `≺` the right side
-vanishes, and left multiplication by `ζ_I` is injective (F1). ∎
+*Proof.* `G d² = d_Φ G d = d_Φ² G = 0` by Proposition 4.3; the `(I, K)` component reads
+`ζ_I (d²)_{IK} = − Σ_{J ◁ I} G_{IJ} (d²)_{JK}`. We show `(d²)_{IK} = 0` for all `K` by
+well-founded induction on `I` along `◁` (the set of vertices is finite): if
+`(d²)_{JK} = 0` for all `J ◁ I` and all `K` (for a `◁`-minimal `I` the sum is empty), then
+`ζ_I (d²)_{IK} = 0`, and left multiplication by the non-zero polynomial `ζ_I` at the source
+is injective on `e_I A e_K` (Theorem E.1(a) of `01_foundations.md`, a consequence of F1).
+Only the existence of a well-founded order for which `G` is triangular is used, not which
+one. ∎
 
 **Proposition 5.2 (one step) [proved].** Let `w = w′·c`, `(C′, d′)` a complex on the cube of
 `w′` (`d′² = 0`), and `C_R = C′ ⊗ 1`, `C_L = 1 ⊗ C′`. Let `F, h` be families of elements
@@ -343,8 +403,43 @@ and `ζ_m` is injective. The chain map condition for `Γ` on `C_R → C_L` is (�
 `Φ_{k+1}, …, Φ_m`; a complex as soon as the tree formula of `w_{≤k}` is a differential, by
 Proposition 4.2). `C^{(0)} = C_Φ`, `C^{(m)} = C`. A chain map `Γ : C^{(k−1)}_{≤k} → C^{(k)}_{≤k}`
 for the word `w_{≤k}` extends to `C^{(k−1)} → C^{(k)}` by `Γ ⊗ 1` and `1 ⊗ Γ` on the later
-cones, again by naturality. So `G = Γ^{(1)} Γ^{(2)} ⋯ Γ^{(m)}` (first `Γ^{(1)}`) and
-the diagonal of `G` is `∏_{x∈I} ζ_x`. (`06_lib.d_mixed` implements `C^{(k)}`.)
+cones, again by naturality. So `G = Γ^{(1)} Γ^{(2)} ⋯ Γ^{(m)}` (first `Γ^{(1)}`) is a chain
+map `C_Φ → C`. (`06_lib.d_mixed` implements `C^{(k)}`.)
+
+*Triangularity and diagonal.* Suppose every `Γ^{(k)}` has the cone form of Proposition 5.2
+for the word `w_{≤k}`: `Γ^{(k)} = (ζ_k` on the vertices containing `k`, `1` on the others,
+`h_k)`, where `ζ_k = ∏_{a<k, c(a)=c(k)} (x_a − x_k)` and every component of `h_k` goes from a
+vertex `I ∋ k` to a vertex `J ∌ k` (`|J| = |I|`) with `I ∩ {k+1,…,m} = J ∩ {k+1,…,m}` (the
+extension by `⊗ 1`, `1 ⊗` does not touch the later slots). Then:
+
+(i) *`G` is `<_c`-triangular with `G_{II} = ∏_{x∈I} ζ_x e_I`.* `G_{IJ}` is the sum, over the
+sequences `I = J_0, J_1, …, J_m = J` with `J_k = J_{k−1}` (diagonal entry) or `J_{k−1} → J_k`
+a component of `h_k`, of the products of the corresponding entries. A component of `h_k`
+satisfies Lemma 5.0(b) (with this `k`), so `J_k <_c J_{k−1}`; hence `J = I` or `J <_c I`,
+and the only sequence from `I` to `I` is the constant one, whose product is
+`∏_{k∈I} ζ_k e_I` (polynomials in the dots at the same idempotent commute). The factors
+`x_a − x_x` (`a < x ∈ I`, `c(a) = c(x)`) are pairwise different.
+
+(ii) *`G` need not be `≺`-triangular*: the cone form allows components such as
+`{1,5} → {3,4}` of `h_5` (Lemma 5.0), and the degree does not always exclude them: for
+`11211` (`A_2`, red 1) the shapes `{1,5} → {2,4}` and `{1,3,5} → {2,3,4}` of `h_5` (equal
+sums) carry non-zero homogeneous elements of the degree of a component of `Γ^{(5)}`
+(20 basis elements each) [computed, `06r_triangular.py` part (3); in `12121`, `21321`,
+`1212`, `312131` no such shape is allowed by the degree]. So in this generality
+Proposition 5.1 is applied with `◁ = <_c`.
+
+(iii) If every component `I → J` of every `h_k` admits a bijection `I∖J → J∖I` lowering every
+slot, then `G` is also `≺`-triangular (the argument of (i), with Lemma 5.0(a) in place of
+5.0(b)). This holds for the formula of
+Conjecture H and for `H⁺` (§7.2, Definition 8.1): there `J` is `I` with `k` replaced by
+`a_1 < k` and every `b_p` by `a_p < b_p` (all `a`'s outside `I` and pairwise different), and
+for the comparison map of §8.2.
+
+(`06r_triangular.py` parts (1), (2), log `06r_logs/triangular.log`: the `G` of
+Definition 6.2 on `1212`, `213213`, `123421` (`D_4`), `213243` (`A_4`); every component of
+every `h_k` of the formulas H (on `213213`, `12121`, `11211`, `123131`, `121121`, `221122`)
+and `H⁺` (on `121121`, `221122`, `1221122`) is of cone form with a lowering bijection, and
+the factorised `G` is `≺`- and `<_c`-triangular with diagonal `∏_{x∈I} ζ_x`; no failure.)
 
 ---
 ## 6. Words in which every colour occurs at most twice
@@ -419,7 +514,9 @@ In words: `[σ_F]` is the dot-free diagram in which, for each `p ∈ F`, the str
 slides inwards to slot `a_p` (the pure exchange `E` of the brief; no strand crosses the red
 strand, no two strands of the same colour cross, so `[σ_F]` is a basis diagram with
 crossings `ψ` only). `F = ∅` gives the diagonal `G_{II} = ζ_I e_I`, `ζ_I = ∏_{p∈𝔓: b_p∈I} z_p`.
-`G_{I,J} ≠ 0` only for `J = I` or `J ≺ I`.
+`G_{I,J} ≠ 0` only for `J = I_F`, and for `F ≠ ∅` the bijection `b_p ↦ a_p` (`p ∈ F`) from
+`I∖I_F` to `I_F∖I` lowers every slot, so `I_F ≺ I` and `I_F <_c I` (Lemma 5.0(a)): `G` is
+triangular for both orders.
 
 **Theorem 6.2 [proved].** If every colour occurs at most twice in `w`, then for the tree
 differential `d`:  `d_Φ G = G d`.
@@ -506,7 +603,7 @@ of the form `𝒟`, and the labelled strand `j` (resp. `a`) ends in `D_1 D_2′`
 (resp. `{j, y}`) iff `D_2` inverts `{j, y}` (resp. `{a,y}`), and the other pairs as `D_2`. So
 a doubly inverted pair is `{a, y}` or `{j, y}` with `y` crossing both `a` and `j` in `β`,
 and `q = 1` by Lemma 6.4(iii). Independence of the word: `[σ_F]`, `[σ_F(a j)]` do not depend
-on it, and left multiplication by `z_p` is injective (F1). ∎
+on it, and left multiplication by `z_p` is injective (F1: Theorem E.1(a) of `01_foundations.md`). ∎
 
 *Check.* `06_check_labelled.py` part (d): all 549 tree terms of `21321`, `232434`,
 `213421`.
@@ -593,6 +690,11 @@ the sum over the connected subsets `S ∋ ρ`.
 connected `S ∋ ρ` of `T` are the sets `S′` and, if `π(ℓ) ∈ S′`, `S′ ∪ {ℓ}`, for `S′` connected
 in `T′`. For fixed `S′` the factor of `ℓ` sums to `A_ℓ + B_ℓ` if `π(ℓ) ∈ S′` and is `M_ℓ`
 otherwise. ∎
+
+*Check.* `06r_tree_lemma.py 7` (added in the revision): the identity as a polynomial
+identity in independent variables `A_v, B_v` over `ℤ`, for all 874 recursive trees with at
+most 7 vertices (every rooted tree of that size up to relabelling); log
+`06r_logs/tree_lemma.log`.
 
 **Lemma 6.8 (weights) [proved].** Let `q` be a pair and `π` either a pair linked to `q` or a
 slot `ρ` to which `q` is linked. Put `B_q = −ε_q t_{c_q, c(π)} z_q`, where `ε_q = −1` if
@@ -745,10 +847,17 @@ case distinctions made above. Hence `d_Φ G − G d = 0`. ∎
 *Remark (where the hypothesis is used).* (1) Lemma 6.4(ii): a tree term contains at most
 one crossing of strands of equal colour. (2) Lemma 6.3: the link graph is a forest, so that
 the sums over admissible `F″` are the sums over connected sets of Lemma 6.7. With a colour
-occurring three times, the graph of the *labelled* strands is that of the Dynkin diagram
-with the colour doubled, which contains a 4-cycle as soon as the colour has two neighbours
-(or one neighbour occurring twice among the pairs); this is exactly the minimal cyclic
-configuration of `NOTES.md` §4.
+`c` occurring three times there are several pairs of colour `c`, the colour map of Lemma 6.3
+is no longer injective, and the link graph of a configuration *can* contain a 4-cycle (two
+pairs of colour `c` both linked to the same two nodes of colours adjacent to `c` — possible
+when `c` has two neighbours, or one neighbour occurring twice among the pairs); a
+configuration whose link graph is such a 4-cycle is the minimal cyclic configuration of
+`NOTES.md` §4. It need not: words with a colour three times can be cycle-free, e.g. `111`
+and `12121` (`A_2`), and the words with a colour three or four times among the cycle-free
+samples of §7.2. For those words the tree formula is a differential (computed, §7), but the `G` of Definition 6.2 is not a chain map (`111`,
+`12121`, …: `R06_referee.md` §E, multiplicity-3 row), because (1) fails — the mover crosses
+every earlier unaffected strand of its colour — and the correct `G` has the chain terms of
+§7.2.
 
 ---
 ## 7. Words with a colour occurring three or more times
@@ -853,9 +962,10 @@ is `N = 2` with a single neighbouring colour.
 
 Slots `1,4,5` have colour 1 and `2,3,6,7` colour 2; the cyclic configuration is the mover
 `5` with the pairs `(1,4)`, `(2,7)`, `(3,6)` (`cyclefree.find_cycle`). The tree formula does
-not square to zero. The order-by-order corrected differential in the complete ansatz
-(`06_cyclic_true_d.py A 2 1 1221122`, stored in `06_data/`; 690 terms) is the tree formula
-plus **one** component, `{4,5,6,7} → {1,2,3}`:
+not square to zero. The differential produced by the order-by-order solver in the complete
+ansatz (`06_cyclic_true_d.py A 2 1 1221122`, stored in `06_data/`; 690 terms; the normal
+form `d_true` of Remark 8.0(a)) is the tree formula plus **one** component,
+`{4,5,6,7} → {1,2,3}`:
 
 | bijection | coefficient |
 |---|---|
@@ -865,8 +975,57 @@ plus **one** component, `{4,5,6,7} → {1,2,3}`:
 | `(1 5 4)(2 7)(3 6)` (hand-over, the mover changes slot) | `− r_1² r_2² t_{12}² t_{21}²` |
 
 (`x_{c,i}` = dot on the `i`-th strand of colour `c` from the left at the source vertex.) So all
-three phenomena of `NOTES.md` §6 occur: dotted terms, the coefficient 2, hand-over terms.
-(The solver's choice is not canonical: three orders have a kernel.)
+three phenomena of `NOTES.md` §6 occur *in this normal form*: dotted terms, the coefficient
+2, hand-over terms. (The solver's choice is not canonical: three orders have a kernel.)
+
+**Remark 8.0 (normal forms; the dotted terms are not gauge-invariant).**
+(a) *What "the true differential" `d_true` means in this section* (and in the scripts):
+a normal form fixed by the solver. `06_data/*.json` (`1221122` red 1, `1322312`, `2132213`)
+are written by `06_cyclic_true_d.py` = `cupbrane.run_case`: start from `δ₀` (the elementary
+moves with their signs, *not* the tree formula), then repeatedly take the smallest parameter
+monomial (dots ignored) occurring in `d²` and add the correction of that monomial which
+solves that order in the complete ansatz (all homogeneous elements of that monomial, dots
+allowed, `klrw` basis braids, dots at the left end) with minimal `ℓ¹`-norm of its integer
+coefficient vector (HiGHS). That the result contains all tree-formula terms is an outcome of
+the minimisation, not an input. For `1221122` red 1 the orders `r_2t_21`, `r_2²t_21²`,
+`r_1t_12` have kernels of dimension 50, 2, 90 (re-run, identical output:
+`06r_logs/rerun_cyclic_true_d_1221122.log`); the dot-free `d_{F,1}` of (d) below differs
+from `d_true` first at `r_2²t_21²`. `04_data/cyclic7_1221122_W2_tree.json` (red 2) is the same
+solver with weight 1 on tree-formula terms and 1000 on all others: the completion `d_X` that
+keeps the tree formula's `r²`-part (`04_first_order.md` Theorem 9.1(d)).
+(b) *Gauge.* For `g = 1 + k` with `k` of degree 0 and `g` invertible (e.g. `k² = 0`),
+`g d g^{-1}` is again a differential and `g` is an isomorphism between the two complexes. By
+`R04_referee.md` (G0) and `04_first_order.md` Theorem 9.1(e),(f), for red 2 the dot-free
+`d_F = (1 + h_g) d_X (1 − h_g)` is a differential, with `h_g` the two dot-free terms
+`− r_2²t_21² β_{(1 5 4)(2 7)(3 6)} : {4,6,7} → {1,2,3}` and
+`− r_2²t_21² β_{(1 4 5)(2 7)(3 6)} : {4,5,6,7} → {1,2,3,5}`. So the dotted terms, the
+coefficient 2 and the particular hand-over terms of the table are properties of a normal
+form, not invariants of the complex.
+(c) *Lemma [proved].* In Proposition 5.2, if (★) holds for `(F, h)` and `k` is any family of
+the shape of `h` (components `C_R → C_L`), then (★) holds for
+`(F + (d′⊗1)k + k(1⊗d′), h − ζ_m k)`, and the new cube differential is `(1 + k) D (1 − k)`,
+`D = (−d′⊗1, F; 1⊗d′)`. *Proof.* `(d′⊗1)ζ_m k = ζ_m (d′⊗1) k` (Proposition 4.4), so
+`Φ − (d′⊗1)(h − ζ_m k) − (h − ζ_m k)(1⊗d′) = ζ_m (F + (d′⊗1)k + k(1⊗d′))`. And `k² = 0`;
+in `(1+k)D(1−k) = D + kD − Dk − kDk` only `k(1⊗d′)` and `−(−d′⊗1)k` survive, since `k`
+starts in `C_R` and ends in `C_L`. ∎ So the division fixes a normal form through the choice
+of `h`; changing `h` by `ζ_m`-multiples changes the quotient by a gauge.
+(d) *Test* (`06r_gauge_1221122.py`, log `06r_logs/gauge_1221122.log`). **Red 2:** the
+division with `h⁺` (Definition 8.1) is exact in all 153 components and its quotient is
+**exactly `d_X`**, the dotted completion (equal in every component to
+`04_data/cyclic7_1221122_W2_tree.json` and to the referee's independent
+`R04_data/cyclic7_1221122_W2_dotted.json`); it differs from the dot-free `d_F`
+(`R04_data/cyclic7_1221122_W2_dotfree.json`) in 9 components. Iterated division from `d_Φ`
+gives the same. With `h′ = h⁺ − ζ_7 h_g` (the lemma with `k = h_g`; `Γ′ = Γ(1 − h_g)`) the
+division is again exact and its quotient is **exactly `d_F`**. So the division with `h⁺`
+produces neither `d_F` nor a third normal form, but `d_X`. **Red 1** (the example above): the
+stored `d_true` is the quotient of the division with `h⁺`; the same two terms `h_g` are
+homogeneous of degree 0 for red 1 as well and conjugate it into a **dot-free** differential
+`d_{F,1}`, which is the quotient of the division with `h⁺ − ζ_7 h_g`; its terms outside the
+tree formula are exactly those of `d_F` (the 8 hand-over terms `κ*` of `04` Theorem 9.1(e)
+at `r_2²t_21²` and the four terms `ε₄` in `{4,5,6,7} → {1,2,3}`). Hence for this word, for
+both red colours, the dotted terms are an artefact of the normal form selected by `h⁺`.
+Whether the dotted terms of `1322312` (§8.6) and `2132213` (§8.5) can be removed in the
+same way was not tested.
 
 ### 8.2 A comparison map exists and is unique up to homotopy
 
@@ -879,10 +1038,22 @@ homotopy and a scalar, exactly one comparison map; a sparsest representative wit
     {4,6,7} → {1,2,3},  {4,5,6,7} → {1,2,3,5}:   ± r_1 r_2³ t_{12} t_{21} (x_6 − x_7) · [(1 4)(2 6 3 7)],
     {5,6,7} → {1,2,3},  {4,5,6,7} → {1,2,3,4}:   ± r_1 r_2³ t_{12} t_{21} (x_6 − x_7) · [(1 5)(2 6 3 7)].
 
-Hence `G = Γ^{(1)}⋯Γ^{(7)}` exists, is triangular with diagonal `ζ_I`, and
-`d_true = G^{-1} d_Φ G` over `A[Δ^{-1}]`: **the intertwiner description extends to the cyclic
-case.** With the formula of Conjecture H alone the division fails: `Φ − (d′⊗1)h − h(1⊗d′)` is
-not divisible by `ζ_7` in 21 components (`06_divide.py A 2 1 1221122`).
+This representative has the cone form of Proposition 5.2 (diagonal `ζ_7` on `C_R`, `1` on
+`C_L`, all other components `C_R → C_L`: the formula of Conjecture H differs from it only in
+these four components, re-run `06r_logs/rerun_cyc_step_1221122.log`). Take it as `Γ^{(7)}`
+and, for `k ≤ 6`, the formula of Conjecture H for the cycle-free prefix `122112` (a chain
+map at each of these steps [computed], `06_check_step_formula.py A 2 1 1221122`: it fails
+only at the step `k = 7`). Then `G = Γ^{(1)}⋯Γ^{(7)} : C_Φ → (C, d_true)` is a chain map; all
+seven maps have the cone form, so `G` is `<_c`-triangular with diagonal `∏_{x∈I} ζ_x`
+(Remark 5.3(i)); the four extra terms also admit lowering bijections (e.g.
+`{4,6,7} → {1,2,3}`: `4 ↦ 1, 6 ↦ 2, 7 ↦ 3`), so `G` is `≺`-triangular as well (Remark
+5.3(iii)). By Proposition 9.1 (with `◁ = <_c`), `d_true = G^{-1} d_Φ G` after localisation
+at `Δ`. So **in this example** the intertwiner description extends to a cyclic word; this is
+one computed case (and its analogues in §8.5), not a general statement. (By Remark 8.0 the
+target `d_true` is itself one normal form; composing `Γ^{(7)}` with `1 − h_g` gives the
+analogous statement for the dot-free `d_{F,1}`.) With the formula of Conjecture H alone the
+division fails: `Φ − (d′⊗1)h − h(1⊗d′)` is not divisible by `ζ_7` in 21 components
+(`06_divide.py A 2 1 1221122`).
 
 ### 8.3 The formula `H⁺`
 
@@ -908,7 +1079,7 @@ colour, to the chain: three nodes of colours `c, c′, c`.
 `H⁺` differs from `H` only if the colour of the chain has at least four slots
 (`a_{i−1}, a_i, b, m`).
 
-### 8.4 Division with `H⁺` gives the true differential
+### 8.4 Division with `H⁺` reproduces the solver's differential (one example)
 
 `06_divide.py A 2 1 1221122 plus`: with `h⁺` of Definition 8.1 and `d′` the tree differential
 of `122112`, the element `Φ − (d′⊗1)h⁺ − h⁺(1⊗d′)` **is divisible by `ζ_7` in all 153
@@ -916,14 +1087,15 @@ components**, and the quotient
 
     F = ζ_7^{-1} ( Φ_7 − (d′⊗1) h⁺ − h⁺ (1⊗d′) )
 
-equals the stored true differential in every component: the tree terms, and the component
+equals the stored `d_true` in every component: the tree terms, and the component
 of §8.1 with its dotted terms, the coefficient 2 and the three hand-over terms. (By
 Proposition 5.2 divisibility alone implies `d² = 0`; the script checks it again.)
 
-So in this example the differential is given by a closed formula: the tree formula for the
-prefix, the explicit `h⁺`, and one division by the product `ζ_7` of differences of dots.
+So in this example a differential is given by a closed formula: the tree formula for the
+prefix, the explicit `h⁺`, and one division by the product `ζ_7` of differences of dots. It
+is the solver's normal form; `h⁺ − ζ_7 h_g` gives the dot-free one instead (Remark 8.0(d)).
 
-### 8.5 Iterated division: a definition of the differential that does not use the tree formula
+### 8.5 Iterated division: a construction of a differential that does not use the tree formula (computed on a few words)
 
 `06_divide_all.py` starts from `d_0 = d_Φ` and for `k = 1, …, m` defines `d_k` from `d_{k−1}`
 by `d_k = (Γ^{(k)})^{-1} d_{k−1} Γ^{(k)}` with `Γ^{(k)} = ζ_k + h_k⁺` — concretely only the
@@ -932,8 +1104,11 @@ components `I → K` with `k ∈ I`, `k ∉ K` change, and
     ζ_k · d_k(I → K) = Σ_J d_{k−1}(I → J) Γ^{(k)}(J → K) − Σ_{J≠I} Γ^{(k)}(I → J) d_{k−1}(J → K);
 
 the script solves this for `d_k(I → K)` in the complete ansatz and reports non-divisible
-components. If all divisions are exact, `d_m` is a differential (`d_m = G^{-1}d_ΦG`,
-`G = Γ^{(1)}⋯Γ^{(m)}`), obtained without any information about the tree formula.
+components. If all divisions are exact, the script checks `d_m² = 0` directly; `d_m` is then a
+differential on the cube of `w` obtained from `d_Φ` and the explicit `h_k⁺` alone, without
+any information about the tree formula (formally `d_m = G^{-1}d_ΦG`, `G = Γ^{(1)}⋯Γ^{(m)}`,
+after localisation at `Δ`). Whether this happens for a given word is a computation; the
+table lists every word on which it was done.
 
 **Results** (`06_divide_all.py … plus`; "exact" = all divisions exact, and then `d_m² = 0`
 was verified again):
@@ -941,36 +1116,40 @@ was verified again):
 | word | cyclic | result |
 |---|---|---|
 | `A_2` red 1: `12121`, `1211`; red 2: `2112` | no | exact; `d_m` = tree formula |
-| `A_2` red 1 `1221122` | yes | exact; `d_m` = stored true differential in all components (tree formula + the component of §8.1) |
-| `A_2` red 2 `1221122` | yes | exact; `d_m` = the differential `04_data/cyclic7_1221122_W2_tree.json` computed by the first-order front, in all components (`06_compare_04.py`) |
+| `A_2` red 1 `1221122` | yes | exact; `d_m` = stored `d_true` (solver normal form) in all components (tree formula + the component of §8.1) |
+| `A_2` red 2 `1221122` | yes | exact; `d_m` = the differential `04_data/cyclic7_1221122_W2_tree.json` computed by the first-order front, in all components (`06_compare_04.py`): the dotted normal form `d_X`, not the dot-free `d_F` (Remark 8.0(d), `06r_gauge_1221122.py`) |
 | `A_2` red 2 `2211221` | yes | exact; `d_m² = 0`; 3 components differ from the tree formula |
 | `A_3` red 1 `1322312` (one step, `06_divide.py`) | yes | exact; `d² = 0`; 3 components differ from the tree formula (§8.6) |
-| `A_3` red 2 `2132213` (the minimal cyclic configuration with two different neighbouring colours: mover 5 and pair `(1,4)` of colour 2, pairs `(2,6)`, `(3,7)` of colours 1, 3; here `H⁺ = H`) | yes | exact; `d_m` = the corrected differential computed by `06_cyclic_true_d.py` (616 terms), in all components. It is the tree formula plus the component `{4,5,6,7} → {1,2,3}`: `r_1r_2r_3t_{12}t_{32}·(t_{12}t_{23}(x_{1,1}+x_{1,2}) + t_{21}t_{23}(x_{2,1}+x_{2,2}+2x_{2,3}) + t_{21}t_{32}(x_{3,1}+x_{3,2}))·[(1 4)(2 6)(3 7)]` and the hand-over term `r_1r_2²r_3t_{12}t_{21}t_{23}t_{32}·[(1 5 4)(2 6)(3 7)]`. For this word the comparison map is unique outright: the space of chain maps `Cone(Φ_7) → (C, d_true)` is 1-dimensional and there are no homotopies (`06_cyclic_homotopy.py`) |
+| `A_3` red 2 `2132213` (the minimal cyclic configuration with two different neighbouring colours: mover 5 and pair `(1,4)` of colour 2, pairs `(2,6)`, `(3,7)` of colours 1, 3; here `H⁺ = H`) | yes | exact; `d_m` = the corrected differential computed by `06_cyclic_true_d.py` (616 terms; solver normal form, Remark 8.0(a)), in all components. It is the tree formula plus the component `{4,5,6,7} → {1,2,3}`: `r_1r_2r_3t_{12}t_{32}·(t_{12}t_{23}(x_{1,1}+x_{1,2}) + t_{21}t_{23}(x_{2,1}+x_{2,2}+2x_{2,3}) + t_{21}t_{32}(x_{3,1}+x_{3,2}))·[(1 4)(2 6)(3 7)]` and the hand-over term `r_1r_2²r_3t_{12}t_{21}t_{23}t_{32}·[(1 5 4)(2 6)(3 7)]`. For this word the comparison map is unique outright: the space of chain maps `Cone(Φ_7) → (C, d_true)` is 1-dimensional and there are no homotopies (`06_cyclic_homotopy.py`) |
 | `A_2` red 1 `12211221` (8 strands; the prefix `1221122` is already cyclic) | yes | steps 1–7 exact (they are the word `1221122`); **step 8 is not exact: 18 components are not divisible** (17 minutes) |
 | `A_2` red 1 `12211212` (8 strands, cycle-free prefix `1221121`; one step, `06_divide.py … plus`) | yes | not completed (stopped after 27 minutes) |
 
 On cycle-free words the formula `H⁺` passes the same tests as the formula of Conjecture H
 (`06_check_step_formula.py … plus` on the samples `A 3 random 40 7 3 11`,
 `A 2 random 30 7 4 3`, `D 4 random 40 7 3 7`: all cycle-free words hold), so `H⁺` can
-replace `H` in Conjecture H.
+replace `H` in Conjecture H (as far as these samples show).
 
 **Conjecture H⁺.** If the prefix `w′` has no cyclic configuration, then
 `Φ_m − (d′⊗1)h⁺ − h⁺(1⊗d′)` is divisible by `ζ_m` (`d′` the tree differential of `w′`, `h⁺` of
-Definition 8.1), and the quotient `F` completes `d′` to the differential of the cube of `w`
+Definition 8.1), and the quotient `F` completes `d′` to a differential of the cube of `w`
 (by Proposition 5.2 it does give a differential); it is the tree formula iff `w` has no
-cyclic configuration.
+cyclic configuration. *Evidence:* the cycle-free samples of §7.2 and the five cyclic
+7-strand cases of the table above — nothing more. In the cyclic case the conjecture
+concerns *one* normal form of the differential: in the examples the quotient is the solver's
+(dotted) normal form, and by Remark 8.0(c) a different `h` (`h⁺` minus a `ζ_m`-multiple)
+gives a gauge-equivalent one.
 
 **This does not extend as it stands to words with a cyclic prefix**: for `12211221` the
 division at step 8, with `d_7` the (true) differential of the cyclic prefix and the same
 formula `h_8⁺`, fails in 18 components. Presumably `h` needs further terms attached to the
 cyclic configurations of the prefix (as `d′` then contains dotted and hand-over terms); I
-did not determine them. So the statement "the true differential is `G^{-1}d_ΦG`" is
-established in the cyclic case only at the first cyclic step, and a formula for `G` beyond
-it is open.
+did not determine them. So the statement "the differential is `G^{-1}d_ΦG`" is
+computed in the cyclic case only at the first cyclic step, and only on the words of the
+table; a formula for `G` beyond it is open.
 
-The evidence in the cyclic case is the 7-strand words above (five words; four of them
-with a non-trivial comparison, three of which reproduce an independently computed
-differential exactly). I have no example with two independent cycles and none in
+The evidence in the cyclic case is the 7-strand cases above (five cases: `1221122` with
+red 1 and red 2, `2211221`, `1322312`, `2132213`; four of them with a non-trivial
+comparison, three of which reproduce an independently computed normal form exactly). I have no example with two independent cycles and none in
 which a cyclic configuration needs a chain of length 3.
 
 ### 8.6 The example `1322312` (`A_3`, red 1)
@@ -1002,14 +1181,32 @@ polynomial). `Δ` is central in `A`: it commutes with crossings of different col
 dots slide and `Δ` is symmetric within each colour, and with crossings of equal colour by
 Lemma 1.1.
 
-**Proposition 9.1 [proved].** If `G` is as in Proposition 5.1 and every `ζ_I` is a product of
-factors `±(x_a − x_b)`, `c(a) = c(b)`, without repetition (as in Definition 6.2 and in
-Remark 5.3), then `G ⊗ ℤ[Δ^{-1}] : C_Φ[Δ^{-1}] → C[Δ^{-1}]` is an isomorphism of complexes, and
-`d = G^{-1} d_Φ G` over `A[Δ^{-1}]`.
+*Localisation at `Δ`.* The powers of `Δ` form a multiplicative set `S_Δ = {Δ^n}` of central
+elements of `A`. For an `A`-module, a complex of `A`-modules or a `Pol`-module `M` write
+`M[Δ^{-1}] = S_Δ^{-1} M` for its *localisation at the central element `Δ`* (on `Pol` and its
+modules, `Δ ∈ Pol` acts by multiplication); `A[Δ^{-1}] = S_Δ^{-1}A` is a ring, and a map of
+complexes `f` induces `f[Δ^{-1}]`. Localisation is exact and commutes with homology and with
+`e (−)`. (No ring of the form `ℤ[Δ^{-1}]` or `R[Δ^{-1}]` is meant: `Δ` is an element of `A`,
+not of `ℤ` or `R`.)
 
-*Proof.* `ζ_I` divides `∏_c∏_{i<j}(x_{c,i} − x_{c,j})`, whose square is `Δ`; so `ζ_I` is
-invertible in `e_I A[Δ^{-1}] e_I`, and a triangular matrix with invertible diagonal is
-invertible. ∎
+**Proposition 9.1 [proved].** Let `G : C_Φ → C` satisfy the hypotheses of Proposition 5.1
+for some strict partial order `◁` on the vertices, and let every `ζ_I` be a product of
+factors `±(x_a − x_b)`, `a ≠ b`, `c(a) = c(b)`, no two of them for the same pair `{a, b}`.
+This holds for the `G` of Definition 6.2 (`◁ = ≺` or `<_c`) and for a factorised
+`G = Γ^{(1)}⋯Γ^{(m)}` of one-step maps of cone form (`◁ = <_c`, Remark 5.3(i)). Then the
+localisation of `G` at `Δ`, `G[Δ^{-1}] : C_Φ[Δ^{-1}] → C[Δ^{-1}]`, is an isomorphism of
+complexes, and `d = G^{-1} d_Φ G` with `G^{-1}` a `◁`-triangular matrix over `A[Δ^{-1}]`.
+
+*Proof.* At the idempotent `e_I` put `δ = ∏_c ∏_{i<j} (x_{c,i} − x_{c,j})`, so `δ² = Δ`. The
+factors of `ζ_I` are, up to sign, pairwise different factors of `δ`, so `ζ_I g_I = ±δ` for a
+polynomial `g_I`, and `ζ_I e_I` has the inverse `±g_I δ Δ^{-1} e_I` in `e_I A[Δ^{-1}] e_I`
+(polynomials in the dots at one idempotent commute). Write `G = D + N` with `D` the diagonal
+and `N_{IJ} ≠ 0` only for `J ◁ I`. Then `G = D(1 + D^{-1}N)`, and the components of
+`(D^{-1}N)^l` are sums over chains `I = J_0 ▷ J_1 ▷ ⋯ ▷ J_l`; a chain has at most `2^m`
+elements, so `(D^{-1}N)^l = 0` for `l ≥ 2^m`, and `G^{-1} = Σ_{l<2^m} (−D^{-1}N)^l D^{-1}` is a
+two-sided inverse, again `◁`-triangular. Localisation is a functor, so `G[Δ^{-1}]` is a
+chain map, and its inverse is then a chain map as well. From `d_Φ G = G d`,
+`d = G^{-1} d_Φ G`. ∎
 
 **Proposition 9.2 [proved].** Let `t` be a labelled state. The left `Pol`-submodules
 `Pol·𝒟(t → std I) ⊆ e(t) A e_I` are free of rank one and form a subcomplex `𝒦(t)` of
@@ -1018,7 +1215,7 @@ invertible. ∎
     f_j(t) = ∏ { q_{jy} :  y ∈ {W, 1, …, j−1},  j to the left of y in t },      j = 1, …, m.
 
 *Proof.* `𝒟(t → std I)𝒟(std I → t) = ∏_{inv} q ≠ 0` (Proposition 3.5) and `e(t)Ae_I` is a
-free `Pol`-module (F1), so the rank is one. By Proposition 3.5,
+free `Pol`-module (F1: Theorem A.5(ii) of `01_foundations.md`; only `Pol ↪ e(t)Ae(t)` is needed), so the rank is one. By Proposition 3.5,
 `𝒟(t → std I)Φ_j(I) = ∏ q_{jy}·𝒟(t → std(I∖j))` over the pairs `{j, y}` inverted by `Φ_j(I)`
 (`y < j` or `y = W`; in `std I` these `y` are to the left of `j`) which are also inverted
 between `t` and `std I`, i.e. for which `j` is to the left of `y` in `t`. This does not
@@ -1026,7 +1223,8 @@ depend on `I`. ∎
 
 **Proposition 9.3 [proved].** For every state `e` of `A` and every vertex `I`,
 `e A[Δ^{-1}] e_I = ⊕_t Pol[Δ^{-1}]·𝒟(t → std I)`, the sum over the labelled states `t` with
-colour sequence `e`. Hence `e\,C_Φ[Δ^{-1}] = ⊕_t 𝒦(t)[Δ^{-1}]` as complexes.
+colour sequence `e`. Hence `e\,C_Φ[Δ^{-1}] = ⊕_t 𝒦(t)[Δ^{-1}]` as complexes (localisations
+at `Δ`).
 
 *Proof.* Over `Pol[Δ^{-1}]`, `ψ = (x_i − x_{i+1})^{-1}(φ + r)` for strands of equal colour, so
 every product of generators of `A` from `e` to `e_I` is a combination, with coefficients
@@ -1034,18 +1232,22 @@ in `Pol[Δ^{-1}]` written at the source (Proposition 3.3), of products of genera
 words ending in `std I`; by Proposition 3.5 (applied letter by letter) each such product
 is a `Pol`-multiple of one `𝒟(t → std I)`. So the `𝒟(t → std I)` span. Their number is the
 number of colour-preserving bijections, which is the rank of the free `Pol[Δ^{-1}]`-module
-`eA[Δ^{-1}]e_I` (F1); a spanning set of `n` elements of a free module of rank `n` over a
+`eA[Δ^{-1}]e_I` (F1: Theorem A.5(ii) of `01_foundations.md`, localised at `Δ`); a spanning set of `n` elements of a free module of rank `n` over a
 commutative ring is a basis. ∎
 
 **Corollary 9.4 [proved, for every word for which a map `G` as in Proposition 9.1 exists —
 by Theorem 6.2 for every word in which each colour occurs at most twice].** Let
-`R′ = R[r^{-1}, t^{-1}, u^{-1}]` (all parameters inverted). Then
+`R′ = R[r^{-1}, t^{-1}, u^{-1}]` (all parameters inverted; `R → R′` is flat, so
+`H_i(C) ⊗_R R′ = H_i(C ⊗_R R′)`), `Pol′ = R′[x_1, …, x_m]`, and let `[Δ^{-1}]` denote
+localisation at the central element `Δ` as above. Then
 
-    H_i(C) ⊗_R R′[Δ^{-1}] = 0   for i > 0,
-    e·H_0(C) ⊗_R R′[Δ^{-1}] ≅ ⊕_t Pol′[Δ^{-1}] / (f_1(t), …, f_m(t)).
+    (H_i(C) ⊗_R R′)[Δ^{-1}] = 0   for i > 0,
+    e·(H_0(C) ⊗_R R′)[Δ^{-1}] ≅ ⊕_t Pol′[Δ^{-1}] / (f_1(t), …, f_m(t)).
 
-*Proof.* By Propositions 9.1 and 9.3 it suffices to show that the Koszul complex of
-`(f_j(t))` over `Pol′ = R′[x]` is exact in positive degrees. Over `R′` each `f_j(t)` is a
+*Proof.* Localisation at `Δ` and `⊗_R R′` are exact, so the left sides are the homology of
+`e·(C ⊗_R R′)[Δ^{-1}]`, which by Propositions 9.1 and 9.3 (over `R′`) is isomorphic to
+`⊕_t 𝒦(t) ⊗_R R′` localised at `Δ`. So it suffices to show that the Koszul complex of
+`(f_j(t))` over `Pol′` is exact in positive degrees (then so is its localisation). Over `R′` each `f_j(t)` is a
 unit (if no factor contains a dot) or, up to a unit, a monic polynomial of positive degree
 in `x_j` with coefficients in `R′[x_1,…,x_{j−1}]` (each non-constant factor is `u_k x_j` or
 `t x_j + t′ x_y`, `y < j`). If some `f_j` is a unit the Koszul complex is contractible.
@@ -1063,7 +1265,7 @@ and `H(C)` and `H(C_Φ)` can differ by torsion.
 ---
 ## 10. Status
 
-### Proved completely (from the relations of §1.1 and F1, F3)
+### Proved completely (from the relations of §1.1, F1 = Theorems A.5 and E.1 of `01_foundations.md`, and F3)
 
 * Lemma 1.1, Lemma 2.1 (intertwiner identities), **Lemma 2.3** (the generators "`ψ` for
   different colours, `φ` for equal colours" satisfy the braid relations exactly, red strand
@@ -1072,18 +1274,42 @@ and `H(C)` and `H(C_Φ)` can differ by torsion.
   product rule (3.5).
 * Proposition 4.2 (naturality of `Φ`, statement (i) of the brief), **Proposition 4.3**
   (`d_Φ² = 0` for every word), Proposition 4.4 (statement (ii) of the brief).
-* Proposition 5.1 (a triangular `G` with `d_Φ G = G d` forces `d² = 0`), Proposition 5.2 (the
-  Key Lemma (★) implies that `F` is a chain map), Remark 5.3 (factorisation of `G`).
+* Lemma 5.0 (the sum order `≺` and the colex order `<_c`), Proposition 5.1 (a `G` with
+  `d_Φ G = G d`, triangular for *some* strict partial order on the vertices, forces
+  `d² = 0`), Proposition 5.2 (the Key Lemma (★) implies that `F` is a chain map), Remark 5.3
+  (factorisation of `G`; a factorised `G` of one-step maps of cone form is `<_c`-triangular
+  with diagonal `∏_{x∈I} ζ_x`, and `≺`-triangular when every `h_k` lowers every slot, as for
+  the formulas H and `H⁺`; not `≺`-triangular in general).
 * **Theorem 6.2 and Corollary 6.3**: for every word in which each colour occurs at most
-  twice, `d_Φ G = G d_tree` with `G` of Definition 6.2; hence the tree formula is a
-  differential. (Lemmas 6.1, 6.3–6.8, Corollary 6.9.) This is independent of the proof in
-  `05_main_sliding.md`: it uses no sliding of strands through triple points; the only
-  relations entering after §3 are `(x_a − x_b)ψ = φ + r` and the product rule.
-* Propositions 9.1–9.3 and Corollary 9.4: for such words `C[Δ^{-1}] ≅ C_Φ[Δ^{-1}]`, and after
-  inverting `Δ` and the parameters the tree complex has no higher homology.
+  twice, `d_Φ G = G d_tree` with `G` of Definition 6.2 (triangular for `≺` and for `<_c`);
+  hence the tree formula is a differential. (Lemmas 6.1, 6.3–6.8, Corollary 6.9.) This is
+  independent of the proof in `05_main_sliding.md`: it uses no sliding of strands through
+  triple points; the only relations entering after §3 are `(x_a − x_b)ψ = φ + r` and the
+  product rule. Confirmed by the referee (`R06_referee.md`), including an independent
+  class-by-class check of §6.6.
+* Propositions 9.1–9.3 and Corollary 9.4: for such words (and every word with a `G` as in
+  Proposition 9.1) `C[Δ^{-1}] ≅ C_Φ[Δ^{-1}]` (localisation at the central element `Δ`), and
+  after inverting the parameters and localising at `Δ` the tree complex has no higher
+  homology.
+* The lemma of Remark 8.0(c): changing `h` by a `ζ_m`-multiple `ζ_m k` changes the quotient
+  `F` of (★) by the gauge `1 + k`.
 
-Every one of these statements is also checked by an exact computation (scripts named next
-to the statements).
+*Which of these have a script.* Not every statement has one. With a script (exact
+computation, cases listed next to the statement): Lemma 1.1 (referee: `R06_basic.py`, on
+a cubic `f`); Lemmas 2.1, 2.3, Propositions 4.2–4.4 (`06_check_basic.py`; referee:
+`R06_basic.py`, `R06_natural.py`); §3 and Lemma 6.5
+(`06_check_labelled.py`); Lemma 5.0 and the triangularity statements of Remark 5.3,
+Definition 6.2 and §8.2 (`06r_triangular.py`, added in the revision); Lemma 6.6
+(`06_check_bigons.py`); Lemma 6.7 (`06r_tree_lemma.py`, added in the revision); Theorem 6.2
+(`06_check_G_formula.py`, `06_check_minuscule.py`; referee: `R06_main.py` on all 810 + 9 296
+cases of length ≤ 6 in `A_3`, `D_4`, and `R06_classes.py`, which checks that each class
+T0/T1/T2 of §6.6 vanishes separately); Proposition 9.2 (referee: `R06_sec9.py`, 1 536
+identities); the lemma of Remark 8.0(c) in the example of §8 (`06r_gauge_1221122.py`
+parts (3), (4), (6)). **Without a script of their own:** Lemmas 6.1, 6.3, 6.4,
+6.8 and Corollary 6.9 (they enter every check of Theorem 6.2 and the referee's class-by-class
+check, but are not tested separately), Propositions 5.1 and 5.2 (formal arguments; their
+conclusion `d² = 0` is re-checked whenever they are applied, e.g. in `06_divide.py`),
+Propositions 9.1, 9.3 and Corollary 9.4.
 
 ### Verified only by computation
 
@@ -1091,10 +1317,37 @@ to the statements).
   colour occurring three times (§7.1).
 * Conjecture H (closed form of the one-step maps, any multiplicity): 168 cycle-free words,
   up to 10 strands, including `A_5ω_3` and the spinor of `D_5` (§7.2).
-* Cyclic case (§8): existence and uniqueness (up to homotopy) of the comparison map for
-  `1221122` and `2132213`; the formula `H⁺`; exactness of the division at the first cyclic
-  step and equality of the quotient with an independently computed true differential
-  (`1221122` red 1 and red 2, `2132213`), resp. `d² = 0` of the quotient (`2211221`, `1322312`).
+* Cyclic case (§8), **on five cyclic 7-strand cases only** (`1221122` with red 1 and red 2,
+  `2211221`, `1322312`, `2132213`): existence and uniqueness (up to homotopy) of the
+  comparison map for `1221122` (red 1) and `2132213`; the formula `H⁺`; exactness of the
+  division at the first cyclic step and equality of the quotient with an independently
+  computed *normal form* of the differential (`1221122` red 1 and red 2, `2132213`), resp.
+  `d² = 0` of the quotient (`2211221`, `1322312`). For `1221122` (red 1 and red 2) the
+  quotient with `h⁺` is the dotted normal form; the dot-free gauge-equivalent differential
+  is the quotient with `h⁺ − ζ_7 h_g` (Remark 8.0(d)). These are not general statements.
+
+*Re-runs in this revision.* The author's scripts quoted in the text that finish within a few
+minutes were re-run (logs `checks/06r_logs/rerun_*.log`, summary `rerun_SUMMARY.txt`); every
+result agrees with the text: `06_check_basic.py` (each of `121`, `1212`, `1211`, `111` with
+red 1 and red 2: 672 identities, all true), `06_check_labelled.py` (the four words, 60
+random samples per part; (d) 549 tree terms), `06_check_bigons.py 30000 1` (18 136
+configurations), `06_check_G_formula.py` (both random samples: 45 of 45 words),
+`06_check_minuscule.py` (all seven minuscule words, including `A_6ω_2` and `D_5ω_5`),
+`06_check_factorisation.py` (on `2132`, `21321`, `213213`, `132132`; the text's seven words
+are not listed), `06_check_step_formula.py` (the seven named chosen words, the four random
+samples with and without `plus`: as in the table of §7.2, the cyclic words failing at the
+last step only; `1221122` red 1: `YYYYYYN`), `06_batch_G.py` (all 21 words of §7.1: as in the
+table), `06_solve_step.py` (the seven words of §7.1: every step 1-dimensional),
+`06_cyclic_step.py`, `06_cyclic_homotopy.py` (`1221122`: 563 / 562; `2132213`: 1 / 0;
+`1322312`: 522 / 522), `06_divide.py` (`1221122` with H: 21 non-divisible components; with
+`plus`: exact, 0 components differ from `d_true`; `1322312`: exact, 3 components differ from
+the tree formula), `06_divide_all.py … plus` (`12121`, `1211`, `2112`, `1221122` red 1,
+`2211221`, `2132213`: as in the table of §8.5), `06_compare_04.py` (0 components differ), and
+the solver of `06_cyclic_true_d.py A 2 1 1221122` (run into a scratch directory so as not to
+overwrite `06_data/`: 690 terms, identical to the stored file;
+`rerun_cyclic_true_d_1221122.log`). Not re-run: `06_divide_all.py`
+on `12211221` (17 minutes), `06_divide.py … 12211212 plus` (not completed by the author,
+27 minutes), `06_cyclic_G.py` (not completed by the author).
 
 ### Open
 
@@ -1103,11 +1356,27 @@ to the statements).
 * Conjecture H⁺ (division at the first cyclic step), and the correct `h` after a cyclic
   step, where `H⁺` is known to be insufficient (`12211221`, §8.5); a closed formula for
   the quotient in the cyclic case (the dotted and hand-over terms are *produced* by the
-  division; they are not yet *described* term by term).
+  division; they are not yet *described* term by term) — and, by Remark 8.0, which normal
+  form such a formula should describe.
+* Whether the dotted cyclic terms of `1322312`, `2132213`, `2211221` are gauge artefacts as
+  they are for `1221122` (Remark 8.0(d)).
 * Whether `C` is a resolution over `R` (no `Δ`-torsion in the higher homology), §9.
 * The other-direction map `G′ : C → C_Φ` (diagonal `∏_{x∉I} ζ_x`) was not studied.
 
 ### Failed attempts and corrections to the brief
+
+* *(Corrected in the revision after `R06_referee.md`.)* The first version stated
+  Proposition 5.1 for the sum order `≺` only and called a factorised `G = Γ^{(1)}⋯Γ^{(m)}`
+  triangular (Remark 5.3, §8.2, Proposition 9.1) without saying for which order; for one-step
+  maps of cone form it is `<_c`-triangular, not `≺`-triangular in general (Lemma 5.0,
+  Remark 5.3(ii)). Corollary 6.3 was not affected (Definition 6.2 is `≺`-triangular).
+* *(Corrected in the revision, after `R04_referee.md` G0.)* The first version called the
+  solver's output "the true differential" and presented its dotted terms, coefficient 2 and
+  hand-over terms as *the* cyclic correction, and the iterated division as a general
+  definition of the differential. For `1221122` (red 1 and red 2) the dotted terms are a
+  normal-form artefact: a dot-free gauge-equivalent differential exists and is produced by
+  the division with `h⁺ − ζ_7 h_g` (Remark 8.0); the statements about division are
+  computations on five cyclic cases (Conjecture H⁺).
 
 * The global `G` is **not** the product of the commuting factors `z_p − r_pE_p`: for two
   linked pairs the coefficient of the double exchange is neither of the two honest bigons
@@ -1154,3 +1423,6 @@ from `proofs/checks/`.
 | `06_divide_all.py … [plus] [print]` | iterated division from `d_Φ` | §8.5 |
 | `06_compare_04.py [FILE]` | iterated division against the differential stored in `04_data/` | §8.5 |
 | `06_cyclic_G.py` | global `G` in the complete ansatz against a stored differential — **not completed** for 7 strands (too large); superseded by `06_cyclic_step.py` | — |
+| `06r_triangular.py` (revision) | Lemma 5.0 on all pairs of subsets of `{1..9}`; triangularity (`≺`, `<_c`) and diagonal of the `G` of Definition 6.2 and of factorised `G` (formulas H, `H⁺`); one-step shapes not `≺`-smaller allowed by the degree (log `06r_logs/triangular.log`, < 1 min) | §5, Remark 5.3 |
+| `06r_tree_lemma.py [N]` (revision) | Lemma 6.7 as a polynomial identity on all recursive trees with ≤ `N` vertices (log `06r_logs/tree_lemma.log`) | Lemma 6.7 |
+| `06r_gauge_1221122.py` (revision) | `1221122`, red 2: the quotient of the division with `h⁺` against `d_X` (`04_data`, `R04_data`) and `d_F` (`R04_data`); iterated division; division with `h⁺ − ζ_7h_g`; the gauge; red 1: the same gauge on `06_data` (log `06r_logs/gauge_1221122.log`, 3 min) | Remark 8.0 |

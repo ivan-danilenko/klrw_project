@@ -1,0 +1,4 @@
+$ sage -python 06_check_minuscule.py A 5 3
+minuscule word 321432543 multiplicities [1, 1, 2, 2, 3]
+A5 red 3 word 321432543: cyclic False, steps OK: YYYYYYYYY   [43s]
+[exit 0, 56 s]

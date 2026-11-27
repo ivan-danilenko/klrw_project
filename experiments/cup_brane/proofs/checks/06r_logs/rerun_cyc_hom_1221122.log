@@ -1,0 +1,3 @@
+$ sage -python 06_cyclic_homotopy.py A 2 1 1221122
+chain maps: dim 563; homotopies: 562 unknowns, null-homotopic chain maps: dim 562; chain maps modulo homotopy: dim 1  [130s]
+[exit 0, 193 s]

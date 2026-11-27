@@ -1,0 +1,20 @@
+(0) Lemma 5.0(a) on 16284 pairs: True;  (b) on 24054 pairs: True;  colex = max of symmetric difference in I: True;  a pair as in (b) that is not sum-smaller: ([1, 4], [2, 3], 4)
+(1) Def. 6.2, A2 red 1 word 1212: 9 off-diagonal components, not (< and <_c): 0
+(1) Def. 6.2, A3 red 2 word 213213: 61 off-diagonal components, not (< and <_c): 0
+(1) Def. 6.2, D4 red 1 word 123421: 36 off-diagonal components, not (< and <_c): 0
+(1) Def. 6.2, A4 red 2 word 213243: 36 off-diagonal components, not (< and <_c): 0
+(2) H  A3 red 2 word 213213: h-components 57, not (cone shape and lowering): 0;  factorised G: 61 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H  A2 red 1 word 12121: h-components 36, not (cone shape and lowering): 0;  factorised G: 38 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H  A2 red 1 word 11211: h-components 48, not (cone shape and lowering): 0;  factorised G: 52 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H  A3 red 1 word 123131: h-components 64, not (cone shape and lowering): 0;  factorised G: 76 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H  A2 red 1 word 121121: h-components 129, not (cone shape and lowering): 0;  factorised G: 146 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H  A2 red 2 word 221122: h-components 112, not (cone shape and lowering): 0;  factorised G: 146 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H+ A2 red 1 word 121121: h-components 129, not (cone shape and lowering): 0;  factorised G: 146 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H+ A2 red 2 word 221122: h-components 112, not (cone shape and lowering): 0;  factorised G: 146 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [0s]
+(2) H+ A2 red 2 word 1221122: h-components 356, not (cone shape and lowering): 0;  factorised G: 460 off-diagonal components, not <_c: 0, not <: 0;  diagonal != prod zeta_x: 0  [1s]
+(3) A2 red 1 word 12121: 8 one-step shapes with sum(J) >= sum(I); with a non-zero hom space of the right degree: 0
+(3) A2 red 1 word 11211: 8 one-step shapes with sum(J) >= sum(I); with a non-zero hom space of the right degree: 2  e.g. [(5, [1, 5], [2, 4], 20), (5, [1, 3, 5], [2, 3, 4], 20)]
+(3) A3 red 2 word 21321: 8 one-step shapes with sum(J) >= sum(I); with a non-zero hom space of the right degree: 0
+(3) A2 red 2 word 1212: 1 one-step shapes with sum(J) >= sum(I); with a non-zero hom space of the right degree: 0
+(3) A3 red 3 word 312131: 46 one-step shapes with sum(J) >= sum(I); with a non-zero hom space of the right degree: 0
+all triangularity checks (0)-(2): OK

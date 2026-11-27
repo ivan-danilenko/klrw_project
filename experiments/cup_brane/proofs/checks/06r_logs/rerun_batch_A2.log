@@ -1,0 +1,9 @@
+$ sage -python 06_batch_G.py A 2 1 111 1 1121 1 1211 1 12121 1 11211 2 121 2 1212
+A2 red 1 word 111: cyclic False, tree d^2=0 True, unknowns 91, chain maps dim 1, G with G_0=1 exists, diagonal = z_I True, max|c| 1  [1s]
+A2 red 1 word 1121: cyclic False, tree d^2=0 True, unknowns 169, chain maps dim 1, G with G_0=1 exists, diagonal = z_I True, max|c| 1  [0s]
+A2 red 1 word 1211: cyclic False, tree d^2=0 True, unknowns 170, chain maps dim 1, G with G_0=1 exists, diagonal = z_I True, max|c| 1  [0s]
+A2 red 1 word 12121: cyclic False, tree d^2=0 True, unknowns 668, chain maps dim 1, G with G_0=1 exists, diagonal = z_I True, max|c| 1  [1s]
+A2 red 1 word 11211: cyclic False, tree d^2=0 True, unknowns 5343, chain maps dim 1, G with G_0=1 exists, diagonal = z_I True, max|c| 1  [4s]
+A2 red 2 word 121: cyclic False, tree d^2=0 True, unknowns 21, chain maps dim 6, G with G_0=1 exists, diagonal = z_I False, max|c| 1  [0s]
+A2 red 2 word 1212: cyclic False, tree d^2=0 True, unknowns 98, chain maps dim 21, G with G_0=1 exists, diagonal = z_I False, max|c| 1  [0s]
+[exit 0, 15 s]

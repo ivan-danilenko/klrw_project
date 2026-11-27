@@ -1,0 +1,10 @@
+$ sage -python 06_check_basic.py A 2 1 121 2 121 1 1212 2 1212 1 1211 2 1211 1 111 2 111
+A2 red 1 word 121: naturality of Phi_m on all states: OK (24 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+A2 red 2 word 121: naturality of Phi_m on all states: OK (24 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+A2 red 1 word 1212: naturality of Phi_m on all states: OK (144 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+A2 red 2 word 1212: naturality of Phi_m on all states: OK (144 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+A2 red 1 word 1211: naturality of Phi_m on all states: OK (144 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+A2 red 2 word 1211: naturality of Phi_m on all states: OK (144 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+A2 red 1 word 111: naturality of Phi_m on all states: OK (24 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+A2 red 2 word 111: naturality of Phi_m on all states: OK (24 identities); z central: True; d_Phi^2 = 0: True; tree d^2 = 0: True
+[exit 0, 9 s]

@@ -1,0 +1,7 @@
+n = 2 vertices: 1 recursive trees, identity holds exactly
+n = 3 vertices: 2 recursive trees, identity holds exactly
+n = 4 vertices: 6 recursive trees, identity holds exactly
+n = 5 vertices: 24 recursive trees, identity holds exactly
+n = 6 vertices: 120 recursive trees, identity holds exactly
+n = 7 vertices: 720 recursive trees, identity holds exactly
+Lemma 6.7 checked on 874 rooted trees (all shapes with <= 7 vertices): OK

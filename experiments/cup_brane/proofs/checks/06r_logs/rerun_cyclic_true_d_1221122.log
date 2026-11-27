@@ -1,0 +1,4 @@
+$ run_case(A2, red 1, 1221122) into the scratchpad (= 06_cyclic_true_d.py A 2 1 1221122 without overwriting 06_data), compared with 06_data/A2__W1_1221122.json
+differential closes
+terms 690 stored 690 identical: True with dots 7
+[('r_2*t_2_1', 490, 440, 50), ('r_2^2*t_2_1^2', 42, 40, 2), ('r_1*t_1_2', 610, 520, 90), ('r_1*r_2*t_1_2*t_2_1', 58, 58, 0), ('r_1*r_2^2*t_1_2*t_2_1^3', 4, 4, 0), ('r_1*r_2^2*t_1_2^2*t_2_1^2', 3, 3, 0), ('r_1*r_2^3*t_1_2*t_2_1^3', 2, 2, 0), ('r_1^2*r_2^2*t_1_2^2*t_2_1^2', 2, 2, 0)]

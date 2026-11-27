@@ -1,0 +1,60 @@
+stored: d_X 690 terms (d^2=0: True), d_X' 690 terms (d^2=0: True), d_F 692 terms (d^2=0: True)
+d_X = d_X' in all components: True
+terms with dots: d_X 1, d_F 0
+d_X vs d_F: 9 components differ
+(1) division with h+: divisible in all components: True (153 components, 0 not divisible)  [59s]
+    quotient cube d^2 = 0: True
+    terms with dots in the quotient: 1
+    quotient vs d_X (04_data): 0 components differ
+    quotient vs d_X' (R04_data dotted): 0 components differ
+    quotient vs d_F (R04_data dot-free): 9 components differ
+    {4,6,7} -> {2,3}:
+        quotient  sigma (2 7)(3 6)             (-1) * t_2_1^2 * r_2^2
+        d_F       sigma (2 7)(3 6)             (-1) * t_2_1^2 * r_2^2
+        d_F       sigma (1 5 4)(2 7)(3 6)      (-1) * t_2_1^2 * r_2^2
+    {4,6,7} -> {1,3}:
+        d_F       sigma (1 5 4)(2 7)(3 6)      t_2_1^2 * r_2^2
+    {1,4,6,7} -> {1,2,3}:
+        quotient  sigma (2 7)(3 6)             (-1) * t_2_1^2 * r_2^2
+        d_F       sigma (2 7)(3 6)             (-1) * t_2_1^2 * r_2^2
+        d_F       sigma (1 5 4)(2 7)(3 6)      (-1) * t_2_1^2 * r_2^2
+    {2,4,6,7} -> {1,2,3}:
+        d_F       sigma (1 5 4)(2 7)(3 6)      (-1) * t_2_1^2 * r_2^2
+    {4,5,6,7} -> {1,3,5}:
+        d_F       sigma (1 4 5)(2 7)(3 6)      (-1) * t_2_1^2 * r_2^2
+    {4,5,6,7} -> {2,3,5}:
+        quotient  sigma (2 7)(3 6)             t_2_1^2 * r_2^2
+        d_F       sigma (2 7)(3 6)             t_2_1^2 * r_2^2
+        d_F       sigma (1 4 5)(2 7)(3 6)      t_2_1^2 * r_2^2
+    {4,5,6,7} -> {1,2,3}:
+        quotient  sigma (1 4)(2 6 3 7)         t_1_2 * r_1 * t_2_1^3 * r_2^3
+        quotient  sigma (1 5 4)(2 7)(3 6)      (-1) * t_2_1^2 * t_1_2^2 * r_2^2 * r_1^2
+        quotient  sigma (1 4)(2 7 3 6)         (-1) * t_1_2 * r_1 * t_2_1^3 * r_2^3
+        quotient  sigma (1 4)(2 7)(3 6)        (-1) * t_1_2 * r_1 * t_2_1^2 * r_2^2 * (t_1_2*x_1_1 + t_1_2*x_1_2 + 2*t_1_2*x_1_3 + t_2_1*x_2_1 + t_2_1*x_2_2 + t_2_1*x_2_3 + t_2_1*x_2_4)
+        d_F       sigma (1 4)(2 6 3 7)         t_1_2 * r_1 * t_2_1^3 * r_2^3
+        d_F       sigma (1 4)(2 7 3 6)         (-1) * t_1_2 * r_1 * t_2_1^3 * r_2^3
+        d_F       sigma (1 4 5)(2 7)(3 6)      t_2_1^2 * t_1_2^2 * r_2^2 * r_1^2
+        d_F       sigma (1 5 4)(2 7)(3 6)      (-1) * t_2_1^2 * t_1_2^2 * r_2^2 * r_1^2
+    {1,4,5,6,7} -> {1,2,3,5}:
+        quotient  sigma (2 7)(3 6)             t_2_1^2 * r_2^2
+        d_F       sigma (2 7)(3 6)             t_2_1^2 * r_2^2
+        d_F       sigma (1 4 5)(2 7)(3 6)      t_2_1^2 * r_2^2
+    {2,4,5,6,7} -> {1,2,3,5}:
+        d_F       sigma (1 4 5)(2 7)(3 6)      t_2_1^2 * r_2^2
+    quotient vs the tree formula: 1 components differ
+    {4,5,6,7} -> {1,2,3}:
+        quotient  sigma (1 4)(2 6 3 7)         t_1_2 * r_1 * t_2_1^3 * r_2^3
+        quotient  sigma (1 5 4)(2 7)(3 6)      (-1) * t_2_1^2 * t_1_2^2 * r_2^2 * r_1^2
+        quotient  sigma (1 4)(2 7 3 6)         (-1) * t_1_2 * r_1 * t_2_1^3 * r_2^3
+        quotient  sigma (1 4)(2 7)(3 6)        (-1) * t_1_2 * r_1 * t_2_1^2 * r_2^2 * (t_1_2*x_1_1 + t_1_2*x_1_2 + 2*t_1_2*x_1_3 + t_2_1*x_2_1 + t_2_1*x_2_2 + t_2_1*x_2_3 + t_2_1*x_2_4)
+(2) iterated division (k = 1..7): non-divisible steps: none; equal to the one-step quotient: True  [87s]
+(3) division with h' = h+ - zeta_7 h_g: divisible: True; d^2 = 0: True; vs d_F: 0 components differ; vs d_X: 9  [88s]
+    (divide_with(h+) = 06_divide.divide: True)
+(4) (1 + h_g) d_quotient (1 - h_g) = d_quotient': True   (h_g^2 = 0: True)
+(5) h+: 132 off-diagonal components; with sum(J) >= sum(I): 0; not colex-smaller: 0
+(5) h': 132 off-diagonal components; with sum(J) >= sum(I): 0; not colex-smaller: 0
+(6) red 1: stored solver differential d_s: d^2 = 0: True; terms with dots: 1; = quotient of the division with h+: True
+    h_g homogeneous of degree 0 for red 1: True; d_F1 := (1+h_g) d_s (1-h_g): d^2 = 0: True; terms with dots: 0
+    division with h+ - zeta_7 h_g: divisible: True; quotient = d_F1: True
+    terms of d_F1 outside the tree formula: 12; the same as those of d_F (red 2): True
+[178s]

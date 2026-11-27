@@ -1,0 +1,5 @@
+$ sage -python 06_check_minuscule.py D 5 1
+minuscule word 12345321 multiplicities [1, 1, 2, 2, 2]
+D5 red 1 word 12345321: 500 components of G, d_Phi G = G d_tree: OK   [8s]
+D5 red 1 word 12345321: cyclic False, steps OK: YYYYYYYY   [3s]
+[exit 0, 18 s]

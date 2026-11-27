@@ -1,0 +1,8 @@
+$ sage -python 06_solve_step.py A 2 1 12121
+type ['A', 2] red 1 word 12121
+step 1: unknowns 192, equations 1218, solution space dim 1 (mod p), homotopy unknowns 0, solution with G_empty=1: 32 terms, max |c| 1
+step 2: unknowns 192, equations 1218, solution space dim 1 (mod p), homotopy unknowns 0, solution with G_empty=1: 32 terms, max |c| 1
+step 3: unknowns 340, equations 1886, solution space dim 1 (mod p), homotopy unknowns 0, solution with G_empty=1: 56 terms, max |c| 1
+step 4: unknowns 290, equations 1444, solution space dim 1 (mod p), homotopy unknowns 0, solution with G_empty=1: 58 terms, max |c| 1
+step 5: unknowns 255, equations 1040, solution space dim 1 (mod p), homotopy unknowns 0, solution with G_empty=1: 120 terms, max |c| 1
+[exit 0, 9 s]

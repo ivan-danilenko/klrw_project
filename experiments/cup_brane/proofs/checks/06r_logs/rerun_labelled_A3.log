@@ -1,0 +1,4 @@
+$ sage -python 06_check_labelled.py A 3 2 21321
+(a) independence of the reduced word: 60 OK; (b) product rule: 60 OK; (c) dots slide: 300 OK
+(d) psi-expansion of the tree terms: 93 terms OK
+[exit 0, 10 s]

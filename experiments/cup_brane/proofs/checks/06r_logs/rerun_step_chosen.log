@@ -1,0 +1,9 @@
+$ sage -python 06_check_step_formula.py A 3 1 111 1 1211 1 1121 1 12121 1 11211 1 121121 1 123131
+A3 red 1 word 111: cyclic False, steps OK: YYY   [0s]
+A3 red 1 word 1211: cyclic False, steps OK: YYYY   [0s]
+A3 red 1 word 1121: cyclic False, steps OK: YYYY   [0s]
+A3 red 1 word 12121: cyclic False, steps OK: YYYYY   [0s]
+A3 red 1 word 11211: cyclic False, steps OK: YYYYY   [1s]
+A3 red 1 word 121121: cyclic False, steps OK: YYYYYY   [3s]
+A3 red 1 word 123131: cyclic False, steps OK: YYYYYY   [1s]
+[exit 0, 14 s]

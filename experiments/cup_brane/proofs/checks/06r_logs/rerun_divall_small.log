@@ -1,0 +1,5 @@
+$ sage -python 06_divide_all.py A 2 1 12121 1 1211 2 2112 plus
+A2 red 1 word 12121: cyclic False; steps with non-divisible components: none; d^2 = 0: True; components different from the tree formula: 0  [3s]
+A2 red 1 word 1211: cyclic False; steps with non-divisible components: none; d^2 = 0: True; components different from the tree formula: 0  [0s]
+A2 red 2 word 2112: cyclic False; steps with non-divisible components: none; d^2 = 0: True; components different from the tree formula: 0  [0s]
+[exit 0, 10 s]

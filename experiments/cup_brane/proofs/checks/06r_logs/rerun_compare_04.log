@@ -1,0 +1,4 @@
+$ sage -python 06_compare_04.py
+stored differential of 04: d^2 = 0: True
+components in which the division differential differs from the stored one: 0
+[exit 0, 114 s]

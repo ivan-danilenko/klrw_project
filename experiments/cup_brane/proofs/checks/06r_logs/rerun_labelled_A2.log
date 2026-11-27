@@ -1,0 +1,3 @@
+$ sage -python 06_check_labelled.py A 2 1 12121
+(a) independence of the reduced word: 60 OK; (b) product rule: 60 OK; (c) dots slide: 300 OK
+[exit 0, 15 s]

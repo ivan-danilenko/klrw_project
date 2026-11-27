@@ -1,0 +1,6 @@
+$ sage -python 06_check_factorisation.py A 3 2 2132 2 21321 2 213213 1 132132
+A3 red 2 word 2132: composite of one-step maps = closed formula for G: True
+A3 red 2 word 21321: composite of one-step maps = closed formula for G: True
+A3 red 2 word 213213: composite of one-step maps = closed formula for G: True
+A3 red 1 word 132132: composite of one-step maps = closed formula for G: True
+[exit 0, 9 s]
