@@ -16,6 +16,13 @@
   `groups.log` (every group zero, incl. Identity N words), `adjfine.log`, `star_small.log`,
   `star_A2.log` ((★) zero on all H1 words; non-zero on the cyclic control `1221122`),
   `groups_H2.log`, `star_H2.log` (H2 words: (★) holds; groups do not close).
+* **PHASE 2 (coordinator, after commit of §§0–8): hanging forests, target H3 / minuscule.**
+  Plan: (a) structure of the hanging forests: a pair hangs from the root iff `a_p < c_1 < b_p`
+  (then it hangs from the arc containing `b_p`, connector the left end of that arc, `ε_p = +1`);
+  adjacent/colour-`c` pairs above `c_1` must not contain a chain element — so the forest
+  coefficient does not depend on the chain; (b) test a compact form "chains + fixed forest"
+  (§9); (c) enumerate the last steps of minuscule chain words with multiplicities `≤ 3`
+  (03 Lemma 2.12) (§10); (d) compute grouped (★) on `A_5 ω_3`, `D_5 ω_5` prefixes.
 * **§7 (H2–H4) and §8 (Status) written.** Next steps for a successor: (1) prove Identity N by
   extending Prop. 5.3 to nested families (the configurations `(F,a)` combine by component,
   `07_adjfine.py`); (2) find a compact form for chains *with* hanging forests (§7.2.1) — the key

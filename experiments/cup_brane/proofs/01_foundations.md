@@ -6,17 +6,7 @@ Notation is that of `PROOFS.md` §1 and `NOTES.md` §2. Products are read left t
 `a·b` = first `a`, then `b`. The sections are in the order of priority B, D, A, E, C, F;
 section S is the Status.
 
-**REVISION NOTES** (revision after `R01_referee.md`; applied / remaining)
-
-* R1 status of "A.1 = klrw": **applied** (§A.2; Status updated at the end)
-* R2 hand proof of (A6) in the polynomial representation: **applied** (Prop. A.3)
-* R3 algebras without red strand; generality of A.5/E.1; two red strands: **applied** (Def. A.1′,
-  Remark A.5′; §D now argues in the given algebra and needs no (F1))
-* §D without (F1): (c,c,c) case of D.3 by direct computation, D.5 via the flip: **applied**
-* C1 Artin's lemma: **applied**; C2 side of `y` in pattern S: **applied**; C3 Webster Prop. 2.23:
-  **applied**; C4 KL I over ℤ: **applied**; C5 KKK items: **applied**; C6 E.1 in D.5: **applied**
-* Rouquier route (Remark A.5″), non-faithfulness of `V` at `r = 0`, `t = 0`, `u = 0` (A.5(iv)): **applied**
-* re-run checks, update Status: **applied** (Status rewritten; re-runs below)
+*Revised after `R01_referee.md`.*
 
 **Headline results.**
 

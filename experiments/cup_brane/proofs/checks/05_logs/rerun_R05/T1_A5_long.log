@@ -17,3 +17,5 @@ T1 checks passed for 120 words of type ['A', 5]
    products with 1 double crossings              104
    products with 2 double crossings              12
    tree terms                                    165807
+exit code 0
+wall time 591 s

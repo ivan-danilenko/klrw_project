@@ -328,12 +328,13 @@ reduced word — Lemma 6.2 below for colour multiplicities `≤ 2` — this is a
 braids of `klrw` (Definition B.10 of `01_foundations.md`, the definition of `β` used in all
 computations) satisfy the convention **for every word**: the basis braid of a bijection `π` of
 `n` positions is the insertion-sort word `w(π) = ∏_{p=1}^{n} (p−1, …, p−ℓ_p)`,
-`ℓ_p = #\{p' < p : π(p') > π(p)\}`. A strand fixed at the far left (`p = 1`, `π(1) = 1`) has
-`ℓ_1 = 0` and is counted in no other `ℓ_p` (it ends to the left of every strand), so the other
-factors are those of `w(π)` with every letter raised by 1: `w(ι_L π) = ι_L w(π)`. A strand
-fixed at the far right (`p = n+1`, `π(n+1) = n+1`) is processed last, with `ℓ_{n+1} = 0`, and does
-not change the earlier factors: `w(ι_R π) = w(π)`, read from the larger state, `= ι_R w(π)`. In
-cases 1 and (α) the strand of `m` is such a fixed strand (at `−m`, resp. `+m`).
+`ℓ_p = #\{p' < p : π(p') > π(p)\}`. In `ι_L π` (on `n+1` positions) the new strand is at `p = 1`
+and fixed; it has `ℓ_1 = 0` and is counted in no other `ℓ_p` (it ends to the left of every
+strand), so for `p ≥ 2` the factor of `p` is the factor of `p−1` in `w(π)` with every letter
+raised by 1: `w(ι_L π) = ι_L w(π)`. In `ι_R π` the new strand is at `p = n+1` and fixed; it is
+processed last, with `ℓ_{n+1} = 0`, and the earlier factors are those of `w(π)`:
+`w(ι_R π) = w(π)`, read from the larger state, i.e. `ι_R w(π)`. In cases 1 and (α) the strand of
+`m` is such a fixed strand (at `−m`, the leftmost position, resp. `+m`, the rightmost).
 (`05_cone.py` confirms this numerically.)
 
 Let `d'_{I',J'} ∈ e_{I'} A' e_{J'}` be the components of the tree differential of `w'`, and
